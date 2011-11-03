@@ -51,9 +51,12 @@
 <!--
     <target name="-pre-build">
     </target>
-    <target name="-pre-compile">
+-->
+	<!-- Compile the aXMLRPC into a jar file to use as library. -->
+	<target name="-pre-compile">
+		<ant dir="aXMLRPC" target="jar"/>
     </target>
-
+<!--
     /* This is typically used for code obfuscation.
        Compiled code location: ${out.classes.absolute.dir}
        If this is not done in place, override ${out.dex.input.absolute.dir} */
