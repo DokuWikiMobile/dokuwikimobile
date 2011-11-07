@@ -1,0 +1,28 @@
+package de.timroes.dokuapp.content;
+
+import java.util.Date;
+
+/**
+ *
+ * @author Tim Roes
+ */
+public class PageInfo {
+
+	private String name;
+	private Date lastModified;
+	private String author;
+	private int version;
+
+	public PageInfo(String name, Date lastModified, String author, int version) {
+		this.name = name;
+		this.lastModified = lastModified;
+		this.author = author;
+		this.version = version;
+	}
+
+	@Override
+	public String toString() {
+		return "PageInfo [" + name + "," + lastModified + "," + author + "," + version + "]";
+	}
+
+}
