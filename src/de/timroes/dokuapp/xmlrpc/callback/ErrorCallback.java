@@ -1,4 +1,4 @@
-package de.timroes.dokuapp.services.callback;
+package de.timroes.dokuapp.xmlrpc.callback;
 
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
@@ -7,11 +7,7 @@ import de.timroes.axmlrpc.XMLRPCServerException;
  *
  * @author Tim Roes
  */
-public interface DokuwikiCallback {
-
-	public void onPageLoaded(String pageHtml, long id);
-
-	public void onLogin(boolean succeeded, long id);
+public interface ErrorCallback {
 
 	public void onError(XMLRPCException error, long id);
 

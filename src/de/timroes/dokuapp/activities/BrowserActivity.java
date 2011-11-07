@@ -2,6 +2,7 @@ package de.timroes.dokuapp.activities;
 
 import android.os.Bundle;
 import android.webkit.WebView;
+import android.widget.Toast;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.dokuapp.R;
@@ -33,22 +34,12 @@ public class BrowserActivity extends DokuwikiActivity {
 
 	private synchronized void displayPage(String pagename) {
 		// blabbla show loading stuff
-		service.getPage(pagename, this);
+		service.getPage(this, pagename);
+		Toast.makeText(this, "displayPage", Toast.LENGTH_SHORT).show();
 	}
 
-	@Override
-	public void onPageLoaded(String pageHtml, long id) {
-		super.onPageLoaded(pageHtml, id);
-	}
-
-	@Override
-	public void onError(XMLRPCException error, long id) {
-		super.onError(error, id);
-	}
-
-	@Override
-	public void onServerError(XMLRPCServerException error, long id) {
-		super.onServerError(error, id);
+	public void onServerErrorCallback(XMLRPCServerException error, long id) {
+		Toast.makeText(this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
 	}
 
 
