@@ -4,13 +4,9 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import de.timroes.axmlrpc.XMLRPCCallback;
-import de.timroes.axmlrpc.XMLRPCException;
-import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.dokuapp.Settings;
+import de.timroes.dokuapp.services.DokuwikiClientCallbacks.CallType;
 import de.timroes.dokuapp.services.callback.DokuwikiCallback;
-import de.timroes.dokuapp.services.callback.OnErrorListener;
-import de.timroes.dokuapp.services.callback.OnPageLoadedListener;
 import de.timroes.dokuapp.xmlrpc.DokuwikiClient;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,6 +20,7 @@ import java.util.logging.Logger;
 public class DokuwikiService extends Service {
 
 	private DokuwikiBinder binder = new DokuwikiBinder();
+	private DokuwikiClientCallbacks callbacks = new DokuwikiClientCallbacks();
 	private DokuwikiClient client;
 
 	/**
@@ -46,7 +43,7 @@ public class DokuwikiService extends Service {
 
 		try {
 			String userAgent = getPackageName();
-			client = new DokuwikiClient(new URL(Settings.XMLRPC_URL), userAgent, pageCallback);
+			client = new DokuwikiClient(new URL(Settings.XMLRPC_URL), userAgent, callbacks);
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(DokuwikiService.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -58,25 +55,14 @@ public class DokuwikiService extends Service {
 		return binder;
 	}
 
-	public long getPage(String pagename, DokuwikiCallback callback) {;
+	public long getPage(String pagename, DokuwikiCallback callback) {
 		long id = client.getPageHTML(pagename);
-		return id;
+		return callbacks.addRequest(id, CallType.PAGE, callback);
 	}
 
-	private XMLRPCCallback pageCallback = new XMLRPCCallback() {
-
-		public void onResponse(long id, Object result) {
-			throw new UnsupportedOperationException("Not supported yet.");
-		}
-
-		public void onError(long id, XMLRPCException error) {
-			throw new UnsupportedOperationException("Not supported yet.");
-		}
-
-		public void onServerError(long id, XMLRPCServerException error) {
-			throw new UnsupportedOperationException("Not supported yet.");
-		}
-
-	};
+	public long login(String username, String password, DokuwikiCallback callback) {
+		long id = client.login(username, password);
+		return callbacks.addRequest(id, CallType.LOGIN, callback);
+	}
 
 }

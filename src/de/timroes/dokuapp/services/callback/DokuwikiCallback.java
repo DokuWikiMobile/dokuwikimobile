@@ -1,7 +1,7 @@
 package de.timroes.dokuapp.services.callback;
 
-import de.timroes.dokuapp.exceptions.DokuwikiError;
-import de.timroes.dokuapp.exceptions.DokuwikiServerError;
+import de.timroes.axmlrpc.XMLRPCException;
+import de.timroes.axmlrpc.XMLRPCServerException;
 
 /**
  *
@@ -11,8 +11,10 @@ public interface DokuwikiCallback {
 
 	public void onPageLoaded(String pageHtml, long id);
 
-	public void onError(DokuwikiError error, long id);
+	public void onLogin(boolean succeeded, long id);
 
-	public void onServerError(DokuwikiServerError error, long id);
+	public void onError(XMLRPCException error, long id);
+
+	public void onServerError(XMLRPCServerException error, long id);
 
 }

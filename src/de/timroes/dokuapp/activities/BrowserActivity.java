@@ -2,10 +2,10 @@ package de.timroes.dokuapp.activities;
 
 import android.os.Bundle;
 import android.webkit.WebView;
+import de.timroes.axmlrpc.XMLRPCException;
+import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.dokuapp.R;
 import de.timroes.dokuapp.Settings;
-import de.timroes.dokuapp.exceptions.DokuwikiError;
-import de.timroes.dokuapp.exceptions.DokuwikiServerError;
 
 public class BrowserActivity extends DokuwikiActivity {
 
@@ -42,12 +42,12 @@ public class BrowserActivity extends DokuwikiActivity {
 	}
 
 	@Override
-	public void onError(DokuwikiError error, long id) {
+	public void onError(XMLRPCException error, long id) {
 		super.onError(error, id);
 	}
 
 	@Override
-	public void onServerError(DokuwikiServerError error, long id) {
+	public void onServerError(XMLRPCServerException error, long id) {
 		super.onServerError(error, id);
 	}
 

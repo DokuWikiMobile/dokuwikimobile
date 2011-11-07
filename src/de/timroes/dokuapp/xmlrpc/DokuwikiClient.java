@@ -2,19 +2,24 @@ package de.timroes.dokuapp.xmlrpc;
 
 import de.timroes.axmlrpc.XMLRPCCallback;
 import de.timroes.axmlrpc.XMLRPCClient;
-import de.timroes.axmlrpc.XMLRPCException;
-import de.timroes.dokuapp.content.PageInfo;
 import java.net.URL;
-import java.util.Date;
-import java.util.Map;
 
 /**
- *
+ * This client is responsible for direct communication with the server.
+ * It is the only part of the application that has access to the XML-RPC interface 
+ * of the server via the aXMLRPC client. 
+ * 
+ * It has a method for every possible method call the server understand.
+ * 
+ * The method calls will be handled asynchronously. The methods return an id for
+ * the call. When the call finished the XMLRPCCallback listener, that has been
+ * passed in the constructor, will be called with either the error message
+ * or the response from the server.
+ * 
  * @author Tim Roes
  */
 public class DokuwikiClient {
 
-	public enum CallType { LOGIN, PAGE };
 
 	private XMLRPCClient client;
 	private XMLRPCCallback listener;
@@ -38,15 +43,6 @@ public class DokuwikiClient {
 
 	public long getPageHTML(String pagename) {
 		return client.callAsync(listener, "wiki.getPageHTML", pagename);
-	}
-
-	public PageInfo getPageInfo(String pagename) throws XMLRPCException {
-		Map<String,Object> infos = (Map<String,Object>)client.call("wiki.getPageInfo", pagename);
-		return new PageInfo(
-				(String)infos.get("name"),
-				(Date)infos.get("lastModified"),
-				(String)infos.get("author"),
-				(Integer)infos.get("version"));
 	}
 
 }

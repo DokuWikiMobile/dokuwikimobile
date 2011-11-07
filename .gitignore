@@ -1,5 +1,5 @@
 lib/
 bin/
 gen/
-nbandroid/private.properties
 local.properties
+nbandroid/

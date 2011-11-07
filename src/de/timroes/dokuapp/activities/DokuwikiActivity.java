@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import de.timroes.axmlrpc.XMLRPCException;
+import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.dokuapp.exceptions.DokuwikiError;
 import de.timroes.dokuapp.exceptions.DokuwikiServerError;
 import de.timroes.dokuapp.services.DokuwikiService;
@@ -63,10 +65,12 @@ public abstract class DokuwikiActivity extends Activity implements DokuwikiCallb
 		return service != null;
 	}
 
-	public void onError(DokuwikiError error, long id) { }
+	public void onError(XMLRPCException error, long id) { }
+
+	public void onServerError(XMLRPCServerException error, long id) { }
 
 	public void onPageLoaded(String pageHtml, long id) { }
 
-	public void onServerError(DokuwikiServerError error, long id) { }
+	public void onLogin(boolean succeeded, long id) { }
 
 }
