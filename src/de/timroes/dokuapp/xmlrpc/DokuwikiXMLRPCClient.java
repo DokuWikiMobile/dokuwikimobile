@@ -44,15 +44,35 @@ public class DokuwikiXMLRPCClient {
 		return callbackHandler.addCallback(id, callback);
 	}
 
+	/**
+	 * This inner class handles all the asynchronous callbacks from the server.
+	 * Whenever a call is made to the server, the callback must be registered
+	 * at the handler with the id.
+	 */
 	private class CallbackHandler implements XMLRPCCallback {
 
 		private Map<Long, ErrorCallback> callbacks = new HashMap<Long, ErrorCallback>();
 
+		/**
+		 * Add a callback to the handler, that will be informed when the
+		 * server response or error has been returned.
+		 * 
+		 * @param id The id for the request.
+		 * @param callback The callback to be called.
+		 * @return The id is passed through for further usage.
+		 */
 		public long addCallback(long id, ErrorCallback callback) {
 			callbacks.put(id, callback);
 			return id;
 		}
 
+		/**
+		 * Will be called when the server responded successfully. The returned
+		 * object is passed together with the id generated from the request.
+		 * 
+		 * @param id The id of the request.
+		 * @param result The server response.
+		 */
 		public void onResponse(long id, Object result) {
 			
 			ErrorCallback callback = callbacks.remove(id);
@@ -65,10 +85,22 @@ public class DokuwikiXMLRPCClient {
 
 		}
 
+		/**
+		 * Will be called whenever an error occurs.
+		 * 
+		 * @param id The id of the request.
+		 * @param error The error occured.
+		 */
 		public void onError(long id, XMLRPCException error) {
 			callbacks.remove(id).onError(error, id);
 		}
 
+		/**
+		 * Will be called whenever the server returns an error.
+		 * 
+		 * @param id The id of the request.
+		 * @param error The error returned by the server.
+		 */
 		public void onServerError(long id, XMLRPCServerException error) {
 			callbacks.remove(id).onServerError(error, id);
 		}

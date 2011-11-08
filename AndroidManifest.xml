@@ -13,6 +13,8 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		<activity android:name=".activities.dialogs.LoginDialog"
+				android:theme="@android:style/Theme.Dialog"/>
 		<service android:name=".services.DokuwikiService"
 			android:exported="false" />
 	</application>
