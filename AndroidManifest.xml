@@ -14,8 +14,9 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".activities.dialogs.LoginDialog"
-				android:theme="@android:style/Theme.Dialog"/>
+				android:theme="@android:style/Theme.Dialog"
+				android:excludeFromRecents="true"/>
 		<service android:name=".services.DokuwikiService"
-			android:exported="false" />
+			android:exported="false"/>
 	</application>
 </manifest> 

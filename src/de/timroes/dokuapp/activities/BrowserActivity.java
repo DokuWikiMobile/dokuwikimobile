@@ -7,6 +7,7 @@ import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.dokuapp.DokuwikiConstants;
 import de.timroes.dokuapp.R;
 import de.timroes.dokuapp.Settings;
+import de.timroes.dokuapp.services.DokuwikiService;
 
 public class BrowserActivity extends DokuwikiActivity {
 
@@ -21,19 +22,14 @@ public class BrowserActivity extends DokuwikiActivity {
 	}
 
 	@Override
-	protected void onServiceBound() {
-		super.onServiceBound();
+	public void onServiceBound(DokuwikiService service) {
+		super.onServiceBound(service);
 		displayPage(Settings.HOME);
-	}
-
-	@Override
-	protected void onServiceUnbound() {
-		super.onServiceUnbound();
 	}
 
 	private synchronized void displayPage(String pagename) {
 		// blabbla show loading stuff
-		service.getPage(this, pagename);
+		connector.getService().getPage(this, pagename);
 		Toast.makeText(this, "displayPage", Toast.LENGTH_SHORT).show();
 	}
 

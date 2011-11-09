@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BrowserActivity</string>
+
+	<string name="ok">OK</string>
+	<string name="cancel">Cancel</string>
+	<!-- Login Dialog -->
 	<string name="pleaselogin">Please Login</string>
+	<string name="username">Username</string>
+	<string name="password">Password</string>
+	<string name="savelogin">Save login data</string>
+	<string name="login">Login</string>
+	<string name="notrecommended">Not recommended</string>
+	<string name="nocachewithoutlogin">Intelligent caching might not work propably with this disabled. Disable anyway?</string>
+	<string name="loggingin">Logging in...</string>
+	<string name="loginwrong">The username or password is wrong.</string>
+	<string name="loginfailed">An error occured. Please try again.</string>
 </resources>

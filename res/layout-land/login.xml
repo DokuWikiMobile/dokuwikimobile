@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    	android:orientation="vertical"
+	    android:layout_width="fill_parent"
+    	android:layout_height="fill_parent">
+	<TableLayout android:stretchColumns="1"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+		<TableRow>
+			<TextView android:text="@string/username"
+					android:gravity="right"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"/>
+			<EditText android:id="@+id/username"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"/>
+		</TableRow>
+		<TableRow>
+			<TextView android:text="@string/password"
+					android:gravity="right"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"/>
+			<EditText android:id="@+id/password"
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"/>
+		</TableRow>
+	</TableLayout>
+</LinearLayout>
