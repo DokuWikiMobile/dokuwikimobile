@@ -16,6 +16,7 @@ import android.widget.Toast;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.dokuapp.R;
+import de.timroes.dokuapp.manager.PasswordManager;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 
 /**
@@ -127,13 +128,15 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 
 		if(succeeded) {
 			if(((CheckBox)findViewById(R.id.savelogin)).isChecked()) {
-				// Save login data
+				// Save user login data
+				PasswordManager.get(context).saveLoginData(
+						((EditText)findViewById(R.id.username)).getText().toString(),
+						((EditText)findViewById(R.id.password)).getText().toString());
 			}
 			dismiss();
 		} else {
 			handler.sendMessage(handler.obtainMessage(SHOW_TOAST, R.string.loginwrong, Toast.LENGTH_SHORT));
 		}
-
 		
 	}
 

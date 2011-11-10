@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import de.timroes.dokuapp.Settings;
+import de.timroes.dokuapp.manager.PasswordManager;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 import de.timroes.dokuapp.xmlrpc.callback.PageLoadedCallback;
@@ -42,7 +43,8 @@ public class DokuwikiService extends Service {
 
 		try {
 			String userAgent = getPackageName();
-			client = new DokuwikiXMLRPCClient(new URL(Settings.XMLRPC_URL), userAgent);
+			client = new DokuwikiXMLRPCClient(new URL(Settings.XMLRPC_URL), 
+					PasswordManager.get(this), userAgent);
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(DokuwikiService.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -60,6 +62,10 @@ public class DokuwikiService extends Service {
 
 	public long login(LoginCallback callback, String username, String password) {
 		return client.login(callback, username, password);
+	}
+
+	public void logout() {
+		client.logout();
 	}
 
 }

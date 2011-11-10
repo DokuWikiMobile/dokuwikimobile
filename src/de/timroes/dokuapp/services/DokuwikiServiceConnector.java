@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import de.timroes.dokuapp.activities.dialogs.DokuwikiDialog;
 import de.timroes.dokuapp.services.DokuwikiService.DokuwikiBinder;
 
 /**
