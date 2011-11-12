@@ -4,15 +4,17 @@ import de.timroes.axmlrpc.XMLRPCCallback;
 import de.timroes.axmlrpc.XMLRPCClient;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
+import de.timroes.dokuapp.content.Page;
+import de.timroes.dokuapp.content.PageInfo;
 import de.timroes.dokuapp.manager.PasswordManager;
 import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
-import de.timroes.dokuapp.xmlrpc.callback.PageLoadedCallback;
+import de.timroes.dokuapp.xmlrpc.callback.PageInfoCallback;
+import de.timroes.dokuapp.services.PageLoadedListener;
+import de.timroes.dokuapp.xmlrpc.callback.PageHtmlCallback;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This client is responsible for direct communication with the server.
@@ -34,6 +36,12 @@ public final class DokuwikiXMLRPCClient {
 
 	private final static String CALL_LOGIN ="dokuwiki.login";
 	private final static String CALL_GETPAGEHTML = "wiki.getPageHTML";
+	private final static String CALL_PAGE_INFO = "wiki.getPageInfo";
+
+	private final static String KEY_PAGE_NAME = "name";
+	private final static String KEY_LAST_MODIFIED = "lastModified";
+	private final static String KEY_AUTHOR = "author";
+	private final static String KEY_VERSION = "version";
 
 	private XMLRPCClient client;
 	private CallbackHandler callbackHandler = new CallbackHandler();
@@ -51,14 +59,20 @@ public final class DokuwikiXMLRPCClient {
 		return callbackHandler.addCallback(id, callback, CALL_LOGIN, new Object[]{ username, password });
 	}
 
-	public long getPageHTML(PageLoadedCallback callback, String pagename) {
+	public long getPageHTML(PageHtmlCallback callback, String pagename) {
 		long id = client.callAsync(callbackHandler, CALL_GETPAGEHTML, pagename);
 		return callbackHandler.addCallback(id, callback, CALL_GETPAGEHTML, new Object[]{ pagename });
+	}
+
+	public long getPageInfo(PageInfoCallback callback, String pagename) {
+		long id = client.callAsync(callbackHandler, CALL_PAGE_INFO, pagename);
+		return callbackHandler.addCallback(id, callback, CALL_PAGE_INFO, new Object[]{ pagename });
 	}
 
 	public void logout() {
 		passManager.clearLoginData();
 		client.clearCookies();
+		isLoggedin = false;
 	}
 
 	/**
@@ -85,6 +99,8 @@ public final class DokuwikiXMLRPCClient {
 		/**
 		 * Will be called when the server responded successfully. The returned
 		 * object is passed together with the id generated from the request.
+		 * To get the type the result has, the original callback methodname
+		 * is checked.
 		 * 
 		 * @param id The id of the request.
 		 * @param result The server response.
@@ -94,10 +110,22 @@ public final class DokuwikiXMLRPCClient {
 			CallbackHistory.Entry call = history.remove(id);
 
 			if(CALL_LOGIN.equals(call.methodName)) {
+				// dokuwiki.login returned
 				isLoggedin = (Boolean)result;
 				((LoginCallback)call.callback).onLogin((Boolean)result, id);
 			} else if(CALL_GETPAGEHTML.equals(call.methodName)) {
-				((PageLoadedCallback)call.callback).onPageLoaded((String)result, id);
+				// getPageHTML returned
+				Page p = new Page((String)call.params[0], (String)result);
+				((PageLoadedListener)call.callback).onPageLoaded(p, id);
+			} else if(CALL_PAGE_INFO.equals(call.methodName)) {
+				// getPageInfo returned
+				Map<String,Object> infos = (Map<String,Object>)result;
+				PageInfo pi = new PageInfo(
+						(String)infos.get(KEY_PAGE_NAME),
+						(Date)infos.get(KEY_LAST_MODIFIED),
+						(String)infos.get(KEY_AUTHOR),
+						(Integer)infos.get(KEY_VERSION));
+				((PageInfoCallback)call.callback).onPageInfoLoaded(pi, id);
 			}
 
 		}

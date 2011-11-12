@@ -60,6 +60,12 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 	public LoginDialog(Context context, boolean cancelable, OnCancelListener cancelListener) {
 		super(context, cancelable, cancelListener);
 	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		((EditText)findViewById(R.id.password)).getText().clear();
+	}
 	
 	public void onClick(View view) {
 		switch(view.getId()) {

@@ -1,13 +1,16 @@
 package de.timroes.dokuapp.content;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  *
  * @author Tim Roes
  */
-public class PageInfo {
+public class PageInfo implements Serializable {
 
+	private static final long serialVersionUID = 1;
+	
 	private String name;
 	private Date lastModified;
 	private String author;

@@ -15,4 +15,16 @@
 	<string name="loggingin">Logging in...</string>
 	<string name="loginwrong">The username or password is wrong.</string>
 	<string name="loginfailed">An error occured. Please try again.</string>
+
+	<!-- Preferences -->
+	<string name="preferences">Settings</string>
+	
+		<string name="pref_cache">Cache</string>
+		<string name="pref_clear_cache">Clear cache</string>
+		<string name="pref_sum_clear_cache">The cached files uses %s.</string>
+
+		<string name="pref_security">Security</string>
+		<string name="pref_logout">Logout</string>
+		<string name="pref_sum_logout">Logout and clear saved login data.</string>
+		<string name="logout_done">You have been logged out.</string>
 </resources>

@@ -1,5 +1,6 @@
 package de.timroes.dokuapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -9,13 +10,15 @@ import android.widget.Toast;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.dokuapp.R;
 import de.timroes.dokuapp.Settings;
-import de.timroes.dokuapp.manager.PasswordManager;
+import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.services.DokuwikiService;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 
 public class BrowserActivity extends DokuwikiActivity {
 
 	private WebView browser;
+
+	private Page currentPage;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -24,6 +27,7 @@ public class BrowserActivity extends DokuwikiActivity {
 		setContentView(R.layout.browser);
 		browser = (WebView)findViewById(R.id.mainbrowser);
 	}
+
 
 	@Override
 	public void onServiceBound(DokuwikiService service) {
@@ -34,13 +38,14 @@ public class BrowserActivity extends DokuwikiActivity {
 	private synchronized void displayPage(String pagename) {
 		// blabbla show loading stuff
 		connector.getService().getPage(this, pagename);
-		Toast.makeText(this, "displayPage", Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "Loading page...", Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
-	protected void onPageLoadedCallback(String pageHTML, long id) {
-		super.onPageLoadedCallback(pageHTML, id);
-		Toast.makeText(this, "Page loaded success", Toast.LENGTH_SHORT).show();
+	protected void onPageLoadedCallback(Page page, long id) {
+		super.onPageLoadedCallback(page, id);
+		browser.loadDataWithBaseURL(null, page.getHtml(), "text/html", "utf-8", null);
+		Toast.makeText(this, "Page loaded.", Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
@@ -54,8 +59,8 @@ public class BrowserActivity extends DokuwikiActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if(item.getItemId() == R.id.realod) {
 			displayPage(Settings.HOME);
-		} else if(item.getItemId() == R.id.clear_login) {
-			connector.getService().logout();
+		} else if(item.getItemId() == R.id.preferences) {
+			startActivity(new Intent(this, Preferences.class));
 		} else {
 			return super.onOptionsItemSelected(item);
 		}

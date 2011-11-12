@@ -5,19 +5,20 @@ import android.app.Dialog;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.dokuapp.activities.dialogs.LoginDialog;
+import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.services.DokuwikiService;
 import de.timroes.dokuapp.services.DokuwikiServiceConnector;
 import de.timroes.dokuapp.services.ServiceConnectorListener;
 import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
-import de.timroes.dokuapp.xmlrpc.callback.PageLoadedCallback;
+import de.timroes.dokuapp.services.PageLoadedListener;
 
 /**
  *
  * @author Tim Roes
  */
 public abstract class DokuwikiActivity extends Activity 
-		implements ServiceConnectorListener, ErrorCallback, PageLoadedCallback, LoginCallback {
+		implements ServiceConnectorListener, ErrorCallback, PageLoadedListener, LoginCallback {
 
 	protected final static int DIALOG_LOGIN = 0;
 	
@@ -74,12 +75,12 @@ public abstract class DokuwikiActivity extends Activity
 		});
 	}
 
-	protected void onPageLoadedCallback(String pageHTML, long id) { }
+	protected void onPageLoadedCallback(Page page, long id) { }
 
-	public void onPageLoaded(final String pageHtml, final long id) {
+	public void onPageLoaded(final Page page, final long id) {
 		runOnUiThread(new Runnable() {
 			public void run() {
-				onPageLoadedCallback(pageHtml, id);
+				onPageLoadedCallback(page, id);
 			}
 		});
 	}

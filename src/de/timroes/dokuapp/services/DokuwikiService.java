@@ -5,10 +5,11 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import de.timroes.dokuapp.Settings;
+import de.timroes.dokuapp.content.Page;
+import de.timroes.dokuapp.manager.CacheManager;
 import de.timroes.dokuapp.manager.PasswordManager;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
-import de.timroes.dokuapp.xmlrpc.callback.PageLoadedCallback;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -22,12 +23,14 @@ public class DokuwikiService extends Service {
 
 	private DokuwikiBinder binder = new DokuwikiBinder();
 	private DokuwikiXMLRPCClient client;
+	private CacheManager cache;
 
 	/**
 	 * A Binder interface that allows access to the public methods of this service,
 	 * when bound to it.
 	 */
 	public class DokuwikiBinder extends Binder {
+
 		/**
 		 * Get the bounded service.
 		 * @return The DokuwikiService to which you bound.
@@ -35,6 +38,7 @@ public class DokuwikiService extends Service {
 		public DokuwikiService getService() {
 			return DokuwikiService.this;
 		}
+
 	}
 
 	@Override
@@ -45,6 +49,7 @@ public class DokuwikiService extends Service {
 			String userAgent = getPackageName();
 			client = new DokuwikiXMLRPCClient(new URL(Settings.XMLRPC_URL), 
 					PasswordManager.get(this), userAgent);
+			cache = new CacheManager(this);
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(DokuwikiService.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -56,12 +61,21 @@ public class DokuwikiService extends Service {
 		return binder;
 	}
 
-	public long getPage(PageLoadedCallback callback, String pagename) {
+	public long getPage(PageLoadedListener callback, String pagename) {
+		cache.addPage(new Page("welt", "<h1>asdasdasd</h1>"));
 		return client.getPageHTML(callback, pagename);
 	}
 
 	public long login(LoginCallback callback, String username, String password) {
 		return client.login(callback, username, password);
+	}
+
+	public int getCacheSize() {
+		return cache.getCacheSize();
+	}
+
+	public void clearCache() {
+		cache.clearCache();
 	}
 
 	public void logout() {

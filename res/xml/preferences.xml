@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory
+			android:title="@string/pref_cache">
+		<Preference android:key="clearCache"
+				android:title="@string/pref_clear_cache"
+				android:summary="@string/pref_sum_clear_cache"/>
+	</PreferenceCategory>
+	<PreferenceCategory
+			android:title="@string/pref_security">
+		<Preference android:key="clearLoginData"
+				android:title="@string/pref_logout"
+				android:summary="@string/pref_sum_logout"/>
+	</PreferenceCategory>
+</PreferenceScreen>
