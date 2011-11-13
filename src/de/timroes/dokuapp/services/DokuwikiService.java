@@ -62,8 +62,7 @@ public class DokuwikiService extends Service {
 	}
 
 	public long getPage(PageLoadedListener callback, String pagename) {
-		cache.addPage(new Page("welt", "<h1>asdasdasd</h1>"));
-		return client.getPageHTML(callback, pagename);
+		return cache.getPage(callback, pagename);
 	}
 
 	public long login(LoginCallback callback, String username, String password) {

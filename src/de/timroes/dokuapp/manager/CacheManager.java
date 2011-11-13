@@ -2,6 +2,7 @@ package de.timroes.dokuapp.manager;
 
 import android.content.Context;
 import de.timroes.dokuapp.content.Page;
+import de.timroes.dokuapp.services.PageLoadedListener;
 import de.timroes.dokuapp.util.FileUtil;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,6 +39,12 @@ public class CacheManager {
 			pageDir.mkdir();
 		if(!mediaDir.exists())
 			mediaDir.mkdir();
+	}
+
+	public long getPage(PageLoadedListener listener, String pagename) {
+		
+		return 0;
+		
 	}
 
 	private Map<String,Page> loadCacheFromDisk() {
