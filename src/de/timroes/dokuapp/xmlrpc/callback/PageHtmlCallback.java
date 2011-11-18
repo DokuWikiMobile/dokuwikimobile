@@ -6,6 +6,6 @@ package de.timroes.dokuapp.xmlrpc.callback;
  */
 public interface PageHtmlCallback extends ErrorCallback {
 	
-	public void onPageHtml(String html, long id);
+	public void onPageHtml(String pagename, String html, long id);
 	
 }

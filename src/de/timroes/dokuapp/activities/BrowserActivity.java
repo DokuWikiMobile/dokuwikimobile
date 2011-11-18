@@ -12,11 +12,13 @@ import de.timroes.dokuapp.R;
 import de.timroes.dokuapp.Settings;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.services.DokuwikiService;
+import de.timroes.dokuapp.views.MessageView;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 
 public class BrowserActivity extends DokuwikiActivity {
 
 	private WebView browser;
+	private MessageView message;
 
 	private Page currentPage;
 
@@ -26,8 +28,8 @@ public class BrowserActivity extends DokuwikiActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.browser);
 		browser = (WebView)findViewById(R.id.mainbrowser);
+		message = (MessageView)findViewById(R.id.message);
 	}
-
 
 	@Override
 	public void onServiceBound(DokuwikiService service) {
@@ -42,8 +44,9 @@ public class BrowserActivity extends DokuwikiActivity {
 	}
 
 	@Override
-	protected void onPageLoadedCallback(Page page, long id) {
-		super.onPageLoadedCallback(page, id);
+	protected void onPageLoadedCallback(Page page) {
+		super.onPageLoadedCallback(page);
+		message.setMessage(MessageView.Type.WARNING, page.getPageInfo().toString());
 		browser.loadDataWithBaseURL(null, page.getHtml(), "text/html", "utf-8", null);
 		Toast.makeText(this, "Page loaded.", Toast.LENGTH_SHORT).show();
 	}

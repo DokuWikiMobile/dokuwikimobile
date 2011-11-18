@@ -5,13 +5,15 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import de.timroes.dokuapp.Settings;
-import de.timroes.dokuapp.content.Page;
+import de.timroes.dokuapp.content.PageInfo;
 import de.timroes.dokuapp.manager.CacheManager;
 import de.timroes.dokuapp.manager.PasswordManager;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +51,7 @@ public class DokuwikiService extends Service {
 			String userAgent = getPackageName();
 			client = new DokuwikiXMLRPCClient(new URL(Settings.XMLRPC_URL), 
 					PasswordManager.get(this), userAgent);
-			cache = new CacheManager(this);
+			cache = new CacheManager(this, client);
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(DokuwikiService.class.getName()).log(Level.SEVERE, null, ex);
 		}

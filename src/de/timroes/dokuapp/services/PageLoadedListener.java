@@ -9,6 +9,6 @@ import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
  */
 public interface PageLoadedListener extends ErrorCallback {
 
-	public void onPageLoaded(Page page, long id);
+	public void onPageLoaded(Page page);
 
 }

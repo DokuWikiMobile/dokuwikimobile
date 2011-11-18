@@ -115,8 +115,10 @@ public final class DokuwikiXMLRPCClient {
 				((LoginCallback)call.callback).onLogin((Boolean)result, id);
 			} else if(CALL_GETPAGEHTML.equals(call.methodName)) {
 				// getPageHTML returned
-				Page p = new Page((String)call.params[0], (String)result);
-				((PageLoadedListener)call.callback).onPageLoaded(p, id);
+				((PageHtmlCallback)call.callback).onPageHtml(
+						(String)call.params[0], 
+						(String)result, 
+						id);
 			} else if(CALL_PAGE_INFO.equals(call.methodName)) {
 				// getPageInfo returned
 				Map<String,Object> infos = (Map<String,Object>)result;

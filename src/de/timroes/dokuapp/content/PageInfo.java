@@ -28,4 +28,8 @@ public class PageInfo implements Serializable {
 		return "PageInfo [" + name + "," + lastModified + "," + author + "," + version + "]";
 	}
 
+	public String getName() {
+		return name;
+	}
+
 }

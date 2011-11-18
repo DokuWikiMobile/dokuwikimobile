@@ -75,12 +75,12 @@ public abstract class DokuwikiActivity extends Activity
 		});
 	}
 
-	protected void onPageLoadedCallback(Page page, long id) { }
+	protected void onPageLoadedCallback(Page page) { }
 
-	public void onPageLoaded(final Page page, final long id) {
+	public void onPageLoaded(final Page page) {
 		runOnUiThread(new Runnable() {
 			public void run() {
-				onPageLoadedCallback(page, id);
+				onPageLoadedCallback(page);
 			}
 		});
 	}
