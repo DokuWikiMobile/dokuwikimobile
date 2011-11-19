@@ -32,4 +32,12 @@ public class PageInfo implements Serializable {
 		return name;
 	}
 
+	public String getAuthor() {
+		return author;
+	}
+
+	public Date getLastModified() {
+		return lastModified;
+	}
+
 }

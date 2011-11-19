@@ -12,6 +12,7 @@ import de.timroes.dokuapp.services.ServiceConnectorListener;
 import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 import de.timroes.dokuapp.services.PageLoadedListener;
+import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 
 /**
  *
@@ -65,7 +66,11 @@ public abstract class DokuwikiActivity extends Activity
 		});
 	}
 
-	protected void onServerErrorCallback(XMLRPCServerException error, long id) { }
+	protected void onServerErrorCallback(XMLRPCServerException error, long id) {
+		if(error.getErrorNr() == DokuwikiXMLRPCClient.ERROR_NO_ACCESS) {
+			showDialog(DIALOG_LOGIN);
+		}
+	}
 
 	public final void onServerError(final XMLRPCServerException error, final long id) {
 		runOnUiThread(new Runnable() {

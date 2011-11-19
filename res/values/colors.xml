@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-	<color name="success_color1">#006600</color>
+	<color name="success_color1">#00AA00</color>
 	<color name="success_color2">#006600</color>
-	<color name="success_text_color">#000</color>
+	<color name="success_text_color">#FFF</color>
 
-	<color name="warning_color1">#FFCC00</color>
-	<color name="warning_color2">#FFCC00</color>
+	<color name="warning_color1">#FFE500</color>
+	<color name="warning_color2">#FFBB00</color>
 	<color name="warning_text_color">#000</color>
 
-	<color name="error_color1">#CC0000</color>
-	<color name="error_color2">#CC0000</color>
-	<color name="error_text_color">#000</color>
+	<color name="error_color1">#DD0000</color>
+	<color name="error_color2">#990000</color>
+	<color name="error_text_color">#FFF</color>
 </resources>

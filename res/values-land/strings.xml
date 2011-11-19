@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+	<string name="pageinfo_dialog">
+		&lt;html&gt;
+		&lt;b&gt;Page ID:&lt;/b&gt; %1$s&lt;br&gt;
+		&lt;b&gt;Last edited by:&lt;/b&gt; %2$s&lt;br&gt;
+		&lt;b&gt;Last edited:&lt;/b&gt; %3$s
+		&lt;/html&gt;
+	</string>
+</resources>

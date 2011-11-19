@@ -10,6 +10,7 @@ import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.content.PageInfo;
 import de.timroes.dokuapp.services.PageLoadedListener;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
+import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.PageHtmlCallback;
 import de.timroes.dokuapp.xmlrpc.callback.PageInfoCallback;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback {
 	
 	private Cache cache;
 	private Map<String,PageLoadedListener> listeners = new HashMap<String, PageLoadedListener>();
+	private Map<Long,ErrorCallback> tmpListeners = new HashMap<Long, ErrorCallback>();
 	
 	private CacheStrategy strategy = new NoCacheStrategy();
 	
@@ -50,9 +52,11 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback {
 			}
 		}
 
+		// TODO: two ways to save listener = bad
 		listeners.put(pagename, listener);
-		client.getPageInfo(this, pagename);
-		return 0;
+		long id = client.getPageInfo(this, pagename);
+		tmpListeners.put(id, listener);
+		return id;
 		
 	}
 
@@ -76,11 +80,11 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback {
 	public void onPageInfoLoaded(PageInfo info, long id) {
 		tmpPageInfos.put(info.getName(), info);
 		synchronized(this) {
-		try {
-			wait(3000);
-		} catch (InterruptedException ex) {
-			Logger.getLogger(CacheManager.class.getName()).log(Level.SEVERE, null, ex);
-		}
+			try {
+				wait(3000);
+			} catch (InterruptedException ex) {
+				Logger.getLogger(CacheManager.class.getName()).log(Level.SEVERE, null, ex);
+			}
 		}
 		client.getPageHTML(this, info.getName());
 	}
@@ -94,14 +98,15 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback {
 		}
 
 		listeners.remove(pagename).onPageLoaded(p);
+		tmpListeners.remove(id);
 	}
 
 	public void onError(XMLRPCException error, long id) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		tmpListeners.remove(id).onError(error, id);
 	}
 
 	public void onServerError(XMLRPCServerException error, long id) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		tmpListeners.remove(id).onServerError(error, id);
 	}
 	
 }
