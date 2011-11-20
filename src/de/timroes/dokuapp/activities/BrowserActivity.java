@@ -11,24 +11,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.dokuapp.R;
 import de.timroes.dokuapp.Settings;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.services.DokuwikiService;
+import de.timroes.dokuapp.util.DokuwikiUrl;
 import de.timroes.dokuapp.views.DokuwikiWebView;
 import de.timroes.dokuapp.views.DokuwikiWebView.ScrollListener;
 import de.timroes.dokuapp.views.MessageView;
-import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 
-public class BrowserActivity extends DokuwikiActivity implements ScrollListener {
+public class BrowserActivity extends DokuwikiActivity implements ScrollListener, 
+		DokuwikiWebView.LinkLoadListener {
 
 	private final static int DIALOG_PAGEINFO = 1;
 	
 	private DokuwikiWebView browser;
 	private MessageView message;
-
-	private Page currentPage;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -38,6 +36,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener 
 		browser = (DokuwikiWebView)findViewById(R.id.mainbrowser);
 		message = (MessageView)findViewById(R.id.message);
 		
+		browser.setLinkLoadListener(this);
 		browser.setScrollListener(this);
 		message.setWebView(browser);
 	}
@@ -54,21 +53,22 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener 
 		Toast.makeText(this, "Loading page...", Toast.LENGTH_SHORT).show();
 	}
 
-	private String getPageInfoMessage() {
-		if(currentPage == null)
+	private String getPageInfoMessage(Page page) {
+		if(page == null)
 			return "";
 
 		return getResources().getString(R.string.pageinfo_dialog, 
-				currentPage.getPageInfo().getName(),
-				currentPage.getPageInfo().getAuthor(),
-				currentPage.getPageInfo().getLastModified().toLocaleString());
+				page.getPageInfo().getName(),
+				page.getPageInfo().getAuthor(),
+				page.getPageInfo().getLastModified().toLocaleString());
 	}
 
 	@Override
 	protected void onPrepareDialog(int id, Dialog dialog) {
 		switch(id) {
 			case DIALOG_PAGEINFO:
-				((AlertDialog)dialog).setMessage(Html.fromHtml(getPageInfoMessage()));
+				((AlertDialog)dialog).setMessage(
+						Html.fromHtml(getPageInfoMessage(browser.getPage())));
 				break;
 		}
 		super.onPrepareDialog(id, dialog);
@@ -78,9 +78,10 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener 
 	protected Dialog onCreateDialog(int id) {
 		switch(id) {
 			case DIALOG_PAGEINFO:
+				// Create Pageinfo dialog
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setTitle(R.string.pageinfo);
-				builder.setMessage(Html.fromHtml(getPageInfoMessage()));
+				builder.setMessage(Html.fromHtml(getPageInfoMessage(browser.getPage())));
 				builder.setPositiveButton(R.string.ok, new OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						dialog.dismiss();
@@ -95,9 +96,9 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener 
 	@Override
 	protected void onPageLoadedCallback(Page page) {
 		super.onPageLoadedCallback(page);
-		this.currentPage = page;
 		message.setMessage(MessageView.Type.SUCCESS, page.getPageInfo().toString());
-		browser.loadDataWithBaseURL(null, page.getHtml(), "text/html", "utf-8", null);
+		browser.loadPage(page);
+		message.hideLoading();
 		Toast.makeText(this, "Page loaded.", Toast.LENGTH_SHORT).show();
 	}
 
@@ -109,8 +110,17 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener 
 	}
 
 	@Override
+	public void onBackPressed() {
+		if(browser.canGoBack()) {
+			browser.goBack();
+		} else {
+			finish();
+		}
+	}
+
+	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(R.id.pageinfo).setEnabled(this.currentPage != null);
+		menu.findItem(R.id.pageinfo).setEnabled(browser.getPage() != null);
 		return true;
 	}
 
@@ -135,6 +145,16 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener 
 	}
 
 	public void onScroll(int l, int t, int oldl, int oldt) {
+	}
+
+	public boolean onInternalLinkLoad(DokuwikiWebView webview, DokuwikiUrl link) {
+		displayPage(link.id);
+		return true;
+	}
+
+	public boolean onExternalLinkLoad(DokuwikiWebView webview, String link) {
+		// We don't need to handle any external links. Let android handle them for us.
+		return false;
 	}
 
 }

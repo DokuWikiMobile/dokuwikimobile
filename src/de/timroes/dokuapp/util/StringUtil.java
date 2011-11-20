@@ -2,7 +2,7 @@ package de.timroes.dokuapp.util;
 
 /**
  *
- * @author timroes
+ * @author Tim Roes
  */
 public class StringUtil {
 	

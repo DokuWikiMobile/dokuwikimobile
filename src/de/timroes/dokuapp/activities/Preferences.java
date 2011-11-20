@@ -12,7 +12,7 @@ import de.timroes.dokuapp.util.StringUtil;
 
 /**
  *
- * @author timroes
+ * @author Tim Roes
  */
 public class Preferences extends PreferenceActivity implements Preference.OnPreferenceClickListener,
 		ServiceConnectorListener {
