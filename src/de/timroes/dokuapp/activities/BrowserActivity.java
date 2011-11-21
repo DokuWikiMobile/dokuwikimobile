@@ -28,6 +28,14 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	private DokuwikiWebView browser;
 	private MessageView message;
 
+	/**
+	 * This contains the link to the currently requested page. The page
+	 * must not be loaded yet, but at least the user clicked a link to it.
+	 * This is saved here to make sure, we only load pages into the webview,
+	 * that the user still want to see.
+	 */
+	private DokuwikiUrl currentRequested;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -155,6 +163,10 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	public boolean onExternalLinkLoad(DokuwikiWebView webview, String link) {
 		// We don't need to handle any external links. Let android handle them for us.
 		return false;
+	}
+
+	public void onHistoryLoad(DokuwikiWebView webview, DokuwikiUrl link) {
+		// Nothing to do here
 	}
 
 }

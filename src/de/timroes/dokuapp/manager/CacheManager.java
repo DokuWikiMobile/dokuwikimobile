@@ -39,7 +39,6 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback {
 		cache = new Cache(context.getCacheDir().getAbsolutePath());
 		this.context = context;
 		this.client = client;
-//		cache = loadCacheFromDisk();
 	}
 
 	public long getPage(PageLoadedListener listener, String pagename) {

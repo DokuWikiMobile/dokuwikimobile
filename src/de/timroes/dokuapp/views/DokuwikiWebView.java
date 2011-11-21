@@ -137,11 +137,21 @@ public class DokuwikiWebView extends WebView {
 	}
 
 	public void loadPage(Page p, boolean saveHistory) {
+
+		// If page is null dont do anything.
+		// Also don't do anything, if we want to save history (so we didnt jump
+		// back or forward) and page is equal the current page.
+		// This prevent the same page to be multiple times in the history.
+		if(p == null || (saveHistory && p.equals(currentPage))) {
+			return;
+		}
+		
 		if(saveHistory) {
 			future.clear();
 			if(currentPage != null)
 				history.push(currentPage);
 		}
+
 		this.currentPage = p;
 		loadDataWithBaseURL(null, p.getHtml(), "text/html", "utf-8", null);
 	}
@@ -163,10 +173,52 @@ public class DokuwikiWebView extends WebView {
 		
 	}
 
+	/**
+	 * An interface for listeners, that want to be informed whenever a page has been
+	 * loaded into the webview. This will be triggered whenever another class
+	 * load a page into this webview or a page has been restored from the history.
+	 */
+	public static interface PageLoadedListener {
+
+		/**
+		 * This method is called whenever a new page has been loaded.
+		 * 
+		 * @param webview The webview to which the page has been loaded.
+		 * @param page The page that has been loaded.
+		 */
+		public void onPageLoaded(DokuwikiWebView webview, Page page);
+		
+	}
+	
+	/**
+	 * An interface for listeners, that want to be informed whenever a link has been
+	 * clicked within this web view. The webview itself cannot load any pages,
+	 * since it has no connection to the DOkuwikiService. So the LinkLoadListener
+	 * is responsible for getting the page and load it into this web view.
+	 */
 	public static interface LinkLoadListener {
 
+		/**
+		 * This method is called whenever an internal link is clicked. The
+		 * target of this link is a page within this dokuwiki.
+		 * 
+		 * @param webview The webview in which the link has been clicked.
+		 * @param link The link that has been clicked.
+		 * @return True if the link was handled by the listener.
+		 * 		False if the link should be handled by android.
+		 */
 		public boolean onInternalLinkLoad(DokuwikiWebView webview, DokuwikiUrl link);
 
+		/**
+		 * This method is called whenever an external link is clicked. The target
+		 * of this link is any external resource (like a webpage, mailto or telephone
+		 * number).
+		 * 
+		 * @param webview The webview in which the link has been clicked.
+		 * @param link The link that has been clicked.
+		 * @return True if the link was handled by the listener.
+		 * 		False if the link should be handled by android.
+		 */
 		public boolean onExternalLinkLoad(DokuwikiWebView webview, String link);
 				
 	}
