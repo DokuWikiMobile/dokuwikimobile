@@ -220,6 +220,14 @@ public class DokuwikiWebView extends WebView {
 		 * 		False if the link should be handled by android.
 		 */
 		public boolean onExternalLinkLoad(DokuwikiWebView webview, String link);
+
+		/**
+		 * This method is called whenever a page is loaded from history.
+		 * 
+		 * @param webview The webview in which the history page has been loaded.
+		 * @param link The link to the page that has been loaded from history.
+		 */
+		public void onHistoryLoaded(DokuwikiWebView webview, DokuwikiUrl link);
 				
 	}
 	

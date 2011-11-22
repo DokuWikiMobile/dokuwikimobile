@@ -104,8 +104,12 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	@Override
 	protected void onPageLoadedCallback(Page page) {
 		super.onPageLoadedCallback(page);
+
+		// TODO Improve
+		if(page.getPageName().equals(currentRequested.id)) {
+			browser.loadPage(page);
+		}
 		message.setMessage(MessageView.Type.SUCCESS, page.getPageInfo().toString());
-		browser.loadPage(page);
 		message.hideLoading();
 		Toast.makeText(this, "Page loaded.", Toast.LENGTH_SHORT).show();
 	}
@@ -156,6 +160,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	}
 
 	public boolean onInternalLinkLoad(DokuwikiWebView webview, DokuwikiUrl link) {
+		this.currentRequested = link;
 		displayPage(link.id);
 		return true;
 	}
@@ -165,8 +170,11 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		return false;
 	}
 
-	public void onHistoryLoad(DokuwikiWebView webview, DokuwikiUrl link) {
-		// Nothing to do here
+	public void onHistoryLoaded(DokuwikiWebView webview, DokuwikiUrl link) {
+		// If page has been loaded from history, change currentRequest to that
+		// page. So a page that is currently loaded wont show up in webview
+		// since user has allready decided otherwise.
+		currentRequested = link;
 	}
 
 }

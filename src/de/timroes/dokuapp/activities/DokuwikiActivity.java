@@ -12,6 +12,7 @@ import de.timroes.dokuapp.services.ServiceConnectorListener;
 import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 import de.timroes.dokuapp.services.PageLoadedListener;
+import de.timroes.dokuapp.views.DokuwikiWebView;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 
 /**
