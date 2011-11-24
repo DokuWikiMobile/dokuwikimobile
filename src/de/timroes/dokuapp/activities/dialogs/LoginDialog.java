@@ -28,8 +28,10 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 
 	private final int HIDE_PROGRESS = 0x01;
 	private final int SHOW_TOAST = 0x02;
+	private final int NOTIFY_LISTENER = 0x03;
 	
 	private ProgressDialog progress;
+	private LoginDialogFinished listener;
 
 	final Handler handler = new Handler() {
 	
@@ -44,21 +46,17 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 					Toast.makeText(context, context.getResources()
 							.getString(msg.arg1), msg.arg2).show();
 					break;
+				case NOTIFY_LISTENER:
+					listener.loginDialogFinished((LoginDialogFinished.FinishState)msg.obj);
+					break;
 			}
 		}
 		
 	};
 
-	public LoginDialog(Context context) {
+	public LoginDialog(Context context, LoginDialogFinished listener) {
 		super(context);
-	}
-
-	public LoginDialog(Context context, int theme) {
-		super(context, theme);
-	}
-
-	public LoginDialog(Context context, boolean cancelable, OnCancelListener cancelListener) {
-		super(context, cancelable, cancelListener);
+		this.listener = listener;
 	}
 
 	@Override
@@ -66,10 +64,19 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 		super.onStart();
 		((EditText)findViewById(R.id.password)).getText().clear();
 	}
-	
+
+	@Override
+	public void onBackPressed() {
+		handler.sendMessage(handler.obtainMessage(NOTIFY_LISTENER, 
+				LoginDialogFinished.FinishState.CANCEL));
+		super.onBackPressed();
+	}
+
 	public void onClick(View view) {
 		switch(view.getId()) {
 			case R.id.logincancel:
+				handler.sendMessage(handler.obtainMessage(NOTIFY_LISTENER, 
+						LoginDialogFinished.FinishState.CANCEL));
 				dismiss();
 				break;
 			case R.id.loginok:
@@ -139,6 +146,8 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 						((EditText)findViewById(R.id.username)).getText().toString(),
 						((EditText)findViewById(R.id.password)).getText().toString());
 			}
+			handler.sendMessage(handler.obtainMessage(NOTIFY_LISTENER, 
+					LoginDialogFinished.FinishState.SUCCESS));
 			dismiss();
 		} else {
 			handler.sendMessage(handler.obtainMessage(SHOW_TOAST, R.string.loginwrong, Toast.LENGTH_SHORT));
@@ -158,18 +167,27 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 		System.err.println(error.toString());
 	}
 
+	public static interface LoginDialogFinished {
+
+		public static enum FinishState { SUCCESS, CANCEL };
+		public void loginDialogFinished(FinishState state);
+
+	}
+
 	public static class Builder {
 
 		private final Context context;
+		private final LoginDialogFinished listener;
 		
-		public Builder(Context ctx) {
+		public Builder(Context ctx, LoginDialogFinished listener) {
 			this.context = ctx;
+			this.listener = listener;
 		}
 
 		public LoginDialog create() {
 
 			// Create new dialog login
-			final LoginDialog dialog = new LoginDialog(context);
+			final LoginDialog dialog = new LoginDialog(context, listener);
 			// Add the xml view to the dialog
 			dialog.setContentView(R.layout.login);
 			// Set the title of the dialog

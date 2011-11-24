@@ -12,7 +12,6 @@ import de.timroes.dokuapp.services.ServiceConnectorListener;
 import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 import de.timroes.dokuapp.services.PageLoadedListener;
-import de.timroes.dokuapp.views.DokuwikiWebView;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 
 /**
@@ -20,7 +19,8 @@ import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
  * @author Tim Roes
  */
 public abstract class DokuwikiActivity extends Activity 
-		implements ServiceConnectorListener, ErrorCallback, PageLoadedListener, LoginCallback {
+		implements ServiceConnectorListener, ErrorCallback, PageLoadedListener, 
+		LoginCallback, LoginDialog.LoginDialogFinished {
 
 	protected final static int DIALOG_LOGIN = 0;
 	
@@ -50,7 +50,7 @@ public abstract class DokuwikiActivity extends Activity
 	protected Dialog onCreateDialog(int id) {
 		switch(id) {
 			case DIALOG_LOGIN:
-				LoginDialog.Builder builder = new LoginDialog.Builder(this);
+				LoginDialog.Builder builder = new LoginDialog.Builder(this,this);
 				return builder.create();
 			default:
 				return super.onCreateDialog(id);
@@ -80,6 +80,8 @@ public abstract class DokuwikiActivity extends Activity
 			}
 		});
 	}
+
+	public void loginDialogFinished(FinishState state) { }
 
 	protected void onPageLoadedCallback(Page page) { }
 

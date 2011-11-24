@@ -52,12 +52,20 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	@Override
 	public void onServiceBound(DokuwikiService service) {
 		super.onServiceBound(service);
-		displayPage(Settings.HOME);
+		displayPage(new DokuwikiUrl(Settings.HOME));
 	}
 
-	private synchronized void displayPage(String pagename) {
+	private void reload() {
+		displayPage(currentRequested);
+	}
+
+	private synchronized void displayPage(DokuwikiUrl url) {
 		// blabbla show loading stuff
-		connector.getService().getPage(this, pagename);
+		if(url == null)
+			return;
+
+		currentRequested = url;
+		connector.getService().getPage(this, url.id);
 		Toast.makeText(this, "Loading page...", Toast.LENGTH_SHORT).show();
 	}
 
@@ -105,8 +113,12 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	protected void onPageLoadedCallback(Page page) {
 		super.onPageLoadedCallback(page);
 
+		if(page == null)
+			return;
+
 		// TODO Improve
-		if(page.getPageName().equals(currentRequested.id)) {
+		if(currentRequested != null
+				&& page.getPageName().equals(currentRequested.id)) {
 			browser.loadPage(page);
 		}
 		message.setMessage(MessageView.Type.SUCCESS, page.getPageInfo().toString());
@@ -139,7 +151,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if(item.getItemId() == R.id.realod) {
-			displayPage(Settings.HOME);
+			reload();
 		} else if(item.getItemId() == R.id.preferences) {
 			startActivity(new Intent(this, Preferences.class));
 		} else if(item.getItemId() == R.id.pageinfo) {
@@ -152,16 +164,16 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
+	public void loginDialogFinished(FinishState state) {
+		super.loginDialogFinished(state);
+		reload();
 	}
 
 	public void onScroll(int l, int t, int oldl, int oldt) {
 	}
 
 	public boolean onInternalLinkLoad(DokuwikiWebView webview, DokuwikiUrl link) {
-		this.currentRequested = link;
-		displayPage(link.id);
+		displayPage(link);
 		return true;
 	}
 
