@@ -1,6 +1,9 @@
 package de.timroes.dokuapp.views;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.provider.Browser;
 import android.util.AttributeSet;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -82,6 +85,9 @@ public class DokuwikiWebView extends WebView {
 			currentPage = from.pop();
 		}
 
+		// Notify listerner that page is loaded from history
+		linkListener.onHistoryLoaded(this, new DokuwikiUrl(currentPage.getPageName()));
+		
 		// Load page, but dont modify history again
 		loadPage(currentPage, false);
 	}
@@ -102,11 +108,23 @@ public class DokuwikiWebView extends WebView {
 
 				// Is internal link?
 				if(url.startsWith("/")) {
-					return linkListener.onInternalLinkLoad((DokuwikiWebView)view, DokuwikiUtil.parseUrl(url));
+					linkListener.onInternalLinkLoad((DokuwikiWebView)view, DokuwikiUtil.parseUrl(url));
 				} else {
-					return linkListener.onExternalLinkLoad((DokuwikiWebView)view, url);
-				}
+					// Send external link to listener.
+					if(!linkListener.onExternalLinkLoad((DokuwikiWebView)view, url)) {
+						// If listener did not handle the loading we try to open 
+						// the matching app for it.
+						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+						intent.putExtra(Browser.EXTRA_APPLICATION_ID, getContext().getPackageName());
+						intent.addCategory(Intent.CATEGORY_BROWSABLE);
 
+						getContext().startActivity(intent);
+
+					}
+
+				}
+				
+				return true;
 			}
 			
 		});
@@ -204,10 +222,8 @@ public class DokuwikiWebView extends WebView {
 		 * 
 		 * @param webview The webview in which the link has been clicked.
 		 * @param link The link that has been clicked.
-		 * @return True if the link was handled by the listener.
-		 * 		False if the link should be handled by android.
 		 */
-		public boolean onInternalLinkLoad(DokuwikiWebView webview, DokuwikiUrl link);
+		public void onInternalLinkLoad(DokuwikiWebView webview, DokuwikiUrl link);
 
 		/**
 		 * This method is called whenever an external link is clicked. The target
@@ -217,7 +233,7 @@ public class DokuwikiWebView extends WebView {
 		 * @param webview The webview in which the link has been clicked.
 		 * @param link The link that has been clicked.
 		 * @return True if the link was handled by the listener.
-		 * 		False if the link should be handled by android.
+		 * 		False if we should try open the link in the default application for it
 		 */
 		public boolean onExternalLinkLoad(DokuwikiWebView webview, String link);
 

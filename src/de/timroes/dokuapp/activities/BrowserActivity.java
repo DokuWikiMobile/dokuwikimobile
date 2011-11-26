@@ -52,7 +52,10 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	@Override
 	public void onServiceBound(DokuwikiService service) {
 		super.onServiceBound(service);
-		displayPage(new DokuwikiUrl(Settings.HOME));
+		// If no page has been requested; first start!
+		if(currentRequested == null) {
+			displayPage(new DokuwikiUrl(Settings.HOME));
+		}
 	}
 
 	private void reload() {
@@ -172,9 +175,8 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	public void onScroll(int l, int t, int oldl, int oldt) {
 	}
 
-	public boolean onInternalLinkLoad(DokuwikiWebView webview, DokuwikiUrl link) {
+	public void onInternalLinkLoad(DokuwikiWebView webview, DokuwikiUrl link) {
 		displayPage(link);
-		return true;
 	}
 
 	public boolean onExternalLinkLoad(DokuwikiWebView webview, String link) {
