@@ -1,6 +1,16 @@
 package de.timroes.dokuapp.content;
 
+import android.webkit.MimeTypeMap;
+import de.timroes.dokuapp.cache.AttachmentStorage;
+import de.timroes.dokuapp.util.DokuwikiUtil;
+import de.timroes.dokuapp.util.MimeTypeUtil;
+import de.timroes.dokuapp.util.RegexReplace;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -9,23 +19,34 @@ import java.io.Serializable;
 public class Page implements Serializable {
 
 	private static final long serialVersionUID = 1;
+
+	private static final Pattern EXTRACT_MEDIA = Pattern.compile("(href|src)=\"(/_media/([^\"]+))");
+	private static final String REPLACE_PICTURE_SRC = "<img[^>]*src=\"(/_media/)([^\"]+)\"[^>]*>";
 	
 	private String content;
 	private PageInfo pageinfo;
 	private int lastChecked;
 
-	public Page(String content, PageInfo pageinfo) {
-		this(content, pageinfo, (int)(System.currentTimeMillis() / 1000));
+	private transient AttachmentStorage attachments;
+
+	public Page(AttachmentStorage attachments, String content, PageInfo pageinfo) {
+		this(attachments, content, pageinfo, (int)(System.currentTimeMillis() / 1000));
 	}
 	
-	public Page(String content, PageInfo pageinfo, int lastChecked) {
+	public Page(AttachmentStorage attachments, String content, PageInfo pageinfo, int lastChecked) {
+		this.attachments = attachments;
 		this.content = content;
 		this.pageinfo = pageinfo;
 		this.lastChecked = lastChecked;
 	}
 
+	public void setAttachmentStorage(AttachmentStorage attachments) {
+		this.attachments = attachments;
+	}
+
 	public String getHtml() {
-		return content;
+		String s = insertMedia(content);
+		return s;
 	}
 
 	public PageInfo getPageInfo() {
@@ -42,6 +63,40 @@ public class Page implements Serializable {
 
 	public void setLastChecked(int lastChecked) {
 		this.lastChecked = lastChecked;
+	}
+
+	public List<DokuwikiUrl> getLinkedAttachments() {
+		
+		List<DokuwikiUrl> atts = new ArrayList<DokuwikiUrl>();
+
+		Matcher m = EXTRACT_MEDIA.matcher(content);
+
+		while(m.find()) {
+			atts.add(DokuwikiUtil.parseUrl(m.group(3)));
+		}
+		
+		return atts;
+		
+	}
+
+	private String insertMedia(String html) {
+		RegexReplace reg = new RegexReplace(REPLACE_PICTURE_SRC);
+		return reg.replaceAll(html, new RegexReplace.Callback() {
+			public String replace(MatchResult match) {
+				Attachment a = attachments.getAttachment(DokuwikiUtil.parseUrl(match.group(2)).id);
+				if(a == null)
+					return match.group();
+				else {
+					String type = MimeTypeUtil.getFileType(a.getData());
+					if(type != null)
+						return match.group().substring(0, match.start(1) - match.start())
+								+ "data:" + type + ";base64," + a.getBase64Data()
+								+ match.group().substring(match.end(2) - match.start());
+					else
+						return "";
+				}
+			}
+		});
 	}
 
 	/**

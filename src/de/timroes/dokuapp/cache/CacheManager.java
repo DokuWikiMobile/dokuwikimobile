@@ -1,28 +1,26 @@
-package de.timroes.dokuapp.manager;
+package de.timroes.dokuapp.cache;
 
 import android.content.Context;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
-import de.timroes.dokuapp.cache.Cache;
-import de.timroes.dokuapp.cache.CacheStrategy;
-import de.timroes.dokuapp.cache.NoCacheStrategy;
+import de.timroes.dokuapp.content.Attachment;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.content.PageInfo;
 import de.timroes.dokuapp.services.PageLoadedListener;
+import de.timroes.dokuapp.content.DokuwikiUrl;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
+import de.timroes.dokuapp.xmlrpc.callback.AttachmentCallback;
 import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.PageHtmlCallback;
 import de.timroes.dokuapp.xmlrpc.callback.PageInfoCallback;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Tim Roes
  */
-public class CacheManager implements PageInfoCallback, PageHtmlCallback {
+public class CacheManager implements PageInfoCallback, PageHtmlCallback, AttachmentCallback {
 	
 	private Cache cache;
 	private Map<String,PageLoadedListener> listeners = new HashMap<String, PageLoadedListener>();
@@ -78,26 +76,27 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback {
 
 	public void onPageInfoLoaded(PageInfo info, long id) {
 		tmpPageInfos.put(info.getName(), info);
-		synchronized(this) {
-			try {
-				wait(3000);
-			} catch (InterruptedException ex) {
-				Logger.getLogger(CacheManager.class.getName()).log(Level.SEVERE, null, ex);
-			}
-		}
 		client.getPageHTML(this, info.getName());
 	}
 
 	public void onPageHtml(String pagename, String html, long id) {
-		Page p = new Page(html, tmpPageInfos.remove(pagename));
+		Page p = new Page(cache, html, tmpPageInfos.remove(pagename));
 
 		// Page should be cached
 		if(strategy.cachePages()) {
 			cache.addPage(p);
 		}
+		
+		for(DokuwikiUrl a : p.getLinkedAttachments()) {
+			client.getAttachment(this, a.id);
+		}
 
 		listeners.remove(pagename).onPageLoaded(p);
 		tmpListeners.remove(id);
+	}
+
+	public void onAttachmentLoaded(Attachment att, long id) {
+		cache.addAttachment(att);
 	}
 
 	public void onError(XMLRPCException error, long id) {
@@ -105,7 +104,8 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback {
 	}
 
 	public void onServerError(XMLRPCServerException error, long id) {
+		System.out.println(error);
 		tmpListeners.remove(id).onServerError(error, id);
 	}
-	
+
 }

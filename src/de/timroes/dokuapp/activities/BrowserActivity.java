@@ -15,7 +15,7 @@ import de.timroes.dokuapp.R;
 import de.timroes.dokuapp.Settings;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.services.DokuwikiService;
-import de.timroes.dokuapp.util.DokuwikiUrl;
+import de.timroes.dokuapp.content.DokuwikiUrl;
 import de.timroes.dokuapp.views.DokuwikiWebView;
 import de.timroes.dokuapp.views.DokuwikiWebView.ScrollListener;
 import de.timroes.dokuapp.views.MessageView;
@@ -123,6 +123,8 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		if(currentRequested != null
 				&& page.getPageName().equals(currentRequested.id)) {
 			browser.loadPage(page);
+			// TODO: scroll to anchor
+			browser.scrollTo(0, 0);
 		}
 		message.setMessage(MessageView.Type.SUCCESS, page.getPageInfo().toString());
 		message.hideLoading();

@@ -1,5 +1,6 @@
 package de.timroes.dokuapp.cache;
 
+import de.timroes.dokuapp.content.Attachment;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.util.FileUtil;
 import java.io.File;
@@ -18,9 +19,10 @@ import java.util.logging.Logger;
  *
  * @author Tim Roes
  */
-public class Cache {
+public class Cache implements AttachmentStorage {
 
-	private Map<String,Page> cache = new HashMap<String,Page>();
+	private Map<String,Page> pages = new HashMap<String,Page>();
+	private Map<String,Attachment> attachments = new HashMap<String, Attachment>();
 
 	private static final String PAGE_DIR = "pages";
 	private static final String MEDIA_DIR = "media";
@@ -38,7 +40,8 @@ public class Cache {
 		if(!mediaDir.exists())
 			mediaDir.mkdir();
 
-		cache = loadCacheFromDisk();
+		pages = loadPagesFromDisk();
+		attachments = loadAttachmentsFromDisk();
 	}
 	
 	/**
@@ -47,12 +50,21 @@ public class Cache {
 	 * @param page The page to add to the cache.
 	 */
 	public void addPage(Page page) {
-		cache.put(page.getPageName(), page);
+		pages.put(page.getPageName(), page);
 		savePage(page);
 	}
 	
 	public Page getPage(String pagename) {
-		return cache.get(pagename);
+		return pages.get(pagename);
+	}
+
+	public void addAttachment(Attachment att) {
+		attachments.put(att.getId(), att);
+		saveAttachment(att);
+	}
+
+	public Attachment getAttachment(String id) {
+		return attachments.get(id);
 	}
 	
 	/**
@@ -61,7 +73,8 @@ public class Cache {
 	public void clear() {
 		FileUtil.clearDirectory(pageDir);
 		FileUtil.clearDirectory(mediaDir);
-		cache.clear();
+		pages.clear();
+		attachments.clear();
 	}
 
 	/**
@@ -93,6 +106,25 @@ public class Cache {
 		
 	}
 
+	private void saveAttachment(Attachment att) {
+
+		ObjectOutputStream obj = null;
+		try {
+			FileOutputStream stream = new FileOutputStream(new File(mediaDir, att.getId()));
+			obj = new ObjectOutputStream(stream);
+			obj.writeObject(att);
+		} catch (IOException ex) {
+			Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
+		} finally {
+			try {
+				obj.close();
+			} catch (IOException ex) { 
+				// Ignore if closing of objectstream fails.
+			}
+		}
+
+	}
+
 	private Page loadPage(File file) {
 
 		Page p = null;
@@ -101,6 +133,7 @@ public class Cache {
 			FileInputStream stream = new FileInputStream(file);
 			obj = new ObjectInputStream(stream);
 			p = (Page)obj.readObject();
+			p.setAttachmentStorage(this);
 		} catch (OptionalDataException ex) {
 			// If data is broken just delete cache file
 			file.delete();
@@ -120,8 +153,36 @@ public class Cache {
 		return p;
 		
 	}
+
+	private Attachment loadAttachment(File file) {
+
+		Attachment a = null;
+		ObjectInputStream obj = null;
+		try {
+			FileInputStream stream = new FileInputStream(file);
+			obj = new ObjectInputStream(stream);
+			a = (Attachment)obj.readObject();
+		} catch (OptionalDataException ex) {
+			// If data is broken just delete cache file
+			file.delete();
+		} catch (ClassNotFoundException ex) {
+			// If data is broken just delete cache file
+			file.delete();
+		} catch (IOException ex) {
+			Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
+		} finally {
+			try {
+				obj.close();
+			} catch (IOException ex) {
+				// Ignore if closing of objectstream fails.
+			}
+		}
+
+		return a;	
 		
-	private Map<String,Page> loadCacheFromDisk() {
+	}
+		
+	private Map<String,Page> loadPagesFromDisk() {
 		
 		Map<String,Page> page = new HashMap<String, Page>();
 
@@ -132,6 +193,20 @@ public class Cache {
 		}
 
 		return page;
+		
+	}
+
+	private Map<String, Attachment> loadAttachmentsFromDisk() {
+
+		Map<String,Attachment> attachments = new HashMap<String, Attachment>();
+
+		Attachment a;
+		for(File f : mediaDir.listFiles()) {
+			a = loadAttachment(f);
+			attachments.put(a.getId(), a);
+		}
+
+		return attachments;
 		
 	}
 }

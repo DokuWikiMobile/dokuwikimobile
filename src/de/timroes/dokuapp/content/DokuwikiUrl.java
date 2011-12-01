@@ -1,4 +1,4 @@
-package de.timroes.dokuapp.util;
+package de.timroes.dokuapp.content;
 
 /**
  *

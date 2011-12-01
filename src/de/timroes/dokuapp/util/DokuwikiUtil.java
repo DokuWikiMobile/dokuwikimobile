@@ -1,5 +1,7 @@
 package de.timroes.dokuapp.util;
 
+import de.timroes.dokuapp.content.DokuwikiUrl;
+
 /**
  *
  * @author Tim Roes

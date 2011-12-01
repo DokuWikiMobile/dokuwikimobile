@@ -8,7 +8,7 @@ import android.util.AttributeSet;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import de.timroes.dokuapp.content.Page;
-import de.timroes.dokuapp.util.DokuwikiUrl;
+import de.timroes.dokuapp.content.DokuwikiUrl;
 import de.timroes.dokuapp.util.DokuwikiUtil;
 import java.util.Stack;
 
@@ -99,6 +99,7 @@ public class DokuwikiWebView extends WebView {
 
 	@Override
 	protected void onFinishInflate() {
+		getSettings().setJavaScriptEnabled(true);
 		setWebViewClient(new WebViewClient() {
 
 			@Override

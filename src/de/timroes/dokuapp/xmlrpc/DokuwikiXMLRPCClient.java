@@ -4,17 +4,20 @@ import de.timroes.axmlrpc.XMLRPCCallback;
 import de.timroes.axmlrpc.XMLRPCClient;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
-import de.timroes.dokuapp.content.Page;
+import de.timroes.base64.Base64;
+import de.timroes.dokuapp.content.Attachment;
 import de.timroes.dokuapp.content.PageInfo;
 import de.timroes.dokuapp.manager.PasswordManager;
+import de.timroes.dokuapp.xmlrpc.callback.AttachmentCallback;
 import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 import de.timroes.dokuapp.xmlrpc.callback.PageInfoCallback;
-import de.timroes.dokuapp.services.PageLoadedListener;
 import de.timroes.dokuapp.xmlrpc.callback.PageHtmlCallback;
 import java.net.URL;
 import java.util.Date;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This client is responsible for direct communication with the server.
@@ -32,11 +35,14 @@ import java.util.Map;
  */
 public final class DokuwikiXMLRPCClient {
 
+	public final int version;
+
 	public final static int ERROR_NO_ACCESS = 1;
 
 	private final static String CALL_LOGIN ="dokuwiki.login";
 	private final static String CALL_GETPAGEHTML = "wiki.getPageHTML";
 	private final static String CALL_PAGE_INFO = "wiki.getPageInfo";
+	private final static String CALL_GETATTACHMENT = "wiki.getAttachment";
 
 	private final static String KEY_PAGE_NAME = "name";
 	private final static String KEY_LAST_MODIFIED = "lastModified";
@@ -52,6 +58,15 @@ public final class DokuwikiXMLRPCClient {
 	public DokuwikiXMLRPCClient(URL url, PasswordManager manager, String userAgent) {
 		this.passManager = manager;
 		client = new XMLRPCClient(url, userAgent, XMLRPCClient.FLAGS_ENABLE_COOKIES);
+		
+		// TODO: Need to be asynchrounous!
+		int v = 0;
+		try {
+			v = (Integer)client.call("dokuwiki.getXMLRPCAPIVersion");
+		} catch (XMLRPCException ex) {
+			// TODO: What do we do when the xmlrpc version cannot be read
+		}
+		version = v;
 	}
 
 	public long login(LoginCallback callback, String username, String password) {
@@ -67,6 +82,11 @@ public final class DokuwikiXMLRPCClient {
 	public long getPageInfo(PageInfoCallback callback, String pagename) {
 		long id = client.callAsync(callbackHandler, CALL_PAGE_INFO, pagename);
 		return callbackHandler.addCallback(id, callback, CALL_PAGE_INFO, new Object[]{ pagename });
+	}
+
+	public long getAttachment(AttachmentCallback callback, String aid) {
+		long id = client.callAsync(callbackHandler, CALL_GETATTACHMENT, aid);
+		return callbackHandler.addCallback(id, callback, CALL_GETATTACHMENT, new Object[]{ aid });
 	}
 
 	public void logout() {
@@ -109,7 +129,9 @@ public final class DokuwikiXMLRPCClient {
 			
 			CallbackHistory.Entry call = history.remove(id);
 
-			if(CALL_LOGIN.equals(call.methodName)) {
+			if(call == null) {
+				return;
+			} else if(CALL_LOGIN.equals(call.methodName)) {
 				// dokuwiki.login returned
 				isLoggedin = (Boolean)result;
 				((LoginCallback)call.callback).onLogin((Boolean)result, id);
@@ -128,6 +150,18 @@ public final class DokuwikiXMLRPCClient {
 						(String)infos.get(KEY_AUTHOR),
 						(Integer)infos.get(KEY_VERSION));
 				((PageInfoCallback)call.callback).onPageInfoLoaded(pi, id);
+			} else if(CALL_GETATTACHMENT.equals(call.methodName)) {
+				// getAttachment returned
+				byte[] data;
+				if(version >= 7) {
+					data = (byte[])result;
+				} else {
+					// Before XMLRPC version 7 the data was encoded as base64 but 
+					// transfered as type string, so we need to decode it here.
+					data = Base64.decode((String)result);
+				}
+				Attachment a = new Attachment(call.params[0].toString(), data);
+				((AttachmentCallback)call.callback).onAttachmentLoaded(a, id);
 			}
 
 		}
