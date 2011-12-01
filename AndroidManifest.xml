@@ -12,11 +12,21 @@
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
+			<meta-data android:name="android.app.default_searchable"
+					android:value=".activities.SearchActivity"/>
 		</activity>
 		<activity android:name=".activities.dialogs.LoginDialog"
 				android:theme="@android:style/Theme.Dialog"
 				android:excludeFromRecents="true"/>
 		<activity android:name=".activities.Preferences"/>
+		<activity android:name=".activities.SearchActivity"
+				android:launchMode="singleTop">
+			<intent-filter>
+				<action android:name="android.intent.action.SEARCH"/>
+			</intent-filter>
+			<meta-data android:name="android.app.searchable"
+					android:resource="@xml/searchable"/>
+		</activity>
 		<service android:name=".services.DokuwikiService"
 			android:exported="false"/>
 	</application>

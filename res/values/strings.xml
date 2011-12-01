@@ -5,6 +5,11 @@
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
 
+	<!-- Search -->
+	<string name="search">Search</string>
+	<string name="search_hint">Search pages</string>
+	<string name="searching">Searching...</string>
+
 	<!-- Page Info -->
 	<string name="pageinfo">Page Infos</string>
 	<string name="pageinfo_dialog">

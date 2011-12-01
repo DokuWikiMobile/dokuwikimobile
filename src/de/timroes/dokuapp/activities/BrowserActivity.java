@@ -16,12 +16,15 @@ import de.timroes.dokuapp.Settings;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.services.DokuwikiService;
 import de.timroes.dokuapp.content.DokuwikiUrl;
+import de.timroes.dokuapp.util.DokuwikiUtil;
 import de.timroes.dokuapp.views.DokuwikiWebView;
 import de.timroes.dokuapp.views.DokuwikiWebView.ScrollListener;
 import de.timroes.dokuapp.views.MessageView;
 
 public class BrowserActivity extends DokuwikiActivity implements ScrollListener, 
 		DokuwikiWebView.LinkLoadListener {
+
+	public final static String PAGEID = "pageid";
 
 	private final static int DIALOG_PAGEINFO = 1;
 	
@@ -53,9 +56,13 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	public void onServiceBound(DokuwikiService service) {
 		super.onServiceBound(service);
 		// If no page has been requested; first start!
-		if(currentRequested == null) {
+		if(getIntent().getStringExtra(PAGEID) != null) {
+			// If page id was in intent, use it to open page and delete it afterwards
+			displayPage(DokuwikiUtil.parseUrl(getIntent().getStringExtra(PAGEID)));
+			getIntent().removeExtra(PAGEID);
+		} else if(currentRequested == null) {
 			displayPage(new DokuwikiUrl(Settings.HOME));
-		}
+		} 
 	}
 
 	private void reload() {
@@ -63,9 +70,10 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	}
 
 	private synchronized void displayPage(DokuwikiUrl url) {
-		// blabbla show loading stuff
 		if(url == null)
 			return;
+
+		message.showLoading();
 
 		currentRequested = url;
 		connector.getService().getPage(this, url.id);
@@ -127,7 +135,6 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 			browser.scrollTo(0, 0);
 		}
 		message.setMessage(MessageView.Type.SUCCESS, page.getPageInfo().toString());
-		message.hideLoading();
 		Toast.makeText(this, "Page loaded.", Toast.LENGTH_SHORT).show();
 	}
 
@@ -161,6 +168,8 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 			startActivity(new Intent(this, Preferences.class));
 		} else if(item.getItemId() == R.id.pageinfo) {
 			showDialog(DIALOG_PAGEINFO);
+		} else if(item.getItemId() == R.id.search) {
+			onSearchRequested();
 		} else {
 			return super.onOptionsItemSelected(item);
 		}

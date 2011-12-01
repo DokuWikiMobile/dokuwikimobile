@@ -7,17 +7,19 @@ import de.timroes.axmlrpc.XMLRPCServerException;
 import de.timroes.base64.Base64;
 import de.timroes.dokuapp.content.Attachment;
 import de.timroes.dokuapp.content.PageInfo;
+import de.timroes.dokuapp.content.SearchResult;
 import de.timroes.dokuapp.manager.PasswordManager;
 import de.timroes.dokuapp.xmlrpc.callback.AttachmentCallback;
 import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 import de.timroes.dokuapp.xmlrpc.callback.PageInfoCallback;
 import de.timroes.dokuapp.xmlrpc.callback.PageHtmlCallback;
+import de.timroes.dokuapp.xmlrpc.callback.SearchCallback;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This client is responsible for direct communication with the server.
@@ -43,6 +45,7 @@ public final class DokuwikiXMLRPCClient {
 	private final static String CALL_GETPAGEHTML = "wiki.getPageHTML";
 	private final static String CALL_PAGE_INFO = "wiki.getPageInfo";
 	private final static String CALL_GETATTACHMENT = "wiki.getAttachment";
+	private final static String CALL_SEARCH = "dokuwiki.search";
 
 	private final static String KEY_PAGE_NAME = "name";
 	private final static String KEY_LAST_MODIFIED = "lastModified";
@@ -87,6 +90,11 @@ public final class DokuwikiXMLRPCClient {
 	public long getAttachment(AttachmentCallback callback, String aid) {
 		long id = client.callAsync(callbackHandler, CALL_GETATTACHMENT, aid);
 		return callbackHandler.addCallback(id, callback, CALL_GETATTACHMENT, new Object[]{ aid });
+	}
+
+	public long search(SearchCallback callback, String query) {
+		long id = client.callAsync(callbackHandler, CALL_SEARCH, query);
+		return callbackHandler.addCallback(id, callback, CALL_SEARCH, new Object[]{ query });
 	}
 
 	public void logout() {
@@ -162,6 +170,19 @@ public final class DokuwikiXMLRPCClient {
 				}
 				Attachment a = new Attachment(call.params[0].toString(), data);
 				((AttachmentCallback)call.callback).onAttachmentLoaded(a, id);
+			} else if(CALL_SEARCH.equals(call.methodName)) {
+				List<SearchResult> results = new ArrayList<SearchResult>();
+				Map<String,Object> searchResult;
+				for(Object o : (Object[])result) {
+					searchResult = (Map<String,Object>)o;
+					results.add(new SearchResult((Integer)searchResult.get("mtime"), 
+							(Integer)searchResult.get("score"),
+							(Integer)searchResult.get("rev"),
+							(String)searchResult.get("id"),
+							(String)searchResult.get("snippet")));
+							
+				}
+				((SearchCallback)call.callback).onSearchResults(results, id);
 			}
 
 		}

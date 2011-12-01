@@ -9,6 +9,7 @@ import de.timroes.dokuapp.cache.CacheManager;
 import de.timroes.dokuapp.manager.PasswordManager;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
+import de.timroes.dokuapp.xmlrpc.callback.SearchCallback;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -66,6 +67,10 @@ public class DokuwikiService extends Service {
 
 	public long login(LoginCallback callback, String username, String password) {
 		return client.login(callback, username, password);
+	}
+
+	public long search(SearchCallback callback, String query) {
+		return client.search(callback, query);
 	}
 
 	public int getCacheSize() {
