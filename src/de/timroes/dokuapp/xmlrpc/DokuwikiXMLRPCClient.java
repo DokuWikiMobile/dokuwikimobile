@@ -93,6 +93,7 @@ public final class DokuwikiXMLRPCClient {
 	}
 
 	public long search(SearchCallback callback, String query) {
+		query = "*" + query + "*";
 		long id = client.callAsync(callbackHandler, CALL_SEARCH, query);
 		return callbackHandler.addCallback(id, callback, CALL_SEARCH, new Object[]{ query });
 	}
