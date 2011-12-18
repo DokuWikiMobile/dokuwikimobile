@@ -8,6 +8,7 @@ import de.timroes.dokuapp.Settings;
 import de.timroes.dokuapp.cache.CacheManager;
 import de.timroes.dokuapp.manager.PasswordManager;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
+import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 import de.timroes.dokuapp.xmlrpc.callback.SearchCallback;
 import java.net.MalformedURLException;
@@ -61,16 +62,16 @@ public class DokuwikiService extends Service {
 		return binder;
 	}
 
-	public long getPage(PageLoadedListener callback, String pagename) {
-		return cache.getPage(callback, pagename);
+	public long getPage(PageLoadedListener callback, LoadingListener loading, String pagename) {
+		return cache.getPage(callback, loading, pagename);
 	}
 
-	public long login(LoginCallback callback, String username, String password) {
-		return client.login(callback, username, password);
+	public void login(LoginCallback callback, String username, String password) {
+		client.login(callback, username, password);
 	}
 
-	public long search(SearchCallback callback, String query) {
-		return client.search(callback, query);
+	public void search(SearchCallback callback, LoadingListener loading, String query) {
+		cache.search(callback, loading, query);
 	}
 
 	public int getCacheSize() {

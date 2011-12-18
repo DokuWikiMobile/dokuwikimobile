@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This client is responsible for direct communication with the server.
@@ -56,8 +58,6 @@ public final class DokuwikiXMLRPCClient {
 	private CallbackHandler callbackHandler = new CallbackHandler();
 	private final PasswordManager passManager;
 
-	private boolean isLoggedin;
-
 	public DokuwikiXMLRPCClient(URL url, PasswordManager manager, String userAgent) {
 		this.passManager = manager;
 		client = new XMLRPCClient(url, userAgent, XMLRPCClient.FLAGS_ENABLE_COOKIES);
@@ -72,27 +72,27 @@ public final class DokuwikiXMLRPCClient {
 		version = v;
 	}
 
-	public long login(LoginCallback callback, String username, String password) {
+	public Canceler login(LoginCallback callback, String username, String password) {
 		long id = client.callAsync(callbackHandler, CALL_LOGIN, username, password);
 		return callbackHandler.addCallback(id, callback, CALL_LOGIN, new Object[]{ username, password });
 	}
 
-	public long getPageHTML(PageHtmlCallback callback, String pagename) {
+	public Canceler getPageHTML(PageHtmlCallback callback, String pagename) {
 		long id = client.callAsync(callbackHandler, CALL_GETPAGEHTML, pagename);
 		return callbackHandler.addCallback(id, callback, CALL_GETPAGEHTML, new Object[]{ pagename });
 	}
 
-	public long getPageInfo(PageInfoCallback callback, String pagename) {
+	public Canceler getPageInfo(PageInfoCallback callback, String pagename) {
 		long id = client.callAsync(callbackHandler, CALL_PAGE_INFO, pagename);
 		return callbackHandler.addCallback(id, callback, CALL_PAGE_INFO, new Object[]{ pagename });
 	}
 
-	public long getAttachment(AttachmentCallback callback, String aid) {
+	public Canceler getAttachment(AttachmentCallback callback, String aid) {
 		long id = client.callAsync(callbackHandler, CALL_GETATTACHMENT, aid);
 		return callbackHandler.addCallback(id, callback, CALL_GETATTACHMENT, new Object[]{ aid });
 	}
 
-	public long search(SearchCallback callback, String query) {
+	public Canceler search(SearchCallback callback, String query) {
 		query = "*" + query + "*";
 		long id = client.callAsync(callbackHandler, CALL_SEARCH, query);
 		return callbackHandler.addCallback(id, callback, CALL_SEARCH, new Object[]{ query });
@@ -101,7 +101,6 @@ public final class DokuwikiXMLRPCClient {
 	public void logout() {
 		passManager.clearLoginData();
 		client.clearCookies();
-		isLoggedin = false;
 	}
 
 	/**
@@ -121,8 +120,9 @@ public final class DokuwikiXMLRPCClient {
 		 * @param callback The callback to be called.
 		 * @return The id is passed through for further usage.
 		 */
-		public long addCallback(long id, ErrorCallback callback, String methodName, Object[] params) {
-			return history.add(new CallbackHistory.Entry(id, callback, methodName, params));
+		public Canceler addCallback(long id, ErrorCallback callback, String methodName, Object[] params) {
+			history.add(new CallbackHistory.Entry(id, callback, methodName, params));
+			return new Canceler(id);
 		}
 
 		/**
@@ -142,7 +142,6 @@ public final class DokuwikiXMLRPCClient {
 				return;
 			} else if(CALL_LOGIN.equals(call.methodName)) {
 				// dokuwiki.login returned
-				isLoggedin = (Boolean)result;
 				((LoginCallback)call.callback).onLogin((Boolean)result, id);
 			} else if(CALL_GETPAGEHTML.equals(call.methodName)) {
 				// getPageHTML returned
@@ -160,6 +159,7 @@ public final class DokuwikiXMLRPCClient {
 						(Integer)infos.get(KEY_VERSION));
 				((PageInfoCallback)call.callback).onPageInfoLoaded(pi, id);
 			} else if(CALL_GETATTACHMENT.equals(call.methodName)) {
+				// TODO: CHECK REAL xmlrpc version here when it is implemented
 				// getAttachment returned
 				byte[] data;
 				if(version >= 7) {
@@ -250,4 +250,22 @@ public final class DokuwikiXMLRPCClient {
 
 	}
 
+	public class Canceler {
+
+		private long id;
+
+		public Canceler(long id) {
+			this.id = id;
+		}
+		
+		public void cancel() {
+			client.cancel(id);
+		}
+
+		public long getId() {
+			return id;
+		}
+
+	}
+	
 }

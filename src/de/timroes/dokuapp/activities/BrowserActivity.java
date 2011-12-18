@@ -16,13 +16,15 @@ import de.timroes.dokuapp.Settings;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.services.DokuwikiService;
 import de.timroes.dokuapp.content.DokuwikiUrl;
+import de.timroes.dokuapp.services.LoadingListener;
 import de.timroes.dokuapp.util.DokuwikiUtil;
 import de.timroes.dokuapp.views.DokuwikiWebView;
 import de.timroes.dokuapp.views.DokuwikiWebView.ScrollListener;
 import de.timroes.dokuapp.views.MessageView;
+import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
 public class BrowserActivity extends DokuwikiActivity implements ScrollListener, 
-		DokuwikiWebView.LinkLoadListener {
+		DokuwikiWebView.LinkLoadListener, LoadingListener {
 
 	public final static String PAGEID = "pageid";
 
@@ -30,6 +32,8 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	
 	private DokuwikiWebView browser;
 	private MessageView message;
+
+	private Canceler canceler;
 
 	/**
 	 * This contains the link to the currently requested page. The page
@@ -76,7 +80,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		message.showLoading();
 
 		currentRequested = url;
-		connector.getService().getPage(this, url.id);
+		connector.getService().getPage(this, this, url.id);
 		Toast.makeText(this, "Loading page...", Toast.LENGTH_SHORT).show();
 	}
 
@@ -200,6 +204,14 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		// page. So a page that is currently loaded wont show up in webview
 		// since user has allready decided otherwise.
 		currentRequested = link;
+	}
+
+	public void startLoading(Canceler cancel) {
+		this.canceler = cancel;
+	}
+
+	public void endLoading() {
+		message.hideLoading();
 	}
 
 }
