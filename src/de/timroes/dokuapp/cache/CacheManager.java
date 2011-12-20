@@ -71,6 +71,16 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 			
 		List<SearchResult> list = new ArrayList<SearchResult>();
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
 
 		// TODO: Do search in cache
 		callback.onSearchResults(list, 0);

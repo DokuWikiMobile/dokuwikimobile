@@ -12,6 +12,7 @@
 	<string name="abortsearch">Click here to stop searching.</string>
 	<string name="no_search_results">No search results.</string>
 	<string name="search_click">Click to start a new search.</string>
+	<string name="search_hits">%s hits</string>
 
 	<!-- Page Info -->
 	<string name="pageinfo">Page Infos</string>

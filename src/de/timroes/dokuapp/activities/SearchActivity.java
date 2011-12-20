@@ -248,10 +248,13 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 		}
 
 		public View getView(int pos, View oldView, ViewGroup parent) {
-			View v = SearchActivity.this.getLayoutInflater().inflate(R.layout.searchresult, null);
-			((TextView)v.findViewById(R.id.searchresult_id)).setText(results.get(pos).getId());
-			((TextView)v.findViewById(R.id.searchresult_hits)).setText(String.valueOf(results.get(pos).getScore()));
-			return v;
+			if(oldView == null)
+				oldView = SearchActivity.this.getLayoutInflater().inflate(R.layout.searchresult, null);
+			((TextView)oldView.findViewById(R.id.searchresult_id)).setText(results.get(pos).getId());
+			String hits = getResources().getString(R.string.search_hits,
+					results.get(pos).getScore());
+			((TextView)oldView.findViewById(R.id.searchresult_hits)).setText(hits);
+			return oldView;
 		}
 
 		public int getItemViewType(int arg0) {
