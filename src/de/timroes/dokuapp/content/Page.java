@@ -4,8 +4,12 @@ import de.timroes.dokuapp.cache.AttachmentStorage;
 import de.timroes.dokuapp.util.MimeTypeUtil;
 import de.timroes.dokuapp.util.RegexReplace;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +24,7 @@ public class Page implements Serializable {
 
 	private static final Pattern EXTRACT_MEDIA = Pattern.compile("(href|src)=\"(/_media/([^\"]+))");
 	private static final String REPLACE_PICTURE_SRC = "<img[^>]*src=\"(/_media/)([^\"]+)\"[^>]*>";
+	private static final String REPLACE_EXTERNAL_PIC_SRC = "<img[^>]*src=\"(/lib/exe/fetch\\.php\\?hash=[0-9a-f]+&amp;media=)([^\"]*)\"[^>]*>";
 	
 	private String content;
 	private PageInfo pageinfo;
@@ -79,7 +84,8 @@ public class Page implements Serializable {
 
 	private String insertMedia(String html) {
 		RegexReplace reg = new RegexReplace(REPLACE_PICTURE_SRC);
-		return reg.replaceAll(html, new RegexReplace.Callback() {
+		html = reg.replaceAll(html, new RegexReplace.Callback() {
+			
 			public String replace(MatchResult match) {
 				Attachment a = attachments.getAttachment(DokuwikiUrl.parseUrl(match.group(2)).id);
 				if(a == null)
@@ -89,12 +95,33 @@ public class Page implements Serializable {
 					if(type != null)
 						return match.group().substring(0, match.start(1) - match.start())
 								+ "data:" + type + ";base64," + a.getBase64Data()
+								//+ "http://localhost/data/data/de.timroes.dokuapp/cache/media/test:testpic.png"
 								+ match.group().substring(match.end(2) - match.start());
 					else
 						return "";
 				}
 			}
+			
 		});
+
+		// Insert external media files
+		reg = new RegexReplace(REPLACE_EXTERNAL_PIC_SRC);
+		html = reg.replaceAll(html, new RegexReplace.Callback() {
+			
+			public String replace(MatchResult match) {
+				try {
+					String decodedUrl = URLDecoder.decode(match.group(2), "UTF-8");
+					return match.group().substring(0, match.start(1) - match.start())
+							+ decodedUrl + match.group().substring(match.end(2) - match.start());
+				} catch (UnsupportedEncodingException ex) {
+					Logger.getLogger(Page.class.getName()).log(Level.SEVERE, null, ex);
+				}
+				return match.group();
+			}
+			
+		});
+
+		return html;
 	}
 
 	/**
