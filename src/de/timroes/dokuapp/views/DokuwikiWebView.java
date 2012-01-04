@@ -9,7 +9,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.content.DokuwikiUrl;
-import de.timroes.dokuapp.util.DokuwikiUtil;
 import java.util.Stack;
 
 /**
@@ -109,7 +108,7 @@ public class DokuwikiWebView extends WebView {
 
 				// Is internal link?
 				if(url.startsWith("/")) {
-					linkListener.onInternalLinkLoad((DokuwikiWebView)view, DokuwikiUtil.parseUrl(url));
+					linkListener.onInternalLinkLoad((DokuwikiWebView)view, DokuwikiUrl.parseUrl(url));
 				} else {
 					// Send external link to listener.
 					if(!linkListener.onExternalLinkLoad((DokuwikiWebView)view, url)) {

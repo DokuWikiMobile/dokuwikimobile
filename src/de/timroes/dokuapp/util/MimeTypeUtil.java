@@ -12,8 +12,8 @@ public class MimeTypeUtil {
 			return "image/png";
 		else if(file[0] == (byte)0xff && file[1] == (byte)0xd8)
 			return "image/jpeg";
-		//else if(file[0] == (byte)0x47 && file[1] == (byte)0x49)
-		//	return "image/gif";
+		else if(file[0] == (byte)0x47 && file[1] == (byte)0x49)
+			return "image/gif";
 
 		return null;
 		

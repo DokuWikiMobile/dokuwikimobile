@@ -17,7 +17,6 @@ import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.services.DokuwikiService;
 import de.timroes.dokuapp.content.DokuwikiUrl;
 import de.timroes.dokuapp.services.LoadingListener;
-import de.timroes.dokuapp.util.DokuwikiUtil;
 import de.timroes.dokuapp.views.DokuwikiWebView;
 import de.timroes.dokuapp.views.DokuwikiWebView.ScrollListener;
 import de.timroes.dokuapp.views.MessageView;
@@ -62,7 +61,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		// If no page has been requested; first start!
 		if(getIntent().getStringExtra(PAGEID) != null) {
 			// If page id was in intent, use it to open page and delete it afterwards
-			displayPage(DokuwikiUtil.parseUrl(getIntent().getStringExtra(PAGEID)));
+			displayPage(DokuwikiUrl.parseUrl(getIntent().getStringExtra(PAGEID)));
 			getIntent().removeExtra(PAGEID);
 		} else if(currentRequested == null) {
 			displayPage(new DokuwikiUrl(Settings.HOME));

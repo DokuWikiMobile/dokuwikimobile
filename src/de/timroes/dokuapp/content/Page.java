@@ -1,8 +1,6 @@
 package de.timroes.dokuapp.content;
 
-import android.webkit.MimeTypeMap;
 import de.timroes.dokuapp.cache.AttachmentStorage;
-import de.timroes.dokuapp.util.DokuwikiUtil;
 import de.timroes.dokuapp.util.MimeTypeUtil;
 import de.timroes.dokuapp.util.RegexReplace;
 import java.io.Serializable;
@@ -72,7 +70,7 @@ public class Page implements Serializable {
 		Matcher m = EXTRACT_MEDIA.matcher(content);
 
 		while(m.find()) {
-			atts.add(DokuwikiUtil.parseUrl(m.group(3)));
+			atts.add(DokuwikiUrl.parseUrl(m.group(3)));
 		}
 		
 		return atts;
@@ -83,7 +81,7 @@ public class Page implements Serializable {
 		RegexReplace reg = new RegexReplace(REPLACE_PICTURE_SRC);
 		return reg.replaceAll(html, new RegexReplace.Callback() {
 			public String replace(MatchResult match) {
-				Attachment a = attachments.getAttachment(DokuwikiUtil.parseUrl(match.group(2)).id);
+				Attachment a = attachments.getAttachment(DokuwikiUrl.parseUrl(match.group(2)).id);
 				if(a == null)
 					return match.group();
 				else {
