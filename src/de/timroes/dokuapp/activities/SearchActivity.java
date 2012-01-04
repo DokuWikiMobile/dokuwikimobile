@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -43,7 +42,7 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 	/**
 	 * The no search results view above the list of results.
 	 */
-	private View noSearchResults;
+	private View searchInformation;
 	
 	/**
 	 * The canceler to cancel the current search.
@@ -77,9 +76,9 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 			}
 		});
 
-		noSearchResults = findViewById(R.id.no_search_results);
-		noSearchResults.setVisibility(View.GONE);
-		noSearchResults.setOnClickListener(new View.OnClickListener() {
+		searchInformation = findViewById(R.id.search_information);
+		searchInformation.setVisibility(View.GONE);
+		searchInformation.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				onSearchRequested();
 			}
@@ -124,7 +123,7 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 		if(Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
 			queuedSearch = getIntent().getStringExtra(SearchManager.QUERY);
 			// Show no search results until we have some to show.
-			showNoSearchResults();
+			hideSearchInformation();
 			// Show the progress dialog as long as we don't have any results to show
 			progress = ProgressDialog.show(this, null, getResources().getText(R.string.searching), 
 					true, true, this);
@@ -161,12 +160,12 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 		// If any results have been found, show them in the list.
 		if(!pages.isEmpty()) {
 			// Clear old results and show new results
-			hideNoSearchResults();
+			showSearchResults(pages.size());
 			adapter.results.addAll(pages);
 		} else if(!isLoading()) {
 			// If no Search results are found and search has been finished
 			// show the no search result text.
-			showNoSearchResults();
+			showSearchResults(0);
 		}
 
 		adapter.notifyObservers();
@@ -200,12 +199,16 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 		hideBottomLoading();
 	}
 
-	private void showNoSearchResults() {
-		noSearchResults.setVisibility(View.VISIBLE);
+	private void showSearchResults(int size) {
+		String information = getResources().getQuantityString(R.plurals.search_results, 
+				size, String.valueOf(size));
+		
+		((TextView)findViewById(R.id.search_information_text)).setText(information);
+		searchInformation.setVisibility(View.VISIBLE);
 	}
-
-	private void hideNoSearchResults() {
-		noSearchResults.setVisibility(View.GONE);
+	
+	private void hideSearchInformation() {
+		searchInformation.setVisibility(View.GONE);
 	}
 	
 	private void showBottomLoading() {

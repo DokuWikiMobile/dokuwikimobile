@@ -10,9 +10,12 @@
 	<string name="search_hint">Search pages</string>
 	<string name="searching">Searching...</string>
 	<string name="abortsearch">Click here to stop searching.</string>
-	<string name="no_search_results">No search results.</string>
 	<string name="search_click">Click to start a new search.</string>
 	<string name="search_hits">%s hits</string>
+	<plurals name="search_results">
+		<item quantity="one">1 search result</item>
+		<item quantity="other">%s search results</item>
+	</plurals>
 
 	<!-- Page Info -->
 	<string name="pageinfo">Page Infos</string>

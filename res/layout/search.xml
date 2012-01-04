@@ -39,17 +39,16 @@
 			</LinearLayout>
 		</LinearLayout>
 	</RelativeLayout>
-	<LinearLayout android:id="@+id/no_search_results"
+	<LinearLayout android:id="@+id/search_information"
 		android:orientation="vertical"
 		android:background="@android:drawable/list_selector_background"
 		android:padding="6sp"
 		android:layout_alignParentTop="true"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">	
-		<TextView
+		<TextView android:id="@+id/search_information_text"
 			android:gravity="center"
 			android:textSize="24sp"
-			android:text="@string/no_search_results"
 			android:duplicateParentState="true"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"/>
@@ -63,7 +62,7 @@
 	</LinearLayout>
 	<ListView android:id="@+id/search_results"
 			android:layout_above="@id/search_progress"
-			android:layout_below="@id/no_search_results"
+			android:layout_below="@id/search_information"
 			android:orientation="horizontal"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"/>
