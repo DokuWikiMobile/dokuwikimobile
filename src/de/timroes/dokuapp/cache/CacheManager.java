@@ -72,6 +72,7 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 		List<SearchResult> list = new ArrayList<SearchResult>();
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+/*		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
@@ -80,7 +81,7 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
-		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+*/
 
 		// TODO: Do search in cache
 		callback.onSearchResults(list, 0);
@@ -136,8 +137,8 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 
 	public void onSearchResults(List<SearchResult> pages, long id) {
 		CallbackPair pair = callbacks.remove(id);
-		((SearchCallback)pair.callback).onSearchResults(pages, id);
 		pair.loading.endLoading();
+		((SearchCallback)pair.callback).onSearchResults(pages, id);
 	}
 
 	public void onAttachmentLoaded(Attachment att, long id) {

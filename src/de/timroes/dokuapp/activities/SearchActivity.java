@@ -41,6 +41,11 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 	private View searchProgress;
 
 	/**
+	 * The no search results view above the list of results.
+	 */
+	private View noSearchResults;
+	
+	/**
 	 * The canceler to cancel the current search.
 	 */
 	private Canceler canceler;
@@ -55,14 +60,11 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 	 */
 	private ListView resultList;
 
-	private List<SearchResult> searchResults = new ArrayList<SearchResult>();
-
-	private View noSearchResults;
-
+	/**
+	 * The adapter for the search results.
+	 */
 	private SearchResultAdapter adapter;
 
-//	private List<SearchResult
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -75,10 +77,15 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 			}
 		});
 
-		noSearchResults = getLayoutInflater().inflate(R.layout.nosearchresults, null);
+		noSearchResults = findViewById(R.id.no_search_results);
+		noSearchResults.setVisibility(View.GONE);
+		noSearchResults.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View view) {
+				onSearchRequested();
+			}
+		});
 
 		resultList = (ListView)findViewById(R.id.search_results);
-		resultList.setFooterDividersEnabled(false);
 		resultList.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> adview, View view, int position, long id) {
 				// A search result has been clicked
@@ -116,6 +123,9 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 	private void queueSearch() {
 		if(Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
 			queuedSearch = getIntent().getStringExtra(SearchManager.QUERY);
+			// Show no search results until we have some to show.
+			showNoSearchResults();
+			// Show the progress dialog as long as we don't have any results to show
 			progress = ProgressDialog.show(this, null, getResources().getText(R.string.searching), 
 					true, true, this);
 			// Try to start the search yet. Normally the service won't be available yet.
@@ -139,23 +149,27 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 	protected void onSearchCallback(List<SearchResult> pages, long id) {
 		super.onSearchCallback(pages, id);
 		
-		// If we got any results hide the dialog
-		hideDialogLoading();
-
-		// Empty results, write warning
-		if(pages.isEmpty()) {
-			System.out.println("Pages empty");
-			//resultList.addFooterView(noSearchResults);
-			return;
+		// If we got any results or are completly finished with searching,
+		// hide the dialog loading interface.
+		if(!pages.isEmpty() || !isLoading()) {
+			hideDialogLoading();
 		}
 
-		// Clear old results and show new results
-		//searchResults.clear();
-		//searchResults.addAll(pages);
+		// Clear current entries in the list
 		adapter.results.clear();
-		adapter.results.addAll(pages);
+
+		// If any results have been found, show them in the list.
+		if(!pages.isEmpty()) {
+			// Clear old results and show new results
+			hideNoSearchResults();
+			adapter.results.addAll(pages);
+		} else if(!isLoading()) {
+			// If no Search results are found and search has been finished
+			// show the no search result text.
+			showNoSearchResults();
+		}
+
 		adapter.notifyObservers();
-		//resultList.setAdapter(resultList.getAdapter());
 
 	}
 
@@ -185,6 +199,14 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 		hideDialogLoading();
 		hideBottomLoading();
 	}
+
+	private void showNoSearchResults() {
+		noSearchResults.setVisibility(View.VISIBLE);
+	}
+
+	private void hideNoSearchResults() {
+		noSearchResults.setVisibility(View.GONE);
+	}
 	
 	private void showBottomLoading() {
 		searchProgress.setVisibility(View.VISIBLE);
@@ -199,6 +221,11 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 				searchProgress.setVisibility(View.GONE);
 			}
 		});
+	}
+
+	private boolean isLoading() {
+		return searchProgress.getVisibility() == View.VISIBLE
+				|| progress.isShowing();
 	}
 
 	private void hideDialogLoading() {

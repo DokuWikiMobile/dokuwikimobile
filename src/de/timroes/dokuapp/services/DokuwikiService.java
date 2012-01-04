@@ -8,7 +8,6 @@ import de.timroes.dokuapp.Settings;
 import de.timroes.dokuapp.cache.CacheManager;
 import de.timroes.dokuapp.manager.PasswordManager;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
-import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
 import de.timroes.dokuapp.xmlrpc.callback.SearchCallback;
 import java.net.MalformedURLException;
