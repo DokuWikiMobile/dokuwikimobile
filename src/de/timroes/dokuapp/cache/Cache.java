@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
+import java.io.StreamCorruptedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -19,10 +20,9 @@ import java.util.logging.Logger;
  *
  * @author Tim Roes
  */
-public class Cache implements AttachmentStorage {
+public class Cache implements Storage {
 
 	private Map<String,Page> pages = new HashMap<String,Page>();
-	private Map<String,Attachment> attachments = new HashMap<String, Attachment>();
 
 	private static final String PAGE_DIR = "pages";
 	private static final String MEDIA_DIR = "media";
@@ -41,7 +41,6 @@ public class Cache implements AttachmentStorage {
 			mediaDir.mkdir();
 
 		pages = loadPagesFromDisk();
-		attachments = loadAttachmentsFromDisk();
 	}
 	
 	/**
@@ -59,12 +58,11 @@ public class Cache implements AttachmentStorage {
 	}
 
 	public void addAttachment(Attachment att) {
-		attachments.put(att.getId(), att);
 		saveAttachment(att);
 	}
 
 	public Attachment getAttachment(String id) {
-		return attachments.get(id);
+		return loadAttachment(new File(mediaDir, id));
 	}
 	
 	/**
@@ -74,7 +72,6 @@ public class Cache implements AttachmentStorage {
 		FileUtil.clearDirectory(pageDir);
 		FileUtil.clearDirectory(mediaDir);
 		pages.clear();
-		attachments.clear();
 	}
 
 	/**
@@ -162,6 +159,9 @@ public class Cache implements AttachmentStorage {
 			FileInputStream stream = new FileInputStream(file);
 			obj = new ObjectInputStream(stream);
 			a = (Attachment)obj.readObject();
+		} catch(StreamCorruptedException ex) {
+			// If data is broken just delete cache file
+			file.delete();	
 		} catch (OptionalDataException ex) {
 			// If data is broken just delete cache file
 			file.delete();
@@ -173,7 +173,7 @@ public class Cache implements AttachmentStorage {
 		} finally {
 			try {
 				obj.close();
-			} catch (IOException ex) {
+			} catch (Exception ex) {
 				// Ignore if closing of objectstream fails.
 			}
 		}
@@ -196,17 +196,4 @@ public class Cache implements AttachmentStorage {
 		
 	}
 
-	private Map<String, Attachment> loadAttachmentsFromDisk() {
-
-		Map<String,Attachment> attachments = new HashMap<String, Attachment>();
-
-		Attachment a;
-		for(File f : mediaDir.listFiles()) {
-			a = loadAttachment(f);
-			attachments.put(a.getId(), a);
-		}
-
-		return attachments;
-		
-	}
 }

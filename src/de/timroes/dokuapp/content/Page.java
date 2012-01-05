@@ -1,6 +1,6 @@
 package de.timroes.dokuapp.content;
 
-import de.timroes.dokuapp.cache.AttachmentStorage;
+import de.timroes.dokuapp.cache.Storage;
 import de.timroes.dokuapp.util.MimeTypeUtil;
 import de.timroes.dokuapp.util.RegexReplace;
 import java.io.Serializable;
@@ -26,29 +26,41 @@ public class Page implements Serializable {
 	private static final String REPLACE_PICTURE_SRC = "<img[^>]*src=\"(/_media/)([^\"]+)\"[^>]*>";
 	private static final String REPLACE_EXTERNAL_PIC_SRC = "<img[^>]*src=\"(/lib/exe/fetch\\.php\\?hash=[0-9a-f]+&amp;media=)([^\"]*)\"[^>]*>";
 	
-	private String content;
+	protected String content;
 	private PageInfo pageinfo;
 	private int lastChecked;
 
-	private transient AttachmentStorage attachments;
+	private transient Storage attachments;
 
-	public Page(AttachmentStorage attachments, String content, PageInfo pageinfo) {
+	public Page(Storage attachments, String content, PageInfo pageinfo) {
 		this(attachments, content, pageinfo, (int)(System.currentTimeMillis() / 1000));
 	}
 	
-	public Page(AttachmentStorage attachments, String content, PageInfo pageinfo, int lastChecked) {
+	public Page(Storage attachments, String content, PageInfo pageinfo, int lastChecked) {
 		this.attachments = attachments;
 		this.content = content;
 		this.pageinfo = pageinfo;
 		this.lastChecked = lastChecked;
 	}
 
-	public void setAttachmentStorage(AttachmentStorage attachments) {
+	/**
+	 * Returns the html content of the page. This is the raw html as it was
+	 * returned by the XML-RPC interface. This is not suitable to be displayed
+	 * in a web view (wrong URLs to images, etc.)
+	 * Always use this method to access the content.
+	 * 
+	 * @return The html as returned from the server.
+	 */
+	protected String getContent() {
+		return content;
+	}
+
+	public void setAttachmentStorage(Storage attachments) {
 		this.attachments = attachments;
 	}
 
 	public String getHtml() {
-		String s = insertMedia(content);
+		String s = insertMedia(getContent());
 		return s;
 	}
 
@@ -72,7 +84,7 @@ public class Page implements Serializable {
 		
 		List<DokuwikiUrl> atts = new ArrayList<DokuwikiUrl>();
 
-		Matcher m = EXTRACT_MEDIA.matcher(content);
+		Matcher m = EXTRACT_MEDIA.matcher(getContent());
 
 		while(m.find()) {
 			atts.add(DokuwikiUrl.parseUrl(m.group(3)));
@@ -95,7 +107,6 @@ public class Page implements Serializable {
 					if(type != null)
 						return match.group().substring(0, match.start(1) - match.start())
 								+ "data:" + type + ";base64," + a.getBase64Data()
-								//+ "http://localhost/data/data/de.timroes.dokuapp/cache/media/test:testpic.png"
 								+ match.group().substring(match.end(2) - match.start());
 					else
 						return "";
