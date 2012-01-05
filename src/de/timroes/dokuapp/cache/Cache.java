@@ -2,6 +2,7 @@ package de.timroes.dokuapp.cache;
 
 import de.timroes.dokuapp.content.Attachment;
 import de.timroes.dokuapp.content.Page;
+import de.timroes.dokuapp.content.PageInfo;
 import de.timroes.dokuapp.util.FileUtil;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,8 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
-import java.io.StreamCorruptedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -20,58 +19,69 @@ import java.util.logging.Logger;
  *
  * @author Tim Roes
  */
-public class Cache implements Storage {
+public class Cache {
 
-	private Map<String,Page> pages = new HashMap<String,Page>();
+	private Map<String, Page> cachedPages = new HashMap<String, Page>();
 
 	private static final String PAGE_DIR = "pages";
+	private static final String PAGE_CONTENTS_DIR = "content";
+	private static final String PAGE_INFO_DIR = "info";
 	private static final String MEDIA_DIR = "media";
 
-	private final File pageDir;
+	private final File cacheDir;
+	private final File pageInfoDir;
+	private final File pageContentDir;
 	private final File mediaDir;
 
-	public Cache(String cacheDir) {
-		pageDir = new File(cacheDir + File.separator + PAGE_DIR);
-		mediaDir = new File(cacheDir + File.separator + MEDIA_DIR);
+	public Cache(String cacheBaseDir) {
 
-		// Create directories
-		if(!pageDir.exists())
-			pageDir.mkdir();
-		if(!mediaDir.exists())
-			mediaDir.mkdir();
+		cacheDir = new File(cacheBaseDir);
+		pageContentDir = new File(cacheDir, PAGE_DIR + File.separator + PAGE_CONTENTS_DIR);
+		pageInfoDir = new File(cacheDir, PAGE_DIR + File.separator + PAGE_INFO_DIR);
+		mediaDir = new File(cacheDir, MEDIA_DIR);
 
-		pages = loadPagesFromDisk();
+		// Create directories if they dont exist
+		for(File p : new File[]{ pageContentDir, pageInfoDir, mediaDir }) {
+			if(!p.exists())
+				p.mkdirs();
+		}
+
+		cachedPages = loadPagesFromDisk();
+
 	}
 	
 	/**
-	 * Add a page to the cache if it is allready in there it will be overwritten.
+	 * Add a page to the cache. Allready existing pages will be overwritten.
 	 * 
 	 * @param page The page to add to the cache.
 	 */
-	public void addPage(Page page) {
-		pages.put(page.getPageName(), page);
-		savePage(page);
+	public void savePage(Page page) {
+		cachedPages.put(page.getPageName(), page);
+		writePageToDisk(page);
 	}
 	
 	public Page getPage(String pagename) {
-		return pages.get(pagename);
+		return cachedPages.get(pagename);
 	}
 
-	public void addAttachment(Attachment att) {
-		saveAttachment(att);
+	public String getPageContent(String pagename) {
+		return (String)loadObject(new File(pageContentDir, pagename));
+	}
+
+	public void saveAttachment(Attachment attachment) {
+		writeAttachmentToDisk(attachment);
 	}
 
 	public Attachment getAttachment(String id) {
-		return loadAttachment(new File(mediaDir, id));
+		return loadAttachment(id);
 	}
 	
 	/**
 	 * Clear the cache. Will delete all saved cache files.
 	 */
 	public void clear() {
-		FileUtil.clearDirectory(pageDir);
-		FileUtil.clearDirectory(mediaDir);
-		pages.clear();
+		FileUtil.clearDirectory(cacheDir);
+		cachedPages.clear();
 	}
 
 	/**
@@ -81,114 +91,100 @@ public class Cache implements Storage {
 	 */
 	public int getCacheSize() {
 		return FileUtil.getDirectorySize(mediaDir)
-				+ FileUtil.getDirectorySize(pageDir);
+				+ FileUtil.getDirectorySize(pageContentDir);
 	}
 
-	private void savePage(Page page) {
+	/**
+	 * Write a specific attachment to disk. This will save the attachmant object
+	 * serialized to the media directory in the cache.
+	 * 
+	 * @param attachment The attachment that should be written to disk.
+	 */
+	private void writeAttachmentToDisk(Attachment attachment) {
+		writeObjectToFile(new File(mediaDir, attachment.getId()), attachment);
+	}
+	
+	/**
+	 * Write a specific page to disk. This will save the content and the page
+	 * info to some seperated files in the cache dir.
+	 * 
+	 * @param page The page that should be written to disk.
+	 */
+	private void writePageToDisk(Page page) {
+		writeObjectToFile(new File(pageContentDir, page.getPageName()), page.getContent());
+		writeObjectToFile(new File(pageInfoDir, page.getPageName()), page.getPageInfo());
+	}
+
+	/**
+	 * Saves an object to a file.
+	 * 
+	 * @param file The file where the object should be stored.
+	 * @param object The object that should be saved.
+	 */
+	private void writeObjectToFile(File file, Object object) {
 
 		ObjectOutputStream obj = null;
+		FileOutputStream stream = null;
+
 		try {
-			FileOutputStream stream = new FileOutputStream(new File(pageDir, page.getPageName()));
+			stream = new FileOutputStream(file);
 			obj = new ObjectOutputStream(stream);
-			obj.writeObject(page);
-		} catch (IOException ex) {
-			Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
+			obj.writeObject(object);
+		} catch(IOException ex) {
+			Logger.getLogger(Cache.class.getName()).log(Level.WARNING, 
+					"Writing cache to disk failed.", ex);
 		} finally {
 			try {
 				obj.close();
-			} catch (IOException ex) { 
-				// Ignore if closing of objectstream fails.
+				stream.close();
+			} catch(Exception ex) {
+				// Ignore if closing fails.		
 			}
 		}
 		
 	}
 
-	private void saveAttachment(Attachment att) {
-
-		ObjectOutputStream obj = null;
-		try {
-			FileOutputStream stream = new FileOutputStream(new File(mediaDir, att.getId()));
-			obj = new ObjectOutputStream(stream);
-			obj.writeObject(att);
-		} catch (IOException ex) {
-			Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
-		} finally {
-			try {
-				obj.close();
-			} catch (IOException ex) { 
-				// Ignore if closing of objectstream fails.
-			}
-		}
-
+	private Page loadEmptyPage(File file) {
+		return new Page(this, (PageInfo)loadObject(file));
 	}
 
-	private Page loadPage(File file) {
-
-		Page p = null;
+	private Attachment loadAttachment(String id) {
+		return (Attachment)loadObject(new File(mediaDir, id));
+	}
+		
+	private Object loadObject(File file) {
+			
+		Object object = null;
 		ObjectInputStream obj = null;
+		FileInputStream stream = null;
+
 		try {
-			FileInputStream stream = new FileInputStream(file);
+			stream = new FileInputStream(file);
 			obj = new ObjectInputStream(stream);
-			p = (Page)obj.readObject();
-			p.setAttachmentStorage(this);
-		} catch (OptionalDataException ex) {
-			// If data is broken just delete cache file
+			object = obj.readObject();
+		} catch(Exception ex) {
 			file.delete();
-		} catch (ClassNotFoundException ex) {
-			// If data is broken just delete cache file
-			file.delete();
-		} catch (IOException ex) {
-			Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
 		} finally {
 			try {
 				obj.close();
-			} catch (IOException ex) {
-				// Ignore if closing of objectstream fails.
+				stream.close();
+			} catch(Exception ex) {
+				// Ignore if closing fails.
 			}
 		}
 
-		return p;
+		return object;
 		
 	}
 
-	private Attachment loadAttachment(File file) {
-
-		Attachment a = null;
-		ObjectInputStream obj = null;
-		try {
-			FileInputStream stream = new FileInputStream(file);
-			obj = new ObjectInputStream(stream);
-			a = (Attachment)obj.readObject();
-		} catch(StreamCorruptedException ex) {
-			// If data is broken just delete cache file
-			file.delete();	
-		} catch (OptionalDataException ex) {
-			// If data is broken just delete cache file
-			file.delete();
-		} catch (ClassNotFoundException ex) {
-			// If data is broken just delete cache file
-			file.delete();
-		} catch (IOException ex) {
-			Logger.getLogger(Cache.class.getName()).log(Level.SEVERE, null, ex);
-		} finally {
-			try {
-				obj.close();
-			} catch (Exception ex) {
-				// Ignore if closing of objectstream fails.
-			}
-		}
-
-		return a;	
-		
-	}
-		
 	private Map<String,Page> loadPagesFromDisk() {
 		
 		Map<String,Page> page = new HashMap<String, Page>();
 
 		Page p;
-		for(File f : pageDir.listFiles()) {
-			p = loadPage(f);
+		for(File f : pageInfoDir.listFiles()) {
+			p = loadEmptyPage(f);
+			p.setCache(this);
 			page.put(p.getPageName(), p);
 		}
 

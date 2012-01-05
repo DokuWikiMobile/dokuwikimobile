@@ -1,6 +1,6 @@
 package de.timroes.dokuapp.content;
 
-import de.timroes.dokuapp.cache.Storage;
+import de.timroes.dokuapp.cache.Cache;
 import de.timroes.dokuapp.util.MimeTypeUtil;
 import de.timroes.dokuapp.util.RegexReplace;
 import java.io.Serializable;
@@ -30,14 +30,21 @@ public class Page implements Serializable {
 	private PageInfo pageinfo;
 	private int lastChecked;
 
-	private transient Storage attachments;
+	/**
+	 * Save reference to cache, to be able to load attachments when needed.
+	 */
+	private transient Cache cache;
 
-	public Page(Storage attachments, String content, PageInfo pageinfo) {
-		this(attachments, content, pageinfo, (int)(System.currentTimeMillis() / 1000));
+	public Page(Cache cache, PageInfo pageinfo) {
+		this(cache, null, pageinfo);
+	}
+
+	public Page(Cache cache, String content, PageInfo pageinfo) {
+		this(cache, content, pageinfo, (int)(System.currentTimeMillis() / 1000));
 	}
 	
-	public Page(Storage attachments, String content, PageInfo pageinfo, int lastChecked) {
-		this.attachments = attachments;
+	public Page(Cache cache, String content, PageInfo pageinfo, int lastChecked) {
+		this.cache = cache;
 		this.content = content;
 		this.pageinfo = pageinfo;
 		this.lastChecked = lastChecked;
@@ -51,12 +58,17 @@ public class Page implements Serializable {
 	 * 
 	 * @return The html as returned from the server.
 	 */
-	protected String getContent() {
+	public String getContent() {
+		
+		if(content == null) {
+			content = cache.getPageContent(pageinfo.getName());
+		}
+		
 		return content;
 	}
 
-	public void setAttachmentStorage(Storage attachments) {
-		this.attachments = attachments;
+	public void setCache(Cache cache) {
+		this.cache = cache;
 	}
 
 	public String getHtml() {
@@ -99,7 +111,7 @@ public class Page implements Serializable {
 		html = reg.replaceAll(html, new RegexReplace.Callback() {
 			
 			public String replace(MatchResult match) {
-				Attachment a = attachments.getAttachment(DokuwikiUrl.parseUrl(match.group(2)).id);
+				Attachment a = cache.getAttachment(DokuwikiUrl.parseUrl(match.group(2)).id);
 				if(a == null)
 					return match.group();
 				else {

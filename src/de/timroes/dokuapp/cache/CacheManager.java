@@ -125,7 +125,7 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 
 		// Page should be cached
 		if(strategy.cachePages()) {
-			cache.addPage(p);
+			cache.savePage(p);
 		}
 		
 		for(DokuwikiUrl a : p.getLinkedAttachments()) {
@@ -142,7 +142,7 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 	}
 
 	public void onAttachmentLoaded(Attachment att, long id) {
-		cache.addAttachment(att);
+		cache.saveAttachment(att);
 	}
 
 	public void onError(XMLRPCException error, long id) {
