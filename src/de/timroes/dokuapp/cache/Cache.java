@@ -65,7 +65,8 @@ public class Cache {
 	}
 
 	public String getPageContent(String pagename) {
-		return (String)loadObject(new File(pageContentDir, pagename));
+		String s = (String)loadObject(new File(pageContentDir, pagename));
+		return (s == null) ? "" : s;
 	}
 
 	public void saveAttachment(Attachment attachment) {

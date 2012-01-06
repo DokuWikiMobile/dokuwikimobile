@@ -67,6 +67,14 @@ public class Page implements Serializable {
 		return content;
 	}
 
+	/**
+	 * This delete the content of this page from memory. This should be done,
+	 * when the page isn't shown anymore, to save memory.
+	 */
+	public void freeContent() {
+		content = null;
+	}
+
 	public void setCache(Cache cache) {
 		this.cache = cache;
 	}

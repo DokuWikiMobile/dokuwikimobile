@@ -165,7 +165,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(item.getItemId() == R.id.realod) {
+		if(item.getItemId() == R.id.reload_abort) {
 			reload();
 		} else if(item.getItemId() == R.id.preferences) {
 			startActivity(new Intent(this, Preferences.class));
@@ -210,7 +210,11 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 	}
 
 	public void endLoading() {
-		message.hideLoading();
+		message.post(new Runnable() {
+			public void run() {
+				message.hideLoading();
+			}
+		});
 	}
 
 }

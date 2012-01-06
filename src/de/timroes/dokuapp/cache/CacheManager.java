@@ -117,7 +117,9 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 
 	public void onPageInfoLoaded(PageInfo info, long id) {
 		tmpPageInfos.put(info.getName(), info);
-		client.getPageHTML(this, info.getName());
+		Canceler c = client.getPageHTML(this, info.getName());
+		// ID will change here, Also the canceler must change herendroid
+		callbacks.put(c.getId(), callbacks.remove(id));
 	}
 
 	public void onPageHtml(String pagename, String html, long id) {
@@ -132,7 +134,9 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 			client.getAttachment(this, a.id);
 		}
 
-		//callbacks.remove(id).onPageLoaded(p);
+		CallbackPair pair = callbacks.remove(id);
+		pair.loading.endLoading();
+		((PageLoadedListener)pair.callback).onPageLoaded(p);
 	}
 
 	public void onSearchResults(List<SearchResult> pages, long id) {
@@ -143,6 +147,7 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 
 	public void onAttachmentLoaded(Attachment att, long id) {
 		cache.saveAttachment(att);
+		// TODO: notify
 	}
 
 	public void onError(XMLRPCException error, long id) {
