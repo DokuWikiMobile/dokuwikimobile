@@ -5,6 +5,9 @@
 	<string name="ok">OK</string>
 	<string name="cancel">Cancel</string>
 
+	<!-- Browser activity -->
+	<string name="page_loading">Page is loading...</string>
+
 	<!-- Search -->
 	<string name="search">Search</string>
 	<string name="search_hint">Search pages</string>

@@ -27,14 +27,21 @@ public class DokuwikiWebView extends WebView {
 	
 	public DokuwikiWebView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		build();
 	}
 
 	public DokuwikiWebView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		build();
 	}
 	
 	public DokuwikiWebView(Context context) {
 		super(context);
+		build();
+	}
+
+	private void build() {
+		setBackgroundColor(0xFFFFFFFF);
 	}
 
 	@Override

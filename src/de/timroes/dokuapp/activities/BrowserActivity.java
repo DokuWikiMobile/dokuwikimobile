@@ -53,6 +53,8 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		browser.setLinkLoadListener(this);
 		browser.setScrollListener(this);
 		message.setWebView(browser);
+
+		message.setMessage(MessageView.Type.WARNING, R.string.page_loading);
 	}
 
 	@Override

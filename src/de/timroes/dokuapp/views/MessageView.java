@@ -65,6 +65,10 @@ public class MessageView extends LinearLayout {
 		text.setPadding(0, 0, 4, 0);
 	}
 
+	public void setMessage(Type type, int resId) {
+		setMessage(type, getResources().getString(resId));
+	}
+	
 	public void setMessage(Type type, String message) {
 		// Set message text
 		text.setText(message);

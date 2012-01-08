@@ -140,7 +140,7 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 
 	public void onAttachmentLoaded(Attachment att, long id) {
 		cache.saveAttachment(att);
-		// TODO: notify
+		//((PageLoadedListener)callbacks.remove(id)).onPageLoaded(null);
 	}
 
 	public void onError(XMLRPCException error, long id) {
