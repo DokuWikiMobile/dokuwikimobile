@@ -39,8 +39,12 @@ public class FileUtil {
 	 */
 	public static void clearDirectory(File f) {
 
-		for(File file : f.listFiles()) {
-			file.delete();
+		if(f.isDirectory()) {
+			for(File file : f.listFiles()) {
+				clearDirectory(file);
+			}
+		} else {
+			f.delete();
 		}
 		
 	}
