@@ -197,6 +197,7 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 		}
 		hideDialogLoading();
 		hideBottomLoading();
+		showSearchResults(adapter.results.size());
 	}
 
 	private void showSearchResults(int size) {
