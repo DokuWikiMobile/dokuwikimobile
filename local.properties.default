@@ -1,0 +1,4 @@
+# After cloning this project, copy this file to local.properties
+# and edit the sdk.dir to match your android sdk root directory.
+
+sdk.dir=/path/to/android/sdk
