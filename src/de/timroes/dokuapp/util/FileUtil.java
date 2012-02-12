@@ -10,7 +10,7 @@ import java.io.File;
 public class FileUtil {
 	
 	/**
-	 * Calculates the size of a directory and all containign files and subdirectories.
+	 * Calculates the size of a directory and all containing files and subdirectories.
 	 * 
 	 * @param f A directory to calculate the size of.
 	 * @return The size of the directory and all containing files in bytes.

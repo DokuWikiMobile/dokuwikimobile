@@ -3,24 +3,15 @@ package de.timroes.dokuapp.cache;
 import android.content.Context;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
-import de.timroes.dokuapp.content.Attachment;
-import de.timroes.dokuapp.content.Page;
-import de.timroes.dokuapp.content.PageInfo;
-import de.timroes.dokuapp.content.SearchResult;
-import de.timroes.dokuapp.services.PageLoadedListener;
-import de.timroes.dokuapp.content.DokuwikiUrl;
+import de.timroes.dokuapp.content.*;
 import de.timroes.dokuapp.services.LoadingListener;
+import de.timroes.dokuapp.services.PageLoadedListener;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient.Canceler;
-import de.timroes.dokuapp.xmlrpc.callback.AttachmentCallback;
-import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
-import de.timroes.dokuapp.xmlrpc.callback.PageHtmlCallback;
-import de.timroes.dokuapp.xmlrpc.callback.PageInfoCallback;
-import de.timroes.dokuapp.xmlrpc.callback.SearchCallback;
+import de.timroes.dokuapp.xmlrpc.callback.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 /**
  *
@@ -70,15 +61,15 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 	public Canceler search(SearchCallback callback, LoadingListener loading, String query) {
 			
 		List<SearchResult> list = new ArrayList<SearchResult>();
-		//list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
-		//list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
+		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
 
 		// TODO: Do search in cache
-		//callback.onSearchResults(list, 0);
+		callback.onSearchResults(list, 0);
 
 		// Start online search
 		Canceler canc = client.search(this, query);
-
+		
 		// Save the listeners
 		put(canc.getId(), loading, callback);
 

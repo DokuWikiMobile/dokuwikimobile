@@ -74,9 +74,7 @@ public class Preferences extends PreferenceActivity implements Preference.OnPref
 	private void updateCacheInfo() {
 		// Get size of cache dir. Disable clear cache option if no cache files exists
 		int cacheUsage = connector.getService().getCacheSize();
-		if(cacheUsage <= 0) {
-			((Preference)findPreference(CLEAR_CACHE)).setEnabled(false);
-		}
+		((Preference)findPreference(CLEAR_CACHE)).setEnabled(cacheUsage <= 0);
 		((Preference)findPreference(CLEAR_CACHE)).setSummary(
 				getResources().getString(R.string.pref_sum_clear_cache, 
 				StringUtil.humanReadable(cacheUsage, 1)));

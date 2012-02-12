@@ -7,8 +7,8 @@ import android.provider.Browser;
 import android.util.AttributeSet;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.content.DokuwikiUrl;
+import de.timroes.dokuapp.content.Page;
 import java.util.Stack;
 
 /**
@@ -86,6 +86,7 @@ public class DokuwikiWebView extends WebView {
 			return;
 		}
 
+                // TODO: Use temporary variable [see also below]
 		for(int i = 0; i < Math.abs(steps); i++) {
 			to.push(currentPage);
 			currentPage = from.pop();
@@ -167,6 +168,8 @@ public class DokuwikiWebView extends WebView {
 		// Also don't do anything, if we want to save history (so we didnt jump
 		// back or forward) and page is equal the current page.
 		// This prevent the same page to be multiple times in the history.
+		
+		// TODO: Remove this when used temporary variable above
 		if(p == null || (saveHistory && p.equals(currentPage))) {
 			return;
 		}

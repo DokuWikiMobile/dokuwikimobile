@@ -70,6 +70,7 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 		setContentView(R.layout.search);
 
 		searchProgress = findViewById(R.id.search_progress);
+                // TODO: Move to xml file
 		searchProgress.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				cancel();
@@ -78,6 +79,7 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 
 		searchInformation = findViewById(R.id.search_information);
 		searchInformation.setVisibility(View.GONE);
+                // TODO: Move to xml file
 		searchInformation.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View view) {
 				onSearchRequested();
@@ -214,6 +216,7 @@ public class SearchActivity extends DokuwikiActivity implements LoadingListener,
 	
 	private void showBottomLoading() {
 		searchProgress.setVisibility(View.VISIBLE);
+		// TODO: can be removed
 		// Must be done due to a "bug" in Android, see also:
 		// http://code.google.com/p/android/issues/detail?id=12870
 		resultList.setAdapter(resultList.getAdapter());

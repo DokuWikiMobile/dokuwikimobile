@@ -28,8 +28,6 @@ public class MessageView extends LinearLayout {
 	private int color1;
 	private int color2;
 
-	private DokuwikiWebView web;
-	
 	public MessageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		build();
@@ -38,10 +36,6 @@ public class MessageView extends LinearLayout {
 	public MessageView(Context context) {
 		super(context);
 		build();
-	}
-
-	public void setWebView(DokuwikiWebView webview) {
-		this.web = webview;
 	}
 
 	private void build() {

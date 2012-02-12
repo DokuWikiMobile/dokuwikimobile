@@ -27,8 +27,7 @@ public class Page implements Serializable {
 	private static final String REPLACE_EXTERNAL_PIC_SRC = "<img[^>]*src=\"(/lib/exe/fetch\\.php\\?hash=[0-9a-f]+&amp;media=)([^\"]*)\"[^>]*>";
 	
 	protected String content;
-	private PageInfo pageinfo;
-	private int lastChecked;
+	protected PageInfo pageinfo;
 
 	/**
 	 * Save reference to cache, to be able to load attachments when needed.
@@ -38,25 +37,20 @@ public class Page implements Serializable {
 	public Page(Cache cache, PageInfo pageinfo) {
 		this(cache, null, pageinfo);
 	}
-
-	public Page(Cache cache, String content, PageInfo pageinfo) {
-		this(cache, content, pageinfo, (int)(System.currentTimeMillis() / 1000));
-	}
 	
-	public Page(Cache cache, String content, PageInfo pageinfo, int lastChecked) {
+	public Page(Cache cache, String content, PageInfo pageinfo) {
 		this.cache = cache;
 		this.content = content;
 		this.pageinfo = pageinfo;
-		this.lastChecked = lastChecked;
 	}
 
 	/**
-	 * Returns the html content of the page. This is the raw html as it was
+	 * Returns the HTML content of the page. This is the raw HTML as it was
 	 * returned by the XML-RPC interface. This is not suitable to be displayed
 	 * in a web view (wrong URLs to images, etc.)
 	 * Always use this method to access the content.
 	 * 
-	 * @return The html as returned from the server.
+	 * @return The HTML as returned from the server.
 	 */
 	public String getContent() {
 		
@@ -65,6 +59,7 @@ public class Page implements Serializable {
 		}
 		
 		return content;
+		
 	}
 
 	/**
@@ -88,16 +83,8 @@ public class Page implements Serializable {
 		return pageinfo;
 	}
 
-	public int getLastChecked() {
-		return lastChecked;
-	}
-
 	public String getPageName() {
 		return pageinfo.getName();
-	}
-
-	public void setLastChecked(int lastChecked) {
-		this.lastChecked = lastChecked;
 	}
 
 	public List<DokuwikiUrl> getLinkedAttachments() {
@@ -121,6 +108,7 @@ public class Page implements Serializable {
 			public String replace(MatchResult match) {
 				Attachment a = cache.getAttachment(DokuwikiUrl.parseUrl(match.group(2)).id);
 				if(a == null)
+					// TODO: Show error image
 					return match.group();
 				else {
 					String type = MimeTypeUtil.getFileType(a.getData());

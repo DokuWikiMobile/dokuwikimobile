@@ -9,19 +9,12 @@ import de.timroes.dokuapp.content.Attachment;
 import de.timroes.dokuapp.content.PageInfo;
 import de.timroes.dokuapp.content.SearchResult;
 import de.timroes.dokuapp.manager.PasswordManager;
-import de.timroes.dokuapp.xmlrpc.callback.AttachmentCallback;
-import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
-import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
-import de.timroes.dokuapp.xmlrpc.callback.PageInfoCallback;
-import de.timroes.dokuapp.xmlrpc.callback.PageHtmlCallback;
-import de.timroes.dokuapp.xmlrpc.callback.SearchCallback;
+import de.timroes.dokuapp.xmlrpc.callback.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This client is responsible for direct communication with the server.
@@ -60,7 +53,8 @@ public final class DokuwikiXMLRPCClient {
 
 	public DokuwikiXMLRPCClient(URL url, PasswordManager manager, String userAgent) {
 		this.passManager = manager;
-		client = new XMLRPCClient(url, userAgent, XMLRPCClient.FLAGS_ENABLE_COOKIES);
+		client = new XMLRPCClient(url, userAgent, XMLRPCClient.FLAGS_ENABLE_COOKIES 
+				| XMLRPCClient.FLAGS_IGNORE_STATUSCODE);
 		
 		// TODO: Need to be asynchrounous!
 		int v = 0;

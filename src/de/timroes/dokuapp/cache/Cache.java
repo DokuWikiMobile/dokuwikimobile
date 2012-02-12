@@ -4,12 +4,7 @@ import de.timroes.dokuapp.content.Attachment;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.content.PageInfo;
 import de.timroes.dokuapp.util.FileUtil;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -51,7 +46,7 @@ public class Cache {
 	}
 	
 	/**
-	 * Add a page to the cache. Allready existing pages will be overwritten.
+	 * Add a page to the cache. Already existing pages will be overwritten.
 	 * 
 	 * @param page The page to add to the cache.
 	 */
@@ -96,7 +91,7 @@ public class Cache {
 	}
 
 	/**
-	 * Write a specific attachment to disk. This will save the attachmant object
+	 * Write a specific attachment to disk. This will save the attachment object
 	 * serialized to the media directory in the cache.
 	 * 
 	 * @param attachment The attachment that should be written to disk.
@@ -107,7 +102,7 @@ public class Cache {
 	
 	/**
 	 * Write a specific page to disk. This will save the content and the page
-	 * info to some seperated files in the cache dir.
+	 * info to some separated files in the cache directory.
 	 * 
 	 * @param page The page that should be written to disk.
 	 */

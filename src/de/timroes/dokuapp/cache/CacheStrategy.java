@@ -18,7 +18,7 @@ public interface CacheStrategy {
 	
 	/**
 	 * Whether the CacheManager should cache pages.
-	 * If this methos returns false, also showCachedPage should return false.
+	 * If this method returns false, also showCachedPage should return false.
 	 * 
 	 * @return Whether the CacheManager should cache pages.
 	 */

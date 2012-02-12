@@ -20,9 +20,9 @@ public class DokuwikiServiceConnector {
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 
 		/**
-		 * This methos is called when the service has been connected. This will set the
+		 * This method is called when the service has been connected. This will set the
 		 * service variable and call the onServiceBound method, that should
-		 * be overwritten in any subclass activiy, that needs the service to be
+		 * be overwritten in any subclass activity, that needs the service to be
 		 * connected.
 		 */
 		public void onServiceConnected(ComponentName className, IBinder service) {

@@ -9,11 +9,11 @@ import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.content.SearchResult;
 import de.timroes.dokuapp.services.DokuwikiService;
 import de.timroes.dokuapp.services.DokuwikiServiceConnector;
+import de.timroes.dokuapp.services.PageLoadedListener;
 import de.timroes.dokuapp.services.ServiceConnectorListener;
+import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 import de.timroes.dokuapp.xmlrpc.callback.ErrorCallback;
 import de.timroes.dokuapp.xmlrpc.callback.LoginCallback;
-import de.timroes.dokuapp.services.PageLoadedListener;
-import de.timroes.dokuapp.xmlrpc.DokuwikiXMLRPCClient;
 import de.timroes.dokuapp.xmlrpc.callback.SearchCallback;
 import java.util.List;
 
@@ -72,6 +72,7 @@ public abstract class DokuwikiActivity extends Activity
 
 	protected void onServerErrorCallback(XMLRPCServerException error, long id) {
 		if(error.getErrorNr() == DokuwikiXMLRPCClient.ERROR_NO_ACCESS) {
+                        // TODO: only if not logged in
 			showDialog(DIALOG_LOGIN);
 		}
 	}

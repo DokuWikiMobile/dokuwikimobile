@@ -13,9 +13,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import de.timroes.dokuapp.R;
 import de.timroes.dokuapp.Settings;
+import de.timroes.dokuapp.content.DokuwikiUrl;
 import de.timroes.dokuapp.content.Page;
 import de.timroes.dokuapp.services.DokuwikiService;
-import de.timroes.dokuapp.content.DokuwikiUrl;
 import de.timroes.dokuapp.services.LoadingListener;
 import de.timroes.dokuapp.views.DokuwikiWebView;
 import de.timroes.dokuapp.views.DokuwikiWebView.ScrollListener;
@@ -52,7 +52,6 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		
 		browser.setLinkLoadListener(this);
 		browser.setScrollListener(this);
-		message.setWebView(browser);
 
 		message.setMessage(MessageView.Type.WARNING, R.string.page_loading);
 	}
@@ -133,6 +132,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 			return;
 
 		// TODO Improve
+                // TODO: Cancel old request when new is started [not here]
 		if(currentRequested != null
 				&& page.getPageName().equals(currentRequested.id)) {
 			browser.loadPage(page);
