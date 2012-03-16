@@ -53,7 +53,7 @@ public final class DokuwikiXMLRPCClient {
 	public DokuwikiXMLRPCClient(URL url, PasswordManager manager, String userAgent) {
 		this.passManager = manager;
 		client = new XMLRPCClient(url, userAgent, XMLRPCClient.FLAGS_ENABLE_COOKIES 
-				| XMLRPCClient.FLAGS_IGNORE_STATUSCODE);
+				| XMLRPCClient.FLAGS_IGNORE_STATUSCODE | XMLRPCClient.FLAGS_FORWARD);
 		
 		// TODO: Need to be asynchrounous!
 		int v = 0;
@@ -185,9 +185,10 @@ public final class DokuwikiXMLRPCClient {
 		 * Will be called whenever an error occurs.
 		 * 
 		 * @param id The id of the request.
-		 * @param error The error occured.
+		 * @param error The error occurred.
 		 */
 		public void onError(long id, XMLRPCException error) {
+			System.err.println(error.getCause());
 			history.remove(id).callback.onError(error, id);
 		}
 
