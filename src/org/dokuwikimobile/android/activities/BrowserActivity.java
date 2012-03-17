@@ -11,7 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-import de.timroes.dokuapp.R;
+import org.dokuwikimobile.android.R;
 import org.dokuwikimobile.android.Settings;
 import org.dokuwikimobile.android.content.DokuwikiUrl;
 import org.dokuwikimobile.android.content.Page;

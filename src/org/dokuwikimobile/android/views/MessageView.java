@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import de.timroes.dokuapp.R;
+import org.dokuwikimobile.android.R;
 
 /**
  *

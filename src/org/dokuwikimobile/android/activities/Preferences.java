@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
-import de.timroes.dokuapp.R;
+import org.dokuwikimobile.android.R;
 import org.dokuwikimobile.android.services.DokuwikiService;
 import org.dokuwikimobile.android.services.DokuwikiServiceConnector;
 import org.dokuwikimobile.android.services.ServiceConnectorListener;

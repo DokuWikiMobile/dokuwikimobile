@@ -14,13 +14,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import de.timroes.dokuapp.R;
+import java.util.ArrayList;
+import java.util.List;
+import org.dokuwikimobile.android.R;
 import org.dokuwikimobile.android.content.SearchResult;
 import org.dokuwikimobile.android.services.DokuwikiService;
 import org.dokuwikimobile.android.services.LoadingListener;
 import org.dokuwikimobile.android.xmlrpc.DokuwikiXMLRPCClient.Canceler;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
