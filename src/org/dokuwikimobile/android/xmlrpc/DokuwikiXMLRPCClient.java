@@ -66,6 +66,11 @@ public final class DokuwikiXMLRPCClient {
 	}
 
 	public Canceler login(LoginCallback callback, String username, String password) {
+                /* TODO: Add basic auth code and change callbackHandler
+                if(passManager.hasLoginData()) {
+                    client.setLoginData(username, password);
+                }
+                */
 		long id = client.callAsync(callbackHandler, CALL_LOGIN, username, password);
 		return callbackHandler.addCallback(id, callback, CALL_LOGIN, new Object[]{ username, password });
 	}
