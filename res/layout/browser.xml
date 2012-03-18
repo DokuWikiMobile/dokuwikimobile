@@ -3,10 +3,10 @@
     	android:orientation="vertical"
 	    android:layout_width="fill_parent"
     	android:layout_height="fill_parent">
-	<org.dokuwikimobile.android.views.MessageView android:id="@+id/message"
+	<org.dokuwikimobile.ui.view.MessageView android:id="@+id/message"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"/>
-	<org.dokuwikimobile.android.views.DokuwikiWebView android:id="@+id/mainbrowser"
+	<org.dokuwikimobile.ui.view.DokuwikiWebView android:id="@+id/mainbrowser"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent" />
 </LinearLayout>
