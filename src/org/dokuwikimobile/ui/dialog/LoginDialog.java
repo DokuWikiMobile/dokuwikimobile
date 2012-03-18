@@ -11,7 +11,7 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.*;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
-import org.dokuwikimobile.android.R;
+import org.dokuwikimobile.R;
 import org.dokuwikimobile.manager.PasswordManager;
 import org.dokuwikimobile.xmlrpc.callback.LoginCallback;
 

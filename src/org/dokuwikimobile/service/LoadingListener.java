@@ -4,7 +4,7 @@ import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
 /**
  *
- * @author Tim Roes
+ * @author Tim Roes <mail@timroes.de>
  */
 public interface LoadingListener {
 	

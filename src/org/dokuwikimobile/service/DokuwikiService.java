@@ -46,9 +46,8 @@ public class DokuwikiService extends Service {
 		super.onCreate();
 
 		try {
-			String userAgent = getPackageName();
 			client = new DokuwikiXMLRPCClient(new URL(Settings.XMLRPC_URL), 
-					PasswordManager.get(this), userAgent);
+					PasswordManager.get(this));
 			cache = new CacheManager(this, client);
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(DokuwikiService.class.getName()).log(Level.SEVERE, null, ex);

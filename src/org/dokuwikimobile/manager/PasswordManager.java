@@ -16,45 +16,43 @@ public class PasswordManager {
 	
 	private static PasswordManager instance;
 
+	// TODO: Remove singleton functionality, is now handled by DokuwikiManager
 	public static PasswordManager get(Context ctx) {
 		if(instance == null) {
-			instance = new PasswordManager(ctx);
+			instance = new PasswordManager(ctx.getSharedPreferences(PASSWORD_MANAGER_FILE, Context.MODE_PRIVATE));
 		} else {
-			instance.context = ctx;
+			instance.sharedPrefs = ctx.getSharedPreferences(PASSWORD_MANAGER_FILE, Context.MODE_PRIVATE);
 		}
 		return instance;
 	}
 
-	private Context context;
+	private SharedPreferences sharedPrefs;
 
-	private PasswordManager(Context ctx) {
-		this.context = ctx;	
+	public PasswordManager(SharedPreferences sharedPrefs) {
+		this.sharedPrefs = sharedPrefs;
 	}
 
 	public void saveLoginData(String username, String password) {
-		Editor edit = context.getSharedPreferences(PASSWORD_MANAGER_FILE, Context.MODE_PRIVATE).edit();
+		Editor edit = sharedPrefs.edit();
 		edit.putString(USERNAME, username);
 		edit.putString(PASSWORD, password);
 		edit.commit();
 	}
 
 	public boolean hasLoginData() {
-		SharedPreferences sharedPreferences = context.getSharedPreferences(PASSWORD_MANAGER_FILE, Context.MODE_PRIVATE);
-		return sharedPreferences.contains(USERNAME) && sharedPreferences.contains(PASSWORD);
+		return sharedPrefs.contains(USERNAME) && sharedPrefs.contains(PASSWORD);
 	}
 
 	public String getUsername() {
-		return context.getSharedPreferences(PASSWORD_MANAGER_FILE, Context.MODE_PRIVATE)
-				.getString(USERNAME, "");
+		return sharedPrefs.getString(USERNAME, "");
 	}
 
 	public String getPassword() {
-		return context.getSharedPreferences(PASSWORD_MANAGER_FILE, Context.MODE_PRIVATE)
-				.getString(PASSWORD, "");
+		return sharedPrefs.getString(PASSWORD, "");
 	}
 
 	public void clearLoginData() {
-		Editor edit = context.getSharedPreferences(PASSWORD_MANAGER_FILE, Context.MODE_PRIVATE).edit();
+		Editor edit = sharedPrefs.edit();
 		edit.remove(USERNAME).remove(PASSWORD);
 		edit.commit();
 	}

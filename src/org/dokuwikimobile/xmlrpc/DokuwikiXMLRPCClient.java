@@ -1,11 +1,5 @@
 package org.dokuwikimobile.xmlrpc;
 
-import org.dokuwikimobile.xmlrpc.callback.AttachmentCallback;
-import org.dokuwikimobile.xmlrpc.callback.LoginCallback;
-import org.dokuwikimobile.xmlrpc.callback.PageHtmlCallback;
-import org.dokuwikimobile.xmlrpc.callback.PageInfoCallback;
-import org.dokuwikimobile.xmlrpc.callback.SearchCallback;
-import org.dokuwikimobile.xmlrpc.callback.ErrorCallback;
 import de.timroes.axmlrpc.XMLRPCCallback;
 import de.timroes.axmlrpc.XMLRPCClient;
 import de.timroes.axmlrpc.XMLRPCException;
@@ -16,10 +10,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.dokuwikimobile.manager.PasswordManager;
 import org.dokuwikimobile.model.Attachment;
 import org.dokuwikimobile.model.PageInfo;
 import org.dokuwikimobile.model.SearchResult;
-import org.dokuwikimobile.manager.PasswordManager;
+import org.dokuwikimobile.xmlrpc.callback.*;
 /**
  * This client is responsible for direct communication with the server.
  * It is the only part of the application that has access to the XML-RPC interface 
@@ -55,9 +50,9 @@ public final class DokuwikiXMLRPCClient {
 	private CallbackHandler callbackHandler = new CallbackHandler();
 	private final PasswordManager passManager;
 
-	public DokuwikiXMLRPCClient(URL url, PasswordManager manager, String userAgent) {
+	public DokuwikiXMLRPCClient(URL url, PasswordManager manager) {
 		this.passManager = manager;
-		client = new XMLRPCClient(url, userAgent, XMLRPCClient.FLAGS_ENABLE_COOKIES 
+		client = new XMLRPCClient(url, "DokuWikiMobile", XMLRPCClient.FLAGS_ENABLE_COOKIES 
 				| XMLRPCClient.FLAGS_IGNORE_STATUSCODE | XMLRPCClient.FLAGS_FORWARD);
 		
 		// TODO: Need to be asynchrounous!
@@ -68,6 +63,16 @@ public final class DokuwikiXMLRPCClient {
 			// TODO: What do we do when the xmlrpc version cannot be read
 		}
 		version = v;
+	}
+
+	
+
+	public void setLoginData(String username, String password) {
+		client.setLoginData(username, password);
+	}
+
+	public void clearLoginData() {
+		client.clearLoginData();
 	}
 
 	public Canceler login(LoginCallback callback, String username, String password) {

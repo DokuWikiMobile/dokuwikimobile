@@ -16,7 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
-import org.dokuwikimobile.android.R;
+import org.dokuwikimobile.R;
 import org.dokuwikimobile.model.SearchResult;
 import org.dokuwikimobile.service.DokuwikiService;
 import org.dokuwikimobile.service.LoadingListener;
