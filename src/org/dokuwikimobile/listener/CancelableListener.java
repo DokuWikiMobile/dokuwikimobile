@@ -1,4 +1,4 @@
-package org.dokuwikimobile.service;
+package org.dokuwikimobile.listener;
 
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
@@ -6,7 +6,7 @@ import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
  *
  * @author Tim Roes
  */
-public interface LoadingListener {
+public interface CancelableListener {
 	
 	public void startLoading(Canceler cancel);
 

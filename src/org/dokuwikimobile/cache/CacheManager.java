@@ -5,18 +5,18 @@ import org.dokuwikimobile.model.PageInfo;
 import org.dokuwikimobile.model.DokuwikiUrl;
 import org.dokuwikimobile.model.Page;
 import org.dokuwikimobile.model.SearchResult;
-import org.dokuwikimobile.xmlrpc.callback.AttachmentCallback;
-import org.dokuwikimobile.xmlrpc.callback.PageHtmlCallback;
-import org.dokuwikimobile.xmlrpc.callback.PageInfoCallback;
-import org.dokuwikimobile.xmlrpc.callback.SearchCallback;
-import org.dokuwikimobile.xmlrpc.callback.ErrorCallback;
+import org.dokuwikimobile.listener.AttachmentListener;
+import org.dokuwikimobile.listener.PageHtmlListener;
+import org.dokuwikimobile.listener.PageInfoListener;
+import org.dokuwikimobile.listener.SearchListener;
+import org.dokuwikimobile.listener.ErrorListener;
 import android.content.Context;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.dokuwikimobile.service.LoadingListener;
+import org.dokuwikimobile.listener.CancelableListener;
 import org.dokuwikimobile.service.PageLoadedListener;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
@@ -25,8 +25,8 @@ import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
  *
  * @author Tim Roes
  */
-public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchCallback,
-		AttachmentCallback {
+public class CacheManager implements PageInfoListener, PageHtmlListener, SearchListener,
+		AttachmentListener {
 	
 	private Cache cache;
 
@@ -46,11 +46,11 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 		this.client = client;
 	}
 
-	private void put(Long id, LoadingListener listener, ErrorCallback callback) {
+	private void put(Long id, CancelableListener listener, ErrorListener callback) {
 		callbacks.put(id, new CallbackPair(listener, callback));
 	}
 
-	public long getPage(PageLoadedListener listener, LoadingListener loading, String pagename) {
+	public long getPage(PageLoadedListener listener, CancelableListener loading, String pagename) {
 		
 		// If cache strategy allows showing cached pages, show cached page
 		if(strategy.showCachedPage()) {
@@ -66,7 +66,7 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 		
 	}
 
-	public Canceler search(SearchCallback callback, LoadingListener loading, String query) {
+	public Canceler search(SearchListener callback, CancelableListener loading, String query) {
 			
 		List<SearchResult> list = new ArrayList<SearchResult>();
 		list.add(new SearchResult(100, 10, 1, "welt", "Die Welt blabla"));
@@ -134,7 +134,7 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 	public void onSearchResults(List<SearchResult> pages, long id) {
 		CallbackPair pair = callbacks.remove(id);
 		pair.loading.endLoading();
-		((SearchCallback)pair.callback).onSearchResults(pages, id);
+		((SearchListener)pair.callback).onSearchResults(pages, id);
 	}
 
 	public void onAttachmentLoaded(Attachment att, long id) {
@@ -165,10 +165,10 @@ public class CacheManager implements PageInfoCallback, PageHtmlCallback, SearchC
 	
 	private class CallbackPair {
 
-		public LoadingListener loading;
-		public ErrorCallback callback;
+		public CancelableListener loading;
+		public ErrorListener callback;
 
-		public CallbackPair(LoadingListener loading, ErrorCallback callback) {
+		public CallbackPair(CancelableListener loading, ErrorListener callback) {
 			this.loading = loading;
 			this.callback = callback;
 		}

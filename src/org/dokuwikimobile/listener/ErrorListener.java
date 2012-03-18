@@ -1,4 +1,4 @@
-package org.dokuwikimobile.xmlrpc.callback;
+package org.dokuwikimobile.listener;
 
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
@@ -7,7 +7,7 @@ import de.timroes.axmlrpc.XMLRPCServerException;
  *
  * @author Tim Roes
  */
-public interface ErrorCallback {
+public interface ErrorListener {
 
 	public void onError(XMLRPCException error, long id);
 

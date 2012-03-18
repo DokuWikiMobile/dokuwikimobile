@@ -19,14 +19,14 @@ import java.util.List;
 import org.dokuwikimobile.android.R;
 import org.dokuwikimobile.model.SearchResult;
 import org.dokuwikimobile.service.DokuwikiService;
-import org.dokuwikimobile.service.LoadingListener;
+import org.dokuwikimobile.listener.CancelableListener;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
 /**
  *
  * @author Tim Roes
  */
-public class SearchActivity extends DokuwikiActivity implements LoadingListener,
+public class SearchActivity extends DokuwikiActivity implements CancelableListener,
 		OnCancelListener {
 
 	/**
