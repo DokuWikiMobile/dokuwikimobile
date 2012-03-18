@@ -129,8 +129,8 @@ public final class DokuwikiXMLRPCClient {
 		 * @param callback The callback to be called.
 		 * @return The id is passed through for further usage.
 		 */
-		public Canceler addCallback(long id, ErrorListener callback, String methodName, Object[] params) {
-			history.add(new CallbackHistory.Entry(id, callback, methodName, params));
+		public Canceler addCallback(long id, CancelableListener listener, String methodName, Object[] params) {
+			history.add(new CallbackHistory.Entry(id, listener, methodName, params));
 			return new Canceler(id);
 		}
 
@@ -151,10 +151,10 @@ public final class DokuwikiXMLRPCClient {
 				return;
 			} else if(CALL_LOGIN.equals(call.methodName)) {
 				// dokuwiki.login returned
-				((LoginListener)call.callback).onLogin((Boolean)result, id);
+				((LoginListener)call.listener).onLogin((Boolean)result, id);
 			} else if(CALL_GETPAGEHTML.equals(call.methodName)) {
 				// getPageHTML returned
-				((PageHtmlListener)call.callback).onPageHtml(
+				((PageHtmlListener)call.listener).onPageHtml(
 						(String)call.params[0], 
 						(String)result, 
 						id);
@@ -166,7 +166,7 @@ public final class DokuwikiXMLRPCClient {
 						(Date)infos.get(KEY_LAST_MODIFIED),
 						(String)infos.get(KEY_AUTHOR),
 						(Integer)infos.get(KEY_VERSION));
-				((PageInfoListener)call.callback).onPageInfoLoaded(pi, id);
+				((PageInfoListener)call.listener).onPageInfoLoaded(pi, id);
 			} else if(CALL_GETATTACHMENT.equals(call.methodName)) {
 				// TODO: CHECK REAL xmlrpc version here when it is implemented
 				// getAttachment returned
@@ -179,7 +179,7 @@ public final class DokuwikiXMLRPCClient {
 					data = Base64.decode((String)result);
 				}
 				Attachment a = new Attachment(call.params[0].toString(), data);
-				((AttachmentListener)call.callback).onAttachmentLoaded(a, id);
+				((AttachmentListener)call.listener).onAttachmentLoaded(a, id);
 			} else if(CALL_SEARCH.equals(call.methodName)) {
 				List<SearchResult> results = new ArrayList<SearchResult>();
 				Map<String,Object> searchResult;
@@ -192,7 +192,7 @@ public final class DokuwikiXMLRPCClient {
 							(String)searchResult.get("snippet")));
 							
 				}
-				((SearchListener)call.callback).onSearchResults(results, id);
+				((SearchListener)call.listener).onSearchResults(results, id);
 			}
 
 		}
@@ -205,7 +205,7 @@ public final class DokuwikiXMLRPCClient {
 		 */
 		public void onError(long id, XMLRPCException error) {
 			System.err.println(error.getCause());
-			history.remove(id).callback.onError(error, id);
+			history.remove(id).listener.onError(error, id);
 		}
 
 		/**
@@ -237,7 +237,7 @@ public final class DokuwikiXMLRPCClient {
 				// If login failed due to any reason, send original callback
 				if(!login) {
 					// Send error to callback
-					history.remove(id).callback.onServerError(error, id);
+					history.remove(id).listener.onError(error, id);
 					return;
 				}
 
@@ -249,11 +249,11 @@ public final class DokuwikiXMLRPCClient {
 					return;
 				} catch (XMLRPCException ex) {
 					// If the second call fails just send the original error message
-					history.remove(id).callback.onServerError(error, id);
+					history.remove(id).listener.onError(error, id);
 				}
 
 			} else {
-					history.remove(id).callback.onServerError(error, id);
+					history.remove(id).listener.onError(error, id);
 			}
 
 		}

@@ -4,25 +4,25 @@ import android.app.Activity;
 import android.app.Dialog;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
-import org.dokuwikimobile.ui.dialog.LoginDialog;
+import java.util.List;
+import org.dokuwikimobile.listener.CancelableListener;
+import org.dokuwikimobile.listener.LoginListener;
+import org.dokuwikimobile.listener.SearchListener;
 import org.dokuwikimobile.model.Page;
 import org.dokuwikimobile.model.SearchResult;
 import org.dokuwikimobile.service.DokuwikiService;
 import org.dokuwikimobile.service.DokuwikiServiceConnector;
 import org.dokuwikimobile.service.PageLoadedListener;
 import org.dokuwikimobile.service.ServiceConnectorListener;
+import org.dokuwikimobile.ui.dialog.LoginDialog;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
-import org.dokuwikimobile.listener.ErrorListener;
-import org.dokuwikimobile.listener.LoginListener;
-import org.dokuwikimobile.listener.SearchListener;
-import java.util.List;
 
 /**
  *
  * @author Tim Roes
  */
 public abstract class DokuwikiActivity extends Activity 
-		implements ServiceConnectorListener, ErrorListener, PageLoadedListener, 
+		implements ServiceConnectorListener, CancelableListener, PageLoadedListener, 
 		LoginListener, SearchListener, LoginDialog.LoginDialogFinished {
 
 	protected final static int DIALOG_LOGIN = 0;

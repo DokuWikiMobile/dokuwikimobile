@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author timroes
  */
-public interface SearchListener extends ErrorListener {
+public interface SearchListener extends CancelableListener {
 
 	public void onSearchResults(List<SearchResult> pages, long id);
 	
