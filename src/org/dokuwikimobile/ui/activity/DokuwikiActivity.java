@@ -12,9 +12,9 @@ import org.dokuwikimobile.service.DokuwikiServiceConnector;
 import org.dokuwikimobile.service.PageLoadedListener;
 import org.dokuwikimobile.service.ServiceConnectorListener;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
-import org.dokuwikimobile.xmlrpc.callback.ErrorCallback;
-import org.dokuwikimobile.xmlrpc.callback.LoginCallback;
-import org.dokuwikimobile.xmlrpc.callback.SearchCallback;
+import org.dokuwikimobile.listener.ErrorListener;
+import org.dokuwikimobile.listener.LoginListener;
+import org.dokuwikimobile.listener.SearchListener;
 import java.util.List;
 
 /**
@@ -22,8 +22,8 @@ import java.util.List;
  * @author Tim Roes
  */
 public abstract class DokuwikiActivity extends Activity 
-		implements ServiceConnectorListener, ErrorCallback, PageLoadedListener, 
-		LoginCallback, SearchCallback, LoginDialog.LoginDialogFinished {
+		implements ServiceConnectorListener, ErrorListener, PageLoadedListener, 
+		LoginListener, SearchListener, LoginDialog.LoginDialogFinished {
 
 	protected final static int DIALOG_LOGIN = 0;
 	

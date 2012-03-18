@@ -13,17 +13,17 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import org.dokuwikimobile.R;
 import org.dokuwikimobile.Settings;
+import org.dokuwikimobile.listener.CancelableListener;
 import org.dokuwikimobile.model.DokuwikiUrl;
 import org.dokuwikimobile.model.Page;
 import org.dokuwikimobile.service.DokuwikiService;
-import org.dokuwikimobile.service.LoadingListener;
 import org.dokuwikimobile.ui.view.DokuwikiWebView;
 import org.dokuwikimobile.ui.view.DokuwikiWebView.ScrollListener;
 import org.dokuwikimobile.ui.view.MessageView;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
 public class BrowserActivity extends DokuwikiActivity implements ScrollListener, 
-		DokuwikiWebView.LinkLoadListener, LoadingListener {
+		DokuwikiWebView.LinkLoadListener, CancelableListener {
 
 	public final static String PAGEID = "pageid";
 

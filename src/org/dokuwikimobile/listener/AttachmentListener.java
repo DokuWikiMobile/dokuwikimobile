@@ -1,4 +1,4 @@
-package org.dokuwikimobile.xmlrpc.callback;
+package org.dokuwikimobile.listener;
 
 import org.dokuwikimobile.model.Attachment;
 
@@ -6,7 +6,7 @@ import org.dokuwikimobile.model.Attachment;
  *
  * @author Tim Roes
  */
-public interface AttachmentCallback extends ErrorCallback {
+public interface AttachmentListener extends ErrorListener {
 	
 	public void onAttachmentLoaded(Attachment att, long id);
 	

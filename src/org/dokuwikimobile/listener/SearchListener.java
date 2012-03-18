@@ -1,4 +1,4 @@
-package org.dokuwikimobile.xmlrpc.callback;
+package org.dokuwikimobile.listener;
 
 import org.dokuwikimobile.model.SearchResult;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author timroes
  */
-public interface SearchCallback extends ErrorCallback {
+public interface SearchListener extends ErrorListener {
 
 	public void onSearchResults(List<SearchResult> pages, long id);
 	

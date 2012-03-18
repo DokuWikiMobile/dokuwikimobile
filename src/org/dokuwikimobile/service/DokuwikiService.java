@@ -10,10 +10,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dokuwikimobile.Settings;
 import org.dokuwikimobile.cache.CacheManager;
+import org.dokuwikimobile.listener.CancelableListener;
+import org.dokuwikimobile.listener.LoginListener;
+import org.dokuwikimobile.listener.SearchListener;
 import org.dokuwikimobile.manager.PasswordManager;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
-import org.dokuwikimobile.xmlrpc.callback.LoginCallback;
-import org.dokuwikimobile.xmlrpc.callback.SearchCallback;
 
 /**
  *
@@ -60,15 +61,15 @@ public class DokuwikiService extends Service {
 		return binder;
 	}
 
-	public long getPage(PageLoadedListener callback, LoadingListener loading, String pagename) {
+	public long getPage(PageLoadedListener callback, CancelableListener loading, String pagename) {
 		return cache.getPage(callback, loading, pagename);
 	}
 
-	public void login(LoginCallback callback, String username, String password) {
+	public void login(LoginListener callback, String username, String password) {
 		client.login(callback, username, password);
 	}
 
-	public void search(SearchCallback callback, LoadingListener loading, String query) {
+	public void search(SearchListener callback, CancelableListener loading, String query) {
 		cache.search(callback, loading, query);
 	}
 

@@ -2,7 +2,7 @@ package org.dokuwikimobile.xmlrpc;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.dokuwikimobile.xmlrpc.callback.ErrorCallback;
+import org.dokuwikimobile.listener.ErrorListener;
 
 /**
  *
@@ -27,13 +27,13 @@ public class CallbackHistory {
 
 	public static class Entry {
 		public long id;
-		public ErrorCallback callback;
+		public ErrorListener callback;
 		public String methodName;
 		public Object[] params;
 
 		public Entry() { }
 
-		public Entry(long id, ErrorCallback callback, String methodName, Object[] params) {
+		public Entry(long id, ErrorListener callback, String methodName, Object[] params) {
 			this.id = id;
 			this.callback = callback;
 			this.methodName = methodName;

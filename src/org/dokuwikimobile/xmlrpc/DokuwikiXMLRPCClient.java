@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.dokuwikimobile.listener.*;
 import org.dokuwikimobile.manager.PasswordManager;
 import org.dokuwikimobile.model.Attachment;
 import org.dokuwikimobile.model.PageInfo;
 import org.dokuwikimobile.model.SearchResult;
-import org.dokuwikimobile.xmlrpc.callback.*;
+
 /**
  * This client is responsible for direct communication with the server.
  * It is the only part of the application that has access to the XML-RPC interface 
@@ -65,17 +66,17 @@ public final class DokuwikiXMLRPCClient {
 		version = v;
 	}
 
-	
-
 	public void setLoginData(String username, String password) {
-		client.setLoginData(username, password);
+		// TODO
+		client.setLoginData(username, password);	
 	}
 
 	public void clearLoginData() {
+		// TODO:
 		client.clearLoginData();
 	}
 
-	public Canceler login(LoginCallback callback, String username, String password) {
+	public Canceler login(LoginListener callback, String username, String password) {
                 /* TODO: Add basic auth code and change callbackHandler
                 if(passManager.hasLoginData()) {
                     client.setLoginData(username, password);
@@ -85,22 +86,22 @@ public final class DokuwikiXMLRPCClient {
 		return callbackHandler.addCallback(id, callback, CALL_LOGIN, new Object[]{ username, password });
 	}
 
-	public Canceler getPageHTML(PageHtmlCallback callback, String pagename) {
+	public Canceler getPageHTML(PageHtmlListener callback, String pagename) {
 		long id = client.callAsync(callbackHandler, CALL_GETPAGEHTML, pagename);
 		return callbackHandler.addCallback(id, callback, CALL_GETPAGEHTML, new Object[]{ pagename });
 	}
 
-	public Canceler getPageInfo(PageInfoCallback callback, String pagename) {
+	public Canceler getPageInfo(PageInfoListener callback, String pagename) {
 		long id = client.callAsync(callbackHandler, CALL_PAGE_INFO, pagename);
 		return callbackHandler.addCallback(id, callback, CALL_PAGE_INFO, new Object[]{ pagename });
 	}
 
-	public Canceler getAttachment(AttachmentCallback callback, String aid) {
+	public Canceler getAttachment(AttachmentListener callback, String aid) {
 		long id = client.callAsync(callbackHandler, CALL_GETATTACHMENT, aid);
 		return callbackHandler.addCallback(id, callback, CALL_GETATTACHMENT, new Object[]{ aid });
 	}
 
-	public Canceler search(SearchCallback callback, String query) {
+	public Canceler search(SearchListener callback, String query) {
 		query = "*" + query + "*";
 		long id = client.callAsync(callbackHandler, CALL_SEARCH, query);
 		return callbackHandler.addCallback(id, callback, CALL_SEARCH, new Object[]{ query });
@@ -128,7 +129,7 @@ public final class DokuwikiXMLRPCClient {
 		 * @param callback The callback to be called.
 		 * @return The id is passed through for further usage.
 		 */
-		public Canceler addCallback(long id, ErrorCallback callback, String methodName, Object[] params) {
+		public Canceler addCallback(long id, ErrorListener callback, String methodName, Object[] params) {
 			history.add(new CallbackHistory.Entry(id, callback, methodName, params));
 			return new Canceler(id);
 		}
@@ -150,10 +151,10 @@ public final class DokuwikiXMLRPCClient {
 				return;
 			} else if(CALL_LOGIN.equals(call.methodName)) {
 				// dokuwiki.login returned
-				((LoginCallback)call.callback).onLogin((Boolean)result, id);
+				((LoginListener)call.callback).onLogin((Boolean)result, id);
 			} else if(CALL_GETPAGEHTML.equals(call.methodName)) {
 				// getPageHTML returned
-				((PageHtmlCallback)call.callback).onPageHtml(
+				((PageHtmlListener)call.callback).onPageHtml(
 						(String)call.params[0], 
 						(String)result, 
 						id);
@@ -165,7 +166,7 @@ public final class DokuwikiXMLRPCClient {
 						(Date)infos.get(KEY_LAST_MODIFIED),
 						(String)infos.get(KEY_AUTHOR),
 						(Integer)infos.get(KEY_VERSION));
-				((PageInfoCallback)call.callback).onPageInfoLoaded(pi, id);
+				((PageInfoListener)call.callback).onPageInfoLoaded(pi, id);
 			} else if(CALL_GETATTACHMENT.equals(call.methodName)) {
 				// TODO: CHECK REAL xmlrpc version here when it is implemented
 				// getAttachment returned
@@ -178,7 +179,7 @@ public final class DokuwikiXMLRPCClient {
 					data = Base64.decode((String)result);
 				}
 				Attachment a = new Attachment(call.params[0].toString(), data);
-				((AttachmentCallback)call.callback).onAttachmentLoaded(a, id);
+				((AttachmentListener)call.callback).onAttachmentLoaded(a, id);
 			} else if(CALL_SEARCH.equals(call.methodName)) {
 				List<SearchResult> results = new ArrayList<SearchResult>();
 				Map<String,Object> searchResult;
@@ -191,7 +192,7 @@ public final class DokuwikiXMLRPCClient {
 							(String)searchResult.get("snippet")));
 							
 				}
-				((SearchCallback)call.callback).onSearchResults(results, id);
+				((SearchListener)call.callback).onSearchResults(results, id);
 			}
 
 		}

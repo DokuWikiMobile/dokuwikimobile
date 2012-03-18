@@ -13,14 +13,14 @@ import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import org.dokuwikimobile.R;
 import org.dokuwikimobile.manager.PasswordManager;
-import org.dokuwikimobile.xmlrpc.callback.LoginCallback;
+import org.dokuwikimobile.listener.LoginListener;
 
 /**
  *
  * @author Tim Roes
  */
 public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
-		CheckBox.OnCheckedChangeListener, LoginCallback {
+		CheckBox.OnCheckedChangeListener, LoginListener {
 
 	private final int HIDE_PROGRESS = 0x01;
 	private final int SHOW_TOAST = 0x02;
