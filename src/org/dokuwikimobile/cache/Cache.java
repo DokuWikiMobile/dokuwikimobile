@@ -1,18 +1,18 @@
 package org.dokuwikimobile.cache;
 
+import android.util.Log;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.model.Attachment;
 import org.dokuwikimobile.model.Page;
 import org.dokuwikimobile.model.PageInfo;
 import org.dokuwikimobile.util.FileUtil;
-import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * @author Tim Roes
+ * @author Tim Roes <mail@timroes.de>
  */
 public class Cache {
 
@@ -29,8 +29,12 @@ public class Cache {
 	private final File mediaDir;
 
 	public Cache(String cacheBaseDir) {
+		this(new File(cacheBaseDir));		
+	}
+	
+	public Cache(File cacheBaseDir) {
 
-		cacheDir = new File(cacheBaseDir);
+		cacheDir = cacheBaseDir;
 		pageContentDir = new File(cacheDir, PAGE_DIR + File.separator + PAGE_CONTENTS_DIR);
 		pageInfoDir = new File(cacheDir, PAGE_DIR + File.separator + PAGE_INFO_DIR);
 		mediaDir = new File(cacheDir, MEDIA_DIR);
@@ -127,8 +131,7 @@ public class Cache {
 			obj = new ObjectOutputStream(stream);
 			obj.writeObject(object);
 		} catch(IOException ex) {
-			Logger.getLogger(Cache.class.getName()).log(Level.WARNING, 
-					"Writing cache to disk failed.", ex);
+			Log.w(DokuwikiApplication.LOGGER_NAME, "Writing cache to disk failed.");
 		} finally {
 			try {
 				obj.close();
