@@ -18,8 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.dokuwikimobile.R;
 import org.dokuwikimobile.model.SearchResult;
-import org.dokuwikimobile.service.DokuwikiService;
 import org.dokuwikimobile.listener.CancelableListener;
+import org.dokuwikimobile.manager.DokuwikiManager;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
 /**
@@ -28,6 +28,8 @@ import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
  */
 public class SearchActivity extends DokuwikiActivity implements CancelableListener,
 		OnCancelListener {
+
+	private DokuwikiManager manager;
 
 	/**
 	 * The progress dialog that is showed during searching.
@@ -100,6 +102,7 @@ public class SearchActivity extends DokuwikiActivity implements CancelableListen
 		resultList.setAdapter(adapter);
 
 		queueSearch();
+		startSearch();
 	}
 
 	@Override
@@ -107,14 +110,8 @@ public class SearchActivity extends DokuwikiActivity implements CancelableListen
 		super.onNewIntent(intent);
 		setIntent(intent);
 		queueSearch();
-	};
-
-	@Override
-	public void onServiceBound(DokuwikiService service) {
-		super.onServiceBound(service);
-		// Do a requested search
 		startSearch();
-	}
+	};
 
 	/**
 	 * Queue the search string from the intent for a search.
@@ -139,8 +136,8 @@ public class SearchActivity extends DokuwikiActivity implements CancelableListen
 	 * is available for the activity.
 	 */
 	private void startSearch() {
-		if(connector.isConnected() && queuedSearch != null) {
-			connector.getService().search(this, this, queuedSearch);
+		if(queuedSearch != null) {
+			manager.search(this, queuedSearch);
 			// Clear queued search since, since its started now
 			queuedSearch = null;
 		}

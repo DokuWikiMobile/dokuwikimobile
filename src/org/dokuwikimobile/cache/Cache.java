@@ -28,11 +28,6 @@ public class Cache {
 	private final File pageContentDir;
 	private final File mediaDir;
 
-	// TODO: Remove this
-	public Cache(String cacheBaseDir) {
-		this(new File(cacheBaseDir));		
-	}
-	
 	public Cache(File cacheBaseDir) {
 
 		cacheDir = cacheBaseDir;

@@ -2,6 +2,7 @@ package org.dokuwikimobile.ui.activity;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.os.Bundle;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import java.util.List;
@@ -10,10 +11,8 @@ import org.dokuwikimobile.listener.LoginListener;
 import org.dokuwikimobile.listener.SearchListener;
 import org.dokuwikimobile.model.Page;
 import org.dokuwikimobile.model.SearchResult;
-import org.dokuwikimobile.service.DokuwikiService;
-import org.dokuwikimobile.service.DokuwikiServiceConnector;
-import org.dokuwikimobile.service.PageLoadedListener;
-import org.dokuwikimobile.service.ServiceConnectorListener;
+import org.dokuwikimobile.listener.PageListener;
+import org.dokuwikimobile.manager.DokuwikiManager;
 import org.dokuwikimobile.ui.dialog.LoginDialog;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
 
@@ -22,31 +21,16 @@ import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
  * @author Tim Roes
  */
 public abstract class DokuwikiActivity extends Activity 
-		implements ServiceConnectorListener, CancelableListener, PageLoadedListener, 
+		implements CancelableListener, PageListener, 
 		LoginListener, SearchListener, LoginDialog.LoginDialogFinished {
 
 	protected final static int DIALOG_LOGIN = 0;
 	
-	protected final DokuwikiServiceConnector connector;
-
-	public DokuwikiActivity() {
-		connector = new DokuwikiServiceConnector(this, this);
-	}
-	
-	public void onServiceBound(DokuwikiService service) { }
-
-	public void onServiceUnbound() { }
+	protected DokuwikiManager manager;
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-		connector.bindToService();
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-		connector.unbindFromService();
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override

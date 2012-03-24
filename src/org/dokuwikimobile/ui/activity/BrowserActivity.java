@@ -16,7 +16,6 @@ import org.dokuwikimobile.Settings;
 import org.dokuwikimobile.listener.CancelableListener;
 import org.dokuwikimobile.model.DokuwikiUrl;
 import org.dokuwikimobile.model.Page;
-import org.dokuwikimobile.service.DokuwikiService;
 import org.dokuwikimobile.ui.view.DokuwikiWebView;
 import org.dokuwikimobile.ui.view.DokuwikiWebView.ScrollListener;
 import org.dokuwikimobile.ui.view.MessageView;
@@ -54,12 +53,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		browser.setScrollListener(this);
 
 		message.setMessage(MessageView.Type.WARNING, R.string.page_loading);
-	}
 
-	@Override
-	public void onServiceBound(DokuwikiService service) {
-		super.onServiceBound(service);
-		// If no page has been requested; first start!
 		if(getIntent().getStringExtra(PAGEID) != null) {
 			// If page id was in intent, use it to open page and delete it afterwards
 			displayPage(DokuwikiUrl.parseUrl(getIntent().getStringExtra(PAGEID)));
@@ -80,7 +74,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		message.showLoading();
 
 		currentRequested = url;
-		connector.getService().getPage(this, this, url.id);
+		manager.getPage(this, url.id);
 		Toast.makeText(this, "Loading page...", Toast.LENGTH_SHORT).show();
 	}
 

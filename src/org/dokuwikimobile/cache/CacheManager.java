@@ -1,28 +1,18 @@
 package org.dokuwikimobile.cache;
 
-import org.dokuwikimobile.model.Attachment;
-import org.dokuwikimobile.model.PageInfo;
-import org.dokuwikimobile.model.DokuwikiUrl;
-import org.dokuwikimobile.model.Page;
-import org.dokuwikimobile.model.SearchResult;
-import org.dokuwikimobile.listener.AttachmentListener;
-import org.dokuwikimobile.listener.PageHtmlListener;
-import org.dokuwikimobile.listener.PageInfoListener;
-import org.dokuwikimobile.listener.SearchListener;
-import org.dokuwikimobile.listener.ErrorListener;
 import android.content.Context;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.dokuwikimobile.listener.CancelableListener;
-import org.dokuwikimobile.service.PageLoadedListener;
+import org.dokuwikimobile.listener.*;
+import org.dokuwikimobile.model.*;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
 /**
- *
+ * TODO: This class will be removed and all its functionality will be in the DokuwikiManager.
  * @author Tim Roes
  */
 public class CacheManager implements PageInfoListener, PageHtmlListener, SearchListener,
@@ -41,16 +31,17 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 
 
 	public CacheManager(Context context, DokuwikiXMLRPCClient client) {
-		cache = new Cache(context.getCacheDir().getAbsolutePath());
+		//cache = new Cache(context.getCacheDir().getAbsolutePath());
 		this.context = context;
 		this.client = client;
 	}
 
-	private void put(Long id, CancelableListener listener, ErrorListener callback) {
-		callbacks.put(id, new CallbackPair(listener, callback));
+	// object = errorcallback
+	private void put(Long id, CancelableListener listener, Object callback) {
+		//callbacks.put(id, new CallbackPair(listener, callback));
 	}
 
-	public long getPage(PageLoadedListener listener, CancelableListener loading, String pagename) {
+	public long getPage(PageListener listener, CancelableListener loading, String pagename) {
 		
 		// If cache strategy allows showing cached pages, show cached page
 		if(strategy.showCachedPage()) {
@@ -128,13 +119,13 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 
 		CallbackPair pair = callbacks.remove(id);
 		pair.loading.endLoading();
-		((PageLoadedListener)pair.callback).onPageLoaded(p);
+		//((PageListener)pair.callback).onPageLoaded(p);
 	}
 
 	public void onSearchResults(List<SearchResult> pages, long id) {
 		CallbackPair pair = callbacks.remove(id);
 		pair.loading.endLoading();
-		((SearchListener)pair.callback).onSearchResults(pages, id);
+		//((SearchListener)pair.callback).onSearchResults(pages, id);
 	}
 
 	public void onAttachmentLoaded(Attachment att, long id) {
@@ -143,12 +134,12 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 	}
 
 	public void onError(XMLRPCException error, long id) {
-		callbacks.remove(id).callback.onError(error, id);
+		//callbacks.remove(id).callback.onError(error, id);
 	}
 
 	public void onServerError(XMLRPCServerException error, long id) {
 		System.err.println(error);
-		callbacks.remove(id).callback.onServerError(error, id);
+		//callbacks.remove(id).callback.onServerError(error, id);
 	}
 
 	/**
@@ -162,15 +153,24 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 	private void putDependent(long origId, Canceler canceler) {
 		callbacks.put(canceler.getId(), callbacks.get(origId));
 	}
-	
+
+	public void startLoading(Canceler cancel) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	public void endLoading() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
 	private class CallbackPair {
 
 		public CancelableListener loading;
-		public ErrorListener callback;
+		//public ErrorListener callback;
 
-		public CallbackPair(CancelableListener loading, ErrorListener callback) {
+		// object = errorListener
+		public CallbackPair(CancelableListener loading, Object callback) {
 			this.loading = loading;
-			this.callback = callback;
+//			this.callback = callback;
 		}
 		
 	}

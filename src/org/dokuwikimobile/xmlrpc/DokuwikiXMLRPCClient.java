@@ -50,10 +50,10 @@ public final class DokuwikiXMLRPCClient {
 
 	private XMLRPCClient client;
 	private CallbackHandler callbackHandler = new CallbackHandler();
-	private final PasswordManager passManager;
+	private LoginData loginData;
 
-	public DokuwikiXMLRPCClient(URL url, PasswordManager manager) {
-		this.passManager = manager;
+	public DokuwikiXMLRPCClient(URL url) {
+
 		client = new XMLRPCClient(url, "DokuWikiMobile", XMLRPCClient.FLAGS_ENABLE_COOKIES 
 				| XMLRPCClient.FLAGS_IGNORE_STATUSCODE | XMLRPCClient.FLAGS_FORWARD);
 		
@@ -68,12 +68,12 @@ public final class DokuwikiXMLRPCClient {
 	}
 
 	public void setLoginData(LoginData login) {
-		// TODO
+		this.loginData = loginData;
 		client.setLoginData(login.Username, login.Password);	
 	}
 
 	public void clearLoginData() {
-		// TODO:
+		this.loginData = null;
 		client.clearLoginData();
 	}
 
@@ -102,11 +102,6 @@ public final class DokuwikiXMLRPCClient {
 		query = "*" + query + "*";
 		long id = client.callAsync(callbackHandler, CALL_SEARCH, query);
 		return callbackHandler.addCallback(id, callback, CALL_SEARCH, new Object[]{ query });
-	}
-
-	public void logout() {
-		passManager.clearLoginData();
-		client.clearCookies();
 	}
 
 	/**
@@ -220,12 +215,12 @@ public final class DokuwikiXMLRPCClient {
 
 			// If rights are missing try to login and try the same call again
 			if(error.getErrorNr() == ERROR_NO_ACCESS 
-					&& passManager.hasLoginData()) {
+					&& loginData != null) {
 				
 				// Try to login.
 				boolean login = false;
 				try {
-					login = (Boolean)client.call(CALL_LOGIN, passManager.getUsername(), passManager.getPassword());
+					login = (Boolean)client.call(CALL_LOGIN, loginData.Username, loginData.Password);
 				} catch (XMLRPCException ex) {
 					// Don't do anything. Since login will stay false it will be
 					// handled with the next if statement.
@@ -266,6 +261,7 @@ public final class DokuwikiXMLRPCClient {
 		}
 		
 		public void cancel() {
+			callbackHandler.history.remove(id);
 			client.cancel(id);
 		}
 

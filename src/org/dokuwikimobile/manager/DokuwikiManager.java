@@ -10,8 +10,10 @@ import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.cache.Cache;
 import org.dokuwikimobile.listener.CancelableListener;
 import org.dokuwikimobile.listener.LoginListener;
+import org.dokuwikimobile.listener.SearchListener;
 import org.dokuwikimobile.model.Dokuwiki;
 import org.dokuwikimobile.model.LoginData;
+import org.dokuwikimobile.listener.PageListener;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
@@ -28,6 +30,10 @@ import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
  * @author Tim Roes <mail@timroes.de>
  */
 public class DokuwikiManager {
+
+	/// ==================
+	/// STATIC METHODS
+	/// ==================
 
 	private static Map<Dokuwiki, DokuwikiManager> instances 
 			= new HashMap<Dokuwiki, DokuwikiManager>();
@@ -59,7 +65,7 @@ public class DokuwikiManager {
 		manager.passwordManager = new PasswordManager(
 				context.getSharedPreferences(dokuwiki.getMd5hash(), Context.MODE_PRIVATE));
 		// TODO: Remove password manager from dokuwikiXMLRPCclient
-		manager.xmlrpcClient = new DokuwikiXMLRPCClient(dokuwiki.getUrl(), null);
+		manager.xmlrpcClient = new DokuwikiXMLRPCClient(dokuwiki.getUrl());
 
 		// Pass login data to XMLRPC client
 		if(manager.passwordManager.hasLoginData()) {
@@ -85,6 +91,11 @@ public class DokuwikiManager {
 	public static Collection<DokuwikiManager> getAll() {
 		return instances.values();
 	}
+
+
+	/// ====================
+	/// INSTANCE
+	/// ====================
 	
 	private Dokuwiki dokuwiki;
 	private PasswordManager passwordManager;
@@ -93,17 +104,65 @@ public class DokuwikiManager {
 
 	private Listener listener = new Listener();
 
-	private DokuwikiManager() {
+	private DokuwikiManager() { }
 
+	/// ====================
+	/// CACHE FUNCTIONS
+	/// ====================
+
+	/**
+	 * Returns the size of the cache in byte.
+	 * 
+	 * @return Size of cache used in bytes.
+	 */
+	public int getCacheSize() {
+		return cache.getCacheSize();
 	}
 
-	public void login(LoginListener listerner, LoginData login) {
-		// Save login data in password manager
-		passwordManager.saveLoginData(login);
+	/**
+	 * Clear the whole cache of this dokuwiki. 
+	 * This will delete all cached pages and media. Saved preferences will not 
+	 * be touched.
+	 */
+	public void clearCache() {
+		cache.clear();
+	}
 
+	/// ====================
+	/// PAGE FUNCTIONS
+	/// ====================
+
+	public void getPage(PageListener listener, String pageName) {
+		// TODO: Implement page get
+	}
+
+	/// ====================
+	/// SEARCHING
+	/// ====================
+
+	public void search(SearchListener listener, String query) {
+		// TODO: Implement search
+	}
+
+	/// ====================
+	/// AUTHENTICATION
+	/// ====================
+	
+	public void login(LoginListener listerner, LoginData login, boolean saveLogin) {
+
+		if(saveLogin) {
+			// Save login data in password manager
+			passwordManager.saveLoginData(login);
+		}
+
+		// Set login data in xmlrpc interface
+		xmlrpcClient.setLoginData(login);
+
+		// TODO: move startloading to xmlrpc
 		Canceler canceler = xmlrpcClient.login(this.listener, login);
 		listener.startLoading(canceler);
 		listener.put(canceler.getId(), listener);
+
 	}
 
 	/**
@@ -115,6 +174,10 @@ public class DokuwikiManager {
 	}
 
 
+	/// ====================
+	/// LISTENER
+	/// ====================
+	
 	/**
 	 * The Listener class handles all callbacks from the XMLRPC interface.
 	 * It stores a map of all call ids and their listeners.
@@ -183,10 +246,13 @@ public class DokuwikiManager {
 
 		public void onLogin(boolean succeeded, long id) {
 
-			// If login data was wrong, delete it from password manager
+			// If login data was wrong, delete it from password manager and xmlrpc
+			// client
 			if(!succeeded) {
 				passwordManager.clearLoginData();
+				xmlrpcClient.clearLoginData();
 			}
+
 			// Notify original listener
 			LoginListener l;
 			if((l = getListener(id, LoginListener.class, true)) != null) {

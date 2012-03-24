@@ -1,6 +1,7 @@
 package org.dokuwikimobile.ui.dialog;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,22 +13,29 @@ import android.widget.*;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import org.dokuwikimobile.R;
-import org.dokuwikimobile.manager.PasswordManager;
 import org.dokuwikimobile.listener.LoginListener;
+import org.dokuwikimobile.manager.DokuwikiManager;
+import org.dokuwikimobile.manager.PasswordManager;
+import org.dokuwikimobile.model.LoginData;
+import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
 /**
  *
  * @author Tim Roes
  */
-public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
+public class LoginDialog extends Dialog implements View.OnClickListener,
 		CheckBox.OnCheckedChangeListener, LoginListener {
 
 	private final int HIDE_PROGRESS = 0x01;
 	private final int SHOW_TOAST = 0x02;
 	private final int NOTIFY_LISTENER = 0x03;
+
+	private DokuwikiManager manager;
 	
 	private ProgressDialog progress;
 	private LoginDialogFinished listener;
+
+	private Context context;
 
 	final Handler handler = new Handler() {
 	
@@ -52,6 +60,7 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 
 	public LoginDialog(Context context, LoginDialogFinished listener) {
 		super(context);
+		this.context = context;
 		this.listener = listener;
 	}
 
@@ -102,14 +111,14 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 		
 		// Insert cancel button
 		builder.setNegativeButton(android.R.string.no, new OnClickListener() {
-			public void onClick(DialogInterface arg0, int arg1) {
+			public void onClick(DialogInterface inter, int button) {
 				((CheckBox)findViewById(R.id.savelogin)).setChecked(true);
 			}
 		});
 		
 		// Dont disable checkbox when user cancels dialog
 		builder.setOnCancelListener(new OnCancelListener() {
-			public void onCancel(DialogInterface arg0) {
+			public void onCancel(DialogInterface inter) {
 				((CheckBox)findViewById(R.id.savelogin)).setChecked(true);
 			}
 		});
@@ -120,15 +129,14 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 
 	private void doLogin() {
 		
-		if(connector.isConnected()) {
-			// Show waiting dialog
-			progress = ProgressDialog.show(context, null, 
-					context.getResources().getString(R.string.loggingin), true, false);
-			connector.getService().login(this, 
-					((EditText)findViewById(R.id.username)).getEditableText().toString(),
-					((EditText)findViewById(R.id.password)).getEditableText().toString());
-		}
-		
+		// Show waiting dialog
+		progress = ProgressDialog.show(context, null, 
+				context.getResources().getString(R.string.loggingin), true, false);
+		LoginData loginData = new LoginData(
+				((EditText) findViewById(R.id.username)).getEditableText().toString(), 
+				((EditText) findViewById(R.id.password)).getEditableText().toString());
+		manager.login(this, loginData, ((CheckBox)findViewById(R.id.savelogin)).isChecked());
+	
 	}
 
 	public void onLogin(boolean succeeded, long id) {
@@ -136,12 +144,6 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 		handler.sendMessage(handler.obtainMessage(HIDE_PROGRESS));
 
 		if(succeeded) {
-			if(((CheckBox)findViewById(R.id.savelogin)).isChecked()) {
-				// Save user login data
-				PasswordManager.get(context).saveLoginData(
-						((EditText)findViewById(R.id.username)).getText().toString(),
-						((EditText)findViewById(R.id.password)).getText().toString());
-			}
 			handler.sendMessage(handler.obtainMessage(NOTIFY_LISTENER, 
 					LoginDialogFinished.FinishState.SUCCESS));
 			dismiss();
@@ -161,6 +163,14 @@ public class LoginDialog extends DokuwikiDialog implements View.OnClickListener,
 		handler.sendMessage(handler.obtainMessage(HIDE_PROGRESS));
 		handler.sendMessage(handler.obtainMessage(SHOW_TOAST, R.string.loginfailed, Toast.LENGTH_SHORT));
 		System.err.println(error.toString());
+	}
+
+	public void startLoading(Canceler cancel) {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	public void endLoading() {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	public static interface LoginDialogFinished {
