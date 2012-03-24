@@ -1,4 +1,4 @@
-package org.dokuwikimobile.model;
+package org.dokuwikimobile;
 
 import java.net.MalformedURLException;
 import java.net.URL;

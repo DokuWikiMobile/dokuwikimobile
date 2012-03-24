@@ -3,15 +3,14 @@
     <string name="app_name">DokuWiki Mobile</string>
 
 	<string name="ok">OK</string>
-	<string name="cancel">Cancel</string>
 
 	<!-- Browser activity -->
-	<string name="page_loading">Page is loading...</string>
+	<string name="page_loading">Page is loading…</string>
 
 	<!-- Search -->
 	<string name="search">Search</string>
 	<string name="search_hint">Search pages</string>
-	<string name="searching">Searching...</string>
+	<string name="searching">Searching…</string>
 	<string name="abortsearch">Click here to stop searching.</string>
 	<string name="search_click">Click to start a new search.</string>
 	<string name="search_hits">%s hits</string>
@@ -29,9 +28,6 @@
 		&lt;b&gt;Last edited:&lt;/b&gt;&lt;br&gt;%3$s
 		&lt;/html&gt;
 	</string>
-	<string name="pageid">Page ID</string>
-	<string name="pageauthor">Last edited by</string>
-	<string name="pagetime">Last edited at</string>
 
 	<!-- Login Dialog -->
 	<string name="pleaselogin">Please Login</string>
@@ -41,7 +37,7 @@
 	<string name="login">Login</string>
 	<string name="notrecommended">Not recommended</string>
 	<string name="nocachewithoutlogin">Intelligent caching might not work propably with this disabled. Disable anyway?</string>
-	<string name="loggingin">Logging in...</string>
+	<string name="loggingin">Logging in…</string>
 	<string name="loginwrong">The username or password is wrong.</string>
 	<string name="loginfailed">An error occured. Please try again.</string>
 

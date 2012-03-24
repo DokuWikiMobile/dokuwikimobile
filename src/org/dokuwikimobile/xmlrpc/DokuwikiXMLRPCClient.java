@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.dokuwikimobile.listener.*;
-import org.dokuwikimobile.manager.PasswordManager;
 import org.dokuwikimobile.model.Attachment;
 import org.dokuwikimobile.model.LoginData;
 import org.dokuwikimobile.model.PageInfo;
@@ -67,9 +66,9 @@ public final class DokuwikiXMLRPCClient {
 		version = v;
 	}
 
-	public void setLoginData(LoginData login) {
+	public void setLoginData(LoginData loginData) {
 		this.loginData = loginData;
-		client.setLoginData(login.Username, login.Password);	
+		client.setLoginData(loginData.Username, loginData.Password);	
 	}
 
 	public void clearLoginData() {

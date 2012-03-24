@@ -11,7 +11,7 @@ import org.dokuwikimobile.cache.Cache;
 import org.dokuwikimobile.listener.CancelableListener;
 import org.dokuwikimobile.listener.LoginListener;
 import org.dokuwikimobile.listener.SearchListener;
-import org.dokuwikimobile.model.Dokuwiki;
+import org.dokuwikimobile.Dokuwiki;
 import org.dokuwikimobile.model.LoginData;
 import org.dokuwikimobile.listener.PageListener;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
