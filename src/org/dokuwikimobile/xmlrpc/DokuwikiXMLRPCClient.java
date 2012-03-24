@@ -13,6 +13,7 @@ import java.util.Map;
 import org.dokuwikimobile.listener.*;
 import org.dokuwikimobile.manager.PasswordManager;
 import org.dokuwikimobile.model.Attachment;
+import org.dokuwikimobile.model.LoginData;
 import org.dokuwikimobile.model.PageInfo;
 import org.dokuwikimobile.model.SearchResult;
 
@@ -28,7 +29,7 @@ import org.dokuwikimobile.model.SearchResult;
  * passed in the constructor, will be called with either the error message
  * or the response from the server.
  * 
- * @author Tim Roes
+ * @author Tim Roes <mail@timroes.de>
  */
 public final class DokuwikiXMLRPCClient {
 
@@ -66,9 +67,9 @@ public final class DokuwikiXMLRPCClient {
 		version = v;
 	}
 
-	public void setLoginData(String username, String password) {
+	public void setLoginData(LoginData login) {
 		// TODO
-		client.setLoginData(username, password);	
+		client.setLoginData(login.Username, login.Password);	
 	}
 
 	public void clearLoginData() {
@@ -76,14 +77,10 @@ public final class DokuwikiXMLRPCClient {
 		client.clearLoginData();
 	}
 
-	public Canceler login(LoginListener callback, String username, String password) {
-                /* TODO: Add basic auth code and change callbackHandler
-                if(passManager.hasLoginData()) {
-                    client.setLoginData(username, password);
-                }
-                */
-		long id = client.callAsync(callbackHandler, CALL_LOGIN, username, password);
-		return callbackHandler.addCallback(id, callback, CALL_LOGIN, new Object[]{ username, password });
+	public Canceler login(LoginListener callback, LoginData login) {
+		long id = client.callAsync(callbackHandler, CALL_LOGIN, login.Username, login.Password);
+		return callbackHandler.addCallback(id, callback, CALL_LOGIN, 
+				new Object[]{ login.Username, login.Password });
 	}
 
 	public Canceler getPageHTML(PageHtmlListener callback, String pagename) {
