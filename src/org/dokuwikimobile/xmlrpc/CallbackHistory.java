@@ -5,7 +5,7 @@ import java.util.Map;
 import org.dokuwikimobile.listener.CancelableListener;
 
 /**
- *
+ * The CallbackHistory provides a list of all active callback handler to the server.
  * @author Tim Roes
  */
 public class CallbackHistory {
@@ -25,6 +25,9 @@ public class CallbackHistory {
 		return history.get(id);
 	}
 
+	/**
+	 * This inner class handles the creation of an CallbackHistory entry.   
+	 */
 	public static class Entry {
 		public long id;
 		public CancelableListener listener;

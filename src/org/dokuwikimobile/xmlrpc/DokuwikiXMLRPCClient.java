@@ -78,8 +78,10 @@ public final class DokuwikiXMLRPCClient {
 
 	public Canceler login(LoginListener callback, LoginData login) {
 		long id = client.callAsync(callbackHandler, CALL_LOGIN, login.Username, login.Password);
-		return callbackHandler.addCallback(id, callback, CALL_LOGIN, 
+		Canceler c = callbackHandler.addCallback(id, callback, CALL_LOGIN, 
 				new Object[]{ login.Username, login.Password });
+		callback.onStartLoading(c, id);
+		return c;
 	}
 
 	public Canceler getPageHTML(PageHtmlListener callback, String pagename) {
@@ -185,7 +187,9 @@ public final class DokuwikiXMLRPCClient {
 				}
 				((SearchListener)call.listener).onSearchResults(results, id);
 			}
-
+			
+			call.listener.onEndLoading(id);
+			
 		}
 
 		/**
@@ -251,6 +255,9 @@ public final class DokuwikiXMLRPCClient {
 
 	}
 
+	/**
+	 * This inner class provides methods to cancel calls.
+	 */
 	public class Canceler {
 
 		private long id;

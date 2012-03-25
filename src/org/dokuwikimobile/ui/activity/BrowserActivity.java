@@ -201,11 +201,11 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		currentRequested = link;
 	}
 
-	public void startLoading(Canceler cancel) {
+	public void onStartLoading(Canceler cancel, long id) {
 		this.canceler = cancel;
 	}
 
-	public void endLoading() {
+	public void onEndLoading(long id) {
 		message.post(new Runnable() {
 			public void run() {
 				message.hideLoading();

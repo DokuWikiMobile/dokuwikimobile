@@ -171,12 +171,12 @@ public class SearchActivity extends DokuwikiActivity implements CancelableListen
 
 	}
 
-	public void startLoading(Canceler cancel) {
+	public void onStartLoading(Canceler cancel, long id) {
 		this.canceler = cancel;
 		showBottomLoading();
 	}
 
-	public void endLoading() {
+	public void onEndLoading(long id) {
 		hideBottomLoading();
 		hideDialogLoading();
 	}

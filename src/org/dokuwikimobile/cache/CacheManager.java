@@ -73,7 +73,7 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 		put(canc.getId(), loading, callback);
 
 		// Notifiy that we started loading
-		loading.startLoading(canc);
+		loading.onStartLoading(canc, canc.getId());
 		
 		return canc;
 		
@@ -118,13 +118,13 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 		}
 
 		CallbackPair pair = callbacks.remove(id);
-		pair.loading.endLoading();
+		pair.loading.onEndLoading(id);
 		//((PageListener)pair.callback).onPageLoaded(p);
 	}
 
 	public void onSearchResults(List<SearchResult> pages, long id) {
 		CallbackPair pair = callbacks.remove(id);
-		pair.loading.endLoading();
+		pair.loading.onEndLoading(id);
 		//((SearchListener)pair.callback).onSearchResults(pages, id);
 	}
 
@@ -154,11 +154,11 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 		callbacks.put(canceler.getId(), callbacks.get(origId));
 	}
 
-	public void startLoading(Canceler cancel) {
+	public void onStartLoading(Canceler cancel, long id) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	public void endLoading() {
+	public void onEndLoading(long id) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

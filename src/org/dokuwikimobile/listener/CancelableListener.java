@@ -9,9 +9,9 @@ import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
  */
 public interface CancelableListener {
 	
-	public void startLoading(Canceler cancel);
+	public void onStartLoading(Canceler cancel, long id);
 
-	public void endLoading();
+	public void onEndLoading(long id);
         
 	public void onError(XMLRPCException error, long id);
 	

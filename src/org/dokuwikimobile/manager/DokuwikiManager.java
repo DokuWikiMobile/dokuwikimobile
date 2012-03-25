@@ -6,14 +6,14 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.dokuwikimobile.Dokuwiki;
 import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.cache.Cache;
 import org.dokuwikimobile.listener.CancelableListener;
 import org.dokuwikimobile.listener.LoginListener;
-import org.dokuwikimobile.listener.SearchListener;
-import org.dokuwikimobile.Dokuwiki;
-import org.dokuwikimobile.model.LoginData;
 import org.dokuwikimobile.listener.PageListener;
+import org.dokuwikimobile.listener.SearchListener;
+import org.dokuwikimobile.model.LoginData;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 
@@ -24,7 +24,7 @@ import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
  * Dokuwiki. This class can only exist once for each Dokuwiki.
  * 
  * It has a static factory method to receive or create the instance
- * for a specific Dokuwiki. The single isntances are singleton classes, saved
+ * for a specific Dokuwiki. The single instances are singleton classes, saved
  * in a singleton catalog.
  * 
  * @author Tim Roes <mail@timroes.de>
@@ -158,9 +158,7 @@ public class DokuwikiManager {
 		// Set login data in xmlrpc interface
 		xmlrpcClient.setLoginData(login);
 
-		// TODO: move startloading to xmlrpc
 		Canceler canceler = xmlrpcClient.login(this.listener, login);
-		listener.startLoading(canceler);
 		listener.put(canceler.getId(), listener);
 
 	}
@@ -262,11 +260,11 @@ public class DokuwikiManager {
 		}
 
 		// TODO: needs id of call
-		public void startLoading(Canceler cancel) {
+		public void onStartLoading(Canceler cancel, long id) {
 			throw new UnsupportedOperationException("Not supported yet.");
 		}
 
-		public void endLoading() {
+		public void onEndLoading(long id) {
 			throw new UnsupportedOperationException("Not supported yet.");
 		}
 
