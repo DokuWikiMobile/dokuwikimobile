@@ -17,10 +17,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import org.dokuwikimobile.R;
-import org.dokuwikimobile.model.SearchResult;
 import org.dokuwikimobile.listener.CancelableListener;
 import org.dokuwikimobile.manager.DokuwikiManager;
+import org.dokuwikimobile.model.SearchResult;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
+import org.dokuwikimobile.xmlrpc.ErrorCode;
 
 /**
  *
@@ -236,6 +237,10 @@ public class SearchActivity extends DokuwikiActivity implements CancelableListen
 		if(progress.isShowing()) {
 			progress.dismiss();
 		}
+	}
+
+	public void onError(ErrorCode error, String errorMessage, long id) {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	/**

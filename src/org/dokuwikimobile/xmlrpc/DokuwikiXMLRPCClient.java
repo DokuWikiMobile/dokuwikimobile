@@ -1,5 +1,6 @@
 package org.dokuwikimobile.xmlrpc;
 
+import android.util.Log;
 import de.timroes.axmlrpc.XMLRPCCallback;
 import de.timroes.axmlrpc.XMLRPCClient;
 import de.timroes.axmlrpc.XMLRPCException;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.listener.*;
 import org.dokuwikimobile.model.Attachment;
 import org.dokuwikimobile.model.LoginData;
@@ -77,6 +79,7 @@ public final class DokuwikiXMLRPCClient {
 	}
 
 	public Canceler login(LoginListener callback, LoginData login) {
+		// TODO: move to private method 'call'
 		long id = client.callAsync(callbackHandler, CALL_LOGIN, login.Username, login.Password);
 		Canceler c = callbackHandler.addCallback(id, callback, CALL_LOGIN, 
 				new Object[]{ login.Username, login.Password });
@@ -199,8 +202,9 @@ public final class DokuwikiXMLRPCClient {
 		 * @param error The error occurred.
 		 */
 		public void onError(long id, XMLRPCException error) {
-			System.err.println(error.getCause());
-			history.remove(id).listener.onError(error, id);
+			Log.e(DokuwikiApplication.LOGGER_NAME, error.getCause().getMessage());
+			// TODO: Change errorMessage
+			history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, "uncategorized error", id);
 		}
 
 		/**
@@ -216,6 +220,8 @@ public final class DokuwikiXMLRPCClient {
 		 */
 		public void onServerError(long id, XMLRPCServerException error) {
 
+			// TODO: Change whole method for Basic Auth. This is still WIP!!!
+			
 			// If rights are missing try to login and try the same call again
 			if(error.getErrorNr() == ERROR_NO_ACCESS 
 					&& loginData != null) {
@@ -232,7 +238,8 @@ public final class DokuwikiXMLRPCClient {
 				// If login failed due to any reason, send original callback
 				if(!login) {
 					// Send error to callback
-					history.remove(id).listener.onError(error, id);
+					// TODO: Change errorMessage
+					history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, "not logged in", id);
 					return;
 				}
 
@@ -244,11 +251,13 @@ public final class DokuwikiXMLRPCClient {
 					return;
 				} catch (XMLRPCException ex) {
 					// If the second call fails just send the original error message
-					history.remove(id).listener.onError(error, id);
+					// TODO: Change errorMessage
+					history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, "uncategorized error", id);
 				}
 
 			} else {
-					history.remove(id).listener.onError(error, id);
+					// TODO: Change errorMessage
+					history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, "uncategorized error", id);
 			}
 
 		}

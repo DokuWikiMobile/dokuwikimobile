@@ -1,7 +1,6 @@
 package org.dokuwikimobile.cache;
 
 import android.content.Context;
-import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,6 +9,7 @@ import org.dokuwikimobile.listener.*;
 import org.dokuwikimobile.model.*;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
+import org.dokuwikimobile.xmlrpc.ErrorCode;
 
 /**
  * TODO: This class will be removed and all its functionality will be in the DokuwikiManager.
@@ -133,7 +133,7 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 		//((PageLoadedListener)callbacks.remove(id)).onPageLoaded(null);
 	}
 
-	public void onError(XMLRPCException error, long id) {
+	public void onError(ErrorCode error, String errorMessage, long id) {
 		//callbacks.remove(id).callback.onError(error, id);
 	}
 

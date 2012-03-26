@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.*;
@@ -18,6 +19,8 @@ import org.dokuwikimobile.manager.DokuwikiManager;
 import org.dokuwikimobile.manager.PasswordManager;
 import org.dokuwikimobile.model.LoginData;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
+import org.dokuwikimobile.xmlrpc.ErrorCode;
+import org.dokuwikimobile.DokuwikiApplication;
 
 /**
  *
@@ -152,24 +155,24 @@ public class LoginDialog extends Dialog implements View.OnClickListener,
 		}
 		
 	}
-
-	public void onError(XMLRPCException error, long id) {
+	
+	public void onError(ErrorCode error, String errorMessage, long id) {
 		handler.sendMessage(handler.obtainMessage(HIDE_PROGRESS));
 		handler.sendMessage(handler.obtainMessage(SHOW_TOAST, R.string.loginfailed, Toast.LENGTH_SHORT));
-		System.err.println(error.toString());
+		Log.e(DokuwikiApplication.LOGGER_NAME, error.toString());
 	}
 
 	public void onServerError(XMLRPCServerException error, long id) {
 		handler.sendMessage(handler.obtainMessage(HIDE_PROGRESS));
 		handler.sendMessage(handler.obtainMessage(SHOW_TOAST, R.string.loginfailed, Toast.LENGTH_SHORT));
-		System.err.println(error.toString());
+		Log.e(DokuwikiApplication.LOGGER_NAME, error.toString());
 	}
 
-	public void startLoading(Canceler cancel) {
+	public void onStartLoading(Canceler cancel, long id) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	public void endLoading() {
+	public void onEndLoading(long id) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

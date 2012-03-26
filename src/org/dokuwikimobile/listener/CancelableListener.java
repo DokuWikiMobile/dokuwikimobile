@@ -1,7 +1,7 @@
 package org.dokuwikimobile.listener;
 
-import de.timroes.axmlrpc.XMLRPCException;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
+import org.dokuwikimobile.xmlrpc.ErrorCode;
 
 /**
  *
@@ -13,6 +13,6 @@ public interface CancelableListener {
 
 	public void onEndLoading(long id);
         
-	public void onError(XMLRPCException error, long id);
+	public void onError(ErrorCode error, String errorMessage, long id);
 	
 }

@@ -20,6 +20,7 @@ import org.dokuwikimobile.ui.view.DokuwikiWebView;
 import org.dokuwikimobile.ui.view.DokuwikiWebView.ScrollListener;
 import org.dokuwikimobile.ui.view.MessageView;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
+import org.dokuwikimobile.xmlrpc.ErrorCode;
 
 public class BrowserActivity extends DokuwikiActivity implements ScrollListener, 
 		DokuwikiWebView.LinkLoadListener, CancelableListener {
@@ -211,6 +212,10 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 				message.hideLoading();
 			}
 		});
+	}
+
+	public void onError(ErrorCode error, String errorMessage, long id) {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 }
