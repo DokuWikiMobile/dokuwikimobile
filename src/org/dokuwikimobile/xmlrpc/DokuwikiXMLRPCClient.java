@@ -203,8 +203,7 @@ public final class DokuwikiXMLRPCClient {
 		 */
 		public void onError(long id, XMLRPCException error) {
 			Log.e(DokuwikiApplication.LOGGER_NAME, error.getCause().getMessage());
-			// TODO: Change errorMessage
-			history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, "uncategorized error", id);
+			history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, id);
 		}
 
 		/**
@@ -238,8 +237,7 @@ public final class DokuwikiXMLRPCClient {
 				// If login failed due to any reason, send original callback
 				if(!login) {
 					// Send error to callback
-					// TODO: Change errorMessage
-					history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, "not logged in", id);
+					history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, id);
 					return;
 				}
 
@@ -251,13 +249,11 @@ public final class DokuwikiXMLRPCClient {
 					return;
 				} catch (XMLRPCException ex) {
 					// If the second call fails just send the original error message
-					// TODO: Change errorMessage
-					history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, "uncategorized error", id);
+					history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, id);
 				}
 
 			} else {
-					// TODO: Change errorMessage
-					history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, "uncategorized error", id);
+					history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, id);
 			}
 
 		}

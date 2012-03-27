@@ -133,7 +133,7 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 		//((PageLoadedListener)callbacks.remove(id)).onPageLoaded(null);
 	}
 
-	public void onError(ErrorCode error, String errorMessage, long id) {
+	public void onError(ErrorCode error, long id) {
 		//callbacks.remove(id).callback.onError(error, id);
 	}
 

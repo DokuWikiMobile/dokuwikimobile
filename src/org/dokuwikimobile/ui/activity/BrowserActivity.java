@@ -214,7 +214,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		});
 	}
 
-	public void onError(ErrorCode error, String errorMessage, long id) {
+	public void onError(ErrorCode error, long id) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 

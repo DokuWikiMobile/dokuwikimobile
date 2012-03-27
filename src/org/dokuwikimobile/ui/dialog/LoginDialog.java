@@ -156,7 +156,7 @@ public class LoginDialog extends Dialog implements View.OnClickListener,
 		
 	}
 	
-	public void onError(ErrorCode error, String errorMessage, long id) {
+	public void onError(ErrorCode error, long id) {
 		handler.sendMessage(handler.obtainMessage(HIDE_PROGRESS));
 		handler.sendMessage(handler.obtainMessage(SHOW_TOAST, R.string.loginfailed, Toast.LENGTH_SHORT));
 		Log.e(DokuwikiApplication.LOGGER_NAME, error.toString());

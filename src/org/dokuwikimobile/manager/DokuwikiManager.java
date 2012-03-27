@@ -276,8 +276,8 @@ public class DokuwikiManager {
 		 * @param error The error returned from XMLRPC client.
 		 * @param id The id of the call.
 		 */
-		public void onError(ErrorCode error, String errorMessage, long id) {
-			getListener(id, CancelableListener.class, true).onError(error, errorMessage, id);
+		public void onError(ErrorCode error, long id) {
+			getListener(id, CancelableListener.class, true).onError(error, id);
 		}
 		
 	}

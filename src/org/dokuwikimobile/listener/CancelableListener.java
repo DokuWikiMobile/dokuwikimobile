@@ -13,6 +13,6 @@ public interface CancelableListener {
 
 	public void onEndLoading(long id);
         
-	public void onError(ErrorCode error, String errorMessage, long id);
+	public void onError(ErrorCode error, long id);
 	
 }

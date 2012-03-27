@@ -239,7 +239,7 @@ public class SearchActivity extends DokuwikiActivity implements CancelableListen
 		}
 	}
 
-	public void onError(ErrorCode error, String errorMessage, long id) {
+	public void onError(ErrorCode error, long id) {
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
