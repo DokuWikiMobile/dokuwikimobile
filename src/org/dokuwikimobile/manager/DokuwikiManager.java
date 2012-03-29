@@ -106,6 +106,11 @@ public class DokuwikiManager {
 
 	private DokuwikiManager() { }
 
+
+	public Dokuwiki getDokuwiki() {
+		return dokuwiki;
+	}
+
 	/// ====================
 	/// CACHE FUNCTIONS
 	/// ====================
