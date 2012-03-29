@@ -64,9 +64,9 @@ public class DokuwikiManager {
 		// Initialize password manager for this dokuwiki
 		manager.passwordManager = new PasswordManager(
 				context.getSharedPreferences(dokuwiki.getMd5hash(), Context.MODE_PRIVATE));
-		// TODO: Remove password manager from dokuwikiXMLRPCclient
+		// Initialize the xmlrpc client
 		manager.xmlrpcClient = new DokuwikiXMLRPCClient(dokuwiki.getUrl());
-
+		
 		// Pass login data to XMLRPC client
 		if(manager.passwordManager.hasLoginData()) {
 			manager.xmlrpcClient.setLoginData(manager.passwordManager.getLoginData());

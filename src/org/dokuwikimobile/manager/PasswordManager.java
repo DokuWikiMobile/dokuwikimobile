@@ -1,13 +1,12 @@
 package org.dokuwikimobile.manager;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import org.dokuwikimobile.model.LoginData;
 
 /**
  *
- * @author Tim Roes
+ * @author Tim Roes <mail@timroes.de>
  */
 public class PasswordManager {
 

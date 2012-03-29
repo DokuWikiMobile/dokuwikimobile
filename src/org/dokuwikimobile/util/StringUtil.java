@@ -1,5 +1,7 @@
 package org.dokuwikimobile.util;
 
+import java.util.Iterator;
+
 /**
  *
  * @author Tim Roes
@@ -19,6 +21,24 @@ public class StringUtil {
 				/ Math.pow(10, decimal);
 		return String.valueOf(rounded) + " " + SHORT_UNITS[unit];
 
+	}
+	
+	public static String join(Iterable<String> stringArray, String joinChar) {
+
+		StringBuilder builder = new StringBuilder();
+
+		String string;
+		for (Iterator<String> it = stringArray.iterator(); it.hasNext();) {
+			string = it.next();
+			builder.append(string);
+			// Append joining char, if more elements exists
+			if(it.hasNext()) {
+				builder.append(joinChar);
+			}
+		}
+
+		return builder.toString();
+		
 	}
 	
 }
