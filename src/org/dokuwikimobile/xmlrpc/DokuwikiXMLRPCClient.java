@@ -55,8 +55,8 @@ public final class DokuwikiXMLRPCClient {
 
 	public DokuwikiXMLRPCClient(URL url) {
 
-		client = new XMLRPCClient(url, "DokuWikiMobile", XMLRPCClient.FLAGS_ENABLE_COOKIES 
-				| XMLRPCClient.FLAGS_IGNORE_STATUSCODE | XMLRPCClient.FLAGS_FORWARD);
+		client = new XMLRPCClient(url, "DokuWikiMobile",
+				XMLRPCClient.FLAGS_IGNORE_STATUSCODE | XMLRPCClient.FLAGS_FORWARD);
 		
 		// TODO: Need to be asynchrounous!
 		int v = 0;
@@ -78,36 +78,34 @@ public final class DokuwikiXMLRPCClient {
 		client.clearLoginData();
 	}
 
-	public Canceler login(LoginListener callback, LoginData login) {
-		// TODO: move to private method 'call'
-		long id = client.callAsync(callbackHandler, CALL_LOGIN, login.Username, login.Password);
-		Canceler c = callbackHandler.addCallback(id, callback, CALL_LOGIN, 
-				new Object[]{ login.Username, login.Password });
-		callback.onStartLoading(c, id);
+	public Canceler login(LoginListener listener, LoginData login) {
+		return call(listener, CALL_LOGIN, login.Username, login.Password);
+	}
+		
+	public Canceler getPageHTML(PageHtmlListener listener, String pagename) {
+		return call(listener, CALL_GETPAGEHTML, pagename);
+	}
+
+	public Canceler getPageInfo(PageInfoListener listener, String pagename) {
+		return call(listener, CALL_PAGE_INFO, pagename);
+	}
+
+	public Canceler getAttachment(AttachmentListener listener, String aid) {
+		return call(listener, CALL_GETATTACHMENT, aid);
+	}
+
+	public Canceler search(SearchListener listener, String query) {		
+		return call(listener, CALL_SEARCH, query);
+	}
+
+	private Canceler call(CancelableListener listener, String methodName, Object... params) {
+		long id = client.callAsync(callbackHandler, methodName, params);
+		Canceler c = callbackHandler.addCallback(id, listener, methodName, params);
+		listener.onStartLoading(c, id);
 		return c;
 	}
-
-	public Canceler getPageHTML(PageHtmlListener callback, String pagename) {
-		long id = client.callAsync(callbackHandler, CALL_GETPAGEHTML, pagename);
-		return callbackHandler.addCallback(id, callback, CALL_GETPAGEHTML, new Object[]{ pagename });
-	}
-
-	public Canceler getPageInfo(PageInfoListener callback, String pagename) {
-		long id = client.callAsync(callbackHandler, CALL_PAGE_INFO, pagename);
-		return callbackHandler.addCallback(id, callback, CALL_PAGE_INFO, new Object[]{ pagename });
-	}
-
-	public Canceler getAttachment(AttachmentListener callback, String aid) {
-		long id = client.callAsync(callbackHandler, CALL_GETATTACHMENT, aid);
-		return callbackHandler.addCallback(id, callback, CALL_GETATTACHMENT, new Object[]{ aid });
-	}
-
-	public Canceler search(SearchListener callback, String query) {
-		query = "*" + query + "*";
-		long id = client.callAsync(callbackHandler, CALL_SEARCH, query);
-		return callbackHandler.addCallback(id, callback, CALL_SEARCH, new Object[]{ query });
-	}
-
+			
+		
 	/**
 	 * This inner class handles all the asynchronous callbacks from the server.
 	 * Whenever a call is made to the server, the callback must be registered
@@ -208,20 +206,14 @@ public final class DokuwikiXMLRPCClient {
 
 		/**
 		 * Will be called whenever the server returns an error.
-		 * If the error is no access and the user has stored a username
-		 * and password, the client will try to login with this credentials and
-		 * do the original call again. If the call succeeds then, it will instead
-		 * of the error send the result. If it fails again it will send the original
-		 * error message - that will always be an NO ACCESS error message.
-		 * 
+		 * If login with basic auth returns 'no access' and the user has stored
+		 * a username and password, the client tries to login with xmlrpc to check
+		 * if the user is authorized to view the page.
 		 * @param id The id of the request.
 		 * @param error The error returned by the server.
 		 */
 		public void onServerError(long id, XMLRPCServerException error) {
-
-			// TODO: Change whole method for Basic Auth. This is still WIP!!!
-			
-			// If rights are missing try to login and try the same call again
+			// If login with basic auth failed, try to login with xmlrpc
 			if(error.getErrorNr() == ERROR_NO_ACCESS 
 					&& loginData != null) {
 				
@@ -233,35 +225,24 @@ public final class DokuwikiXMLRPCClient {
 					// Don't do anything. Since login will stay false it will be
 					// handled with the next if statement.
 				}
-
-				// If login failed due to any reason, send original callback
-				if(!login) {
+				
+				if(login) {
+					history.get(id).listener.onError(ErrorCode.NO_AUTH, id);
+				} else {
 					// Send error to callback
 					history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, id);
-					return;
+					clearLoginData();
+					client.clearLoginData();
 				}
-
-				try {
-					// If login was successfull try the original call again.
-					CallbackHistory.Entry entry = history.get(id);
-					Object result = client.call(entry.methodName, entry.params);
-					onResponse(id, result);
-					return;
-				} catch (XMLRPCException ex) {
-					// If the second call fails just send the original error message
-					history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, id);
-				}
-
 			} else {
-					history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, id);
+				history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, id);
 			}
-
 		}
 
 	}
 
 	/**
-	 * This inner class provides methods to cancel calls.
+	 * This inner class provides methods to cancel calls. 
 	 */
 	public class Canceler {
 
