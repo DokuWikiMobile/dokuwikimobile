@@ -78,36 +78,34 @@ public final class DokuwikiXMLRPCClient {
 		client.clearLoginData();
 	}
 
-	public Canceler login(LoginListener callback, LoginData login) {
-		// TODO: move to private method 'call'
-		long id = client.callAsync(callbackHandler, CALL_LOGIN, login.Username, login.Password);
-		Canceler c = callbackHandler.addCallback(id, callback, CALL_LOGIN, 
-				new Object[]{ login.Username, login.Password });
-		callback.onStartLoading(c, id);
+	public Canceler login(LoginListener listener, LoginData login) {
+		return call(listener, CALL_LOGIN, login.Username, login.Password);
+	}
+		
+	public Canceler getPageHTML(PageHtmlListener listener, String pagename) {
+		return call(listener, CALL_GETPAGEHTML, pagename);
+	}
+
+	public Canceler getPageInfo(PageInfoListener listener, String pagename) {
+		return call(listener, CALL_PAGE_INFO, pagename);
+	}
+
+	public Canceler getAttachment(AttachmentListener listener, String aid) {
+		return call(listener, CALL_GETATTACHMENT, aid);
+	}
+
+	public Canceler search(SearchListener listener, String query) {		
+		return call(listener, CALL_SEARCH, query);
+	}
+
+	private Canceler call(CancelableListener listener, String methodName, Object... params) {
+		long id = client.callAsync(callbackHandler, methodName, params);
+		Canceler c = callbackHandler.addCallback(id, listener, methodName, params);
+		listener.onStartLoading(c, id);
 		return c;
 	}
-
-	public Canceler getPageHTML(PageHtmlListener callback, String pagename) {
-		long id = client.callAsync(callbackHandler, CALL_GETPAGEHTML, pagename);
-		return callbackHandler.addCallback(id, callback, CALL_GETPAGEHTML, new Object[]{ pagename });
-	}
-
-	public Canceler getPageInfo(PageInfoListener callback, String pagename) {
-		long id = client.callAsync(callbackHandler, CALL_PAGE_INFO, pagename);
-		return callbackHandler.addCallback(id, callback, CALL_PAGE_INFO, new Object[]{ pagename });
-	}
-
-	public Canceler getAttachment(AttachmentListener callback, String aid) {
-		long id = client.callAsync(callbackHandler, CALL_GETATTACHMENT, aid);
-		return callbackHandler.addCallback(id, callback, CALL_GETATTACHMENT, new Object[]{ aid });
-	}
-
-	public Canceler search(SearchListener callback, String query) {
-		query = "*" + query + "*";
-		long id = client.callAsync(callbackHandler, CALL_SEARCH, query);
-		return callbackHandler.addCallback(id, callback, CALL_SEARCH, new Object[]{ query });
-	}
-
+			
+		
 	/**
 	 * This inner class handles all the asynchronous callbacks from the server.
 	 * Whenever a call is made to the server, the callback must be registered
