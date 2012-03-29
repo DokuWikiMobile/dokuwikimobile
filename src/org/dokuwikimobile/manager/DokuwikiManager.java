@@ -1,7 +1,6 @@
 package org.dokuwikimobile.manager;
 
 import android.content.Context;
-import de.timroes.axmlrpc.XMLRPCException;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import org.dokuwikimobile.listener.SearchListener;
 import org.dokuwikimobile.model.LoginData;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
+import org.dokuwikimobile.xmlrpc.ErrorCode;
 
 
 /**
@@ -276,7 +276,7 @@ public class DokuwikiManager {
 		 * @param error The error returned from XMLRPC client.
 		 * @param id The id of the call.
 		 */
-		public void onError(XMLRPCException error, long id) {
+		public void onError(ErrorCode error, long id) {
 			getListener(id, CancelableListener.class, true).onError(error, id);
 		}
 		
