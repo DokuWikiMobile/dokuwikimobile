@@ -229,10 +229,10 @@ public final class DokuwikiXMLRPCClient {
 				if(login) {
 					history.get(id).listener.onError(ErrorCode.NO_AUTH, id);
 				} else {
-					// Send error to callback
-					history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, id);
 					clearLoginData();
 					client.clearLoginData();
+					// Send error to callback
+					history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, id);
 				}
 			} else {
 				history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, id);
