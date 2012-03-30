@@ -55,7 +55,7 @@ public class ChooserActivity extends Activity implements AdapterView.OnItemClick
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		try {
-				Dokuwiki.add("http://wiki.dokuwikimobile.org/lib/exe/xmlrpc.php");
+				Dokuwiki.add("DWM Wiki", "http://wiki.dokuwikimobile.org/lib/exe/xmlrpc.php");
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(ChooserActivity.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -142,7 +142,7 @@ public class ChooserActivity extends Activity implements AdapterView.OnItemClick
 
 			Dokuwiki dw = dokuwikis.get(position);
 			
-			((TextView)convertView.findViewById(R.id.wiki_title)).setText(dw.getMd5hash());
+			((TextView)convertView.findViewById(R.id.wiki_title)).setText(dw.getTitle());
 			((TextView)convertView.findViewById(R.id.wiki_url)).setText(dw.getUrl().toString());
 
 			return convertView;

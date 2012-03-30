@@ -26,6 +26,7 @@ public class Dokuwiki {
 	private static final String WIKILIST_SEPARATOR = ";";
 
 	private static final String WIKI_URL_SUFFIX = "-url";
+	private static final String WIKI_TITLE_SUFFIX = "-title";
 
 	private static SharedPreferences getPrefs() {
 		return DokuwikiApplication.getAppContext()
@@ -72,7 +73,8 @@ public class Dokuwiki {
 
 		try {
 			URL url = new URL(prefs.getString(hash + WIKI_URL_SUFFIX, ""));
-			return new Dokuwiki(url);
+			String title = prefs.getString(hash + WIKI_TITLE_SUFFIX, "");
+			return new Dokuwiki(title, url);
 		} catch (MalformedURLException ex) {
 			Log.e(DokuwikiApplication.LOGGER_NAME, "URL of wiki '" + hash + "' is not a valid URL.");
 			deleteWiki(hash);
@@ -117,7 +119,7 @@ public class Dokuwiki {
 		
 	}
 
-	public static Dokuwiki add(String wikiUrl) throws MalformedURLException {
+	public static Dokuwiki add(String title, String wikiUrl) throws MalformedURLException {
 	
 		URL url = new URL(wikiUrl);
 
@@ -127,14 +129,16 @@ public class Dokuwiki {
 		if(dw != null)
 			return dw;
 		
-		dw = new Dokuwiki(url);
+		dw = new Dokuwiki(title, url);
 
 		List<String> wikiHashed = getWikiHashes();
 		wikiHashed.add(dw.getMd5hash());
 		saveWikiHashes(wikiHashed);
 
+		// Save all prefs of this wiki
 		Editor edit = getPrefs().edit();
-		edit.putString(dw.getMd5hash() + WIKI_URL_SUFFIX, dw.url.toString());
+		edit.putString(dw.getMd5hash() + WIKI_URL_SUFFIX, dw.getUrl().toString());
+		edit.putString(dw.getMd5hash() + WIKI_TITLE_SUFFIX, dw.getTitle());
 		edit.commit();
 
 		return dw;
@@ -183,12 +187,23 @@ public class Dokuwiki {
 
 	}
 	
+	private String title;
 	private URL url;
 	private String md5hash;
 	
-	private Dokuwiki(URL url) { 
+	private Dokuwiki(String title, URL url) { 
+		this.title = title;
 		this.url = url;
 		this.md5hash = HashUtil.hash(url.toString(), HashUtil.MD5);
+	}
+
+	/**
+	 * Return the title of the DokuWiki.
+	 * 
+	 * @return The title of the DokuWiki.
+	 */
+	public String getTitle() {
+		return title;
 	}
 
 	/**
