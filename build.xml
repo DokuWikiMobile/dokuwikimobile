@@ -55,7 +55,8 @@
 	<!-- Compile the aXMLRPC into a jar file to use as library. -->
 	<target name="-pre-compile">
 		<ant dir="aXMLRPC" target="jar"/>
-    </target>
+		<move file="aXMLRPC/dist/aXMLRPC.jar" todir="libs"/>
+	</target>
 <!--
     /* This is typically used for code obfuscation.
        Compiled code location: ${out.classes.absolute.dir}
