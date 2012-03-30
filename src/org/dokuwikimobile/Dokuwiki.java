@@ -97,6 +97,8 @@ public class Dokuwiki {
 	 */
 	private static void deleteWiki(String hash) {
 
+		// TODO: Should also delete DOkuwikiManager and all data
+
 		Editor editor = getPrefs().edit();
 
 		String[] allWikiPrefs = new String[]{ WIKI_URL_SUFFIX };
@@ -119,7 +121,13 @@ public class Dokuwiki {
 	
 		URL url = new URL(wikiUrl);
 
-		Dokuwiki dw = new Dokuwiki(url);
+		// Only add the wiki, if there is no wiki with that url in the list
+		Dokuwiki dw = getByHash(HashUtil.hash(wikiUrl, HashUtil.MD5));
+
+		if(dw != null)
+			return dw;
+		
+		dw = new Dokuwiki(url);
 
 		List<String> wikiHashed = getWikiHashes();
 		wikiHashed.add(dw.getMd5hash());

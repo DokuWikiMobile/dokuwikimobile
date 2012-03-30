@@ -4,6 +4,7 @@
 
 	<string name="ok">OK</string>
 	<string name="add">Add</string>
+	<string name="delete">Delete</string>
 
 	<!-- Browser activity -->
 	<string name="page_loading">Page is loading…</string>
