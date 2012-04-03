@@ -188,7 +188,10 @@ public class DokuwikiManager {
 	
 	/**
 	 * The Listener class handles all callbacks from the XMLRPC interface.
-	 * It stores a map of all call ids and their listeners.
+	 * It stores a map of all call ids and their listeners. In the context of
+	 * this subclass we call of the 'original listener' whenever we mean the listener, 
+	 * that was passed to a call on the DokuwikiManager, and will be saved here
+	 * for later callback.
 	 */
 	private class Listener implements LoginListener {
 		
@@ -276,19 +279,52 @@ public class DokuwikiManager {
 
 			// Notify original listener
 			LoginListener l;
-			if((l = removeListener(id, LoginListener.class)) != null) {
+			if((l = getListener(id, LoginListener.class)) != null) {
 				l.onLogin(succeeded, id);
 			}
 
 		}
 
-		// TODO: needs id of call
+		/**
+		 * Will be called, whenever a call started loading from network.
+		 * This will pass a Canceler object, that allows us to cancel the call.
+		 * We will just forward this call to the original listener.
+		 * 
+		 * @param cancel The canceler to cancel the call.
+		 * @param id The id of the call.
+		 */
 		public void onStartLoading(Canceler cancel, long id) {
-			throw new UnsupportedOperationException("Not supported yet.");
+
+			CancelableListener l = getListener(id, CancelableListener.class);
+
+			if(l != null) {
+				l.onStartLoading(cancel, id);	
+			}
+			
 		}
 
+		/**
+		 * Will be called, whenever a call to the xmlrpc interface ended loading.
+		 * This method should be the last callback made for a specific requested call.
+		 * Any listener of an 'original call' can be assume, that after this method 
+		 * has been called on it, no further information will be passed related,
+		 * to the original call.
+		 * If for any reason we want to make further calls or send further information
+		 * to the original caller after the xmlrpc interface ended loading, we need
+		 * to block the callback here. In this case the call must be made, whenever
+		 * we did everything, and are not going to make any further calls related
+		 * to an original call.
+		 * 
+		 * @param id The id of the call.
+		 */
 		public void onEndLoading(long id) {
-			throw new UnsupportedOperationException("Not supported yet.");
+
+			CancelableListener l = removeListener(id, CancelableListener.class);
+
+			if(l != null) {
+				l.onEndLoading(id);
+			}
+			
 		}
 
 		/**
