@@ -207,8 +207,7 @@ public class DokuwikiManager {
 
 		/**
 		 * Gets the listener for a specific callback. This will take the callback id,
-		 * the type of the listener expected to be returned and whether the listener 
-		 * should be removed from listener map.
+		 * the type of the listener expected to be returned.
 		 * 
 		 * @param id The id of the callback.
 		 * @param listenerType The type of listener expected for that id.
@@ -216,7 +215,21 @@ public class DokuwikiManager {
 		 * 		or had the wrong type.
 		 */
 		private <T> T getListener(long id, Class<T> listenerType) {
-			return getListener(id, listenerType, false);
+			return getOrRemoveListener(id, listenerType, false);
+		}
+
+		/**
+		 * Remove the Listener for a specific callback. This will take the callback id,
+		 * the type of the listener expected to be returned. The listener will be removed
+		 * from the list and returned.
+		 * 
+		 * @param id The id of the callback.
+		 * @param listenerType The type of listener expected for that id.
+		 * @return The listener with the given type or null if none has been found,
+		 * 		or had the wrong type.
+		 */
+		private <T> T removeListener(long id, Class<T> listenerType) {
+			return getOrRemoveListener(id, listenerType, true);
 		}
 
 		/**
@@ -230,7 +243,7 @@ public class DokuwikiManager {
 		 * @return The listener with the given type or null if none has been found,
 		 * 		or had the wrong type.
 		 */
-		private <T> T getListener(long id, Class<T> listenerType, boolean removeListener) {
+		private <T> T getOrRemoveListener(long id, Class<T> listenerType, boolean removeListener) {
 			
 			CancelableListener listener = listeners.get(id);
 
@@ -263,7 +276,7 @@ public class DokuwikiManager {
 
 			// Notify original listener
 			LoginListener l;
-			if((l = getListener(id, LoginListener.class, true)) != null) {
+			if((l = removeListener(id, LoginListener.class)) != null) {
 				l.onLogin(succeeded, id);
 			}
 
@@ -287,7 +300,7 @@ public class DokuwikiManager {
 		 * @param id The id of the call.
 		 */
 		public void onError(ErrorCode error, long id) {
-			getListener(id, CancelableListener.class, true).onError(error, id);
+			removeListener(id, CancelableListener.class).onError(error, id);
 		}
 		
 	}
