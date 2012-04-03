@@ -104,8 +104,9 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 		callbacks.remove(id);
 	}
 
-	public void onPageHtml(String pagename, String html, long id) {
-		Page p = new Page(cache, html, tmpPageInfos.remove(pagename));
+	public void onPageHtml(String html, long id) {
+		//Page p = new Page(cache, html, tmpPageInfos.remove(pagename));
+		Page p = null;
 
 		// Page should be cached
 		if(strategy.cachePages()) {

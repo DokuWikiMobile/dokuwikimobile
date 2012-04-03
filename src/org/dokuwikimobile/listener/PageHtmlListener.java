@@ -2,10 +2,10 @@ package org.dokuwikimobile.listener;
 
 /**
  *
- * @author timroes
+ * @author Tim Roes <mail@timroes.de>
  */
 public interface PageHtmlListener extends CancelableListener {
 	
-	public void onPageHtml(String pagename, String html, long id);
+	public void onPageHtml(String html, long id);
 	
 }

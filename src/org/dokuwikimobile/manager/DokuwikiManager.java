@@ -85,6 +85,9 @@ public class DokuwikiManager {
 	/**
 	 * Returns a collection of all currently instantiated dokuwikis.
 	 * This is NOT necessarily a collection of all dokuwikis, saved in this app.
+	 * Therefor use the Dokuwiki.getAll() method.
+	 * 
+	 * @see Dokuwiki
 	 * 
 	 * @return A collection of all instantiated dokuwikis.
 	 */
@@ -138,7 +141,9 @@ public class DokuwikiManager {
 	/// ====================
 
 	public void getPage(PageListener listener, String pageName) {
-		// TODO: Implement page get
+
+		
+		
 	}
 
 	/// ====================
@@ -153,7 +158,7 @@ public class DokuwikiManager {
 	/// AUTHENTICATION
 	/// ====================
 	
-	public void login(LoginListener listerner, LoginData login, boolean saveLogin) {
+	public void login(LoginListener listener, LoginData login, boolean saveLogin) {
 
 		if(saveLogin) {
 			// Save login data in password manager
@@ -164,7 +169,7 @@ public class DokuwikiManager {
 		xmlrpcClient.setLoginData(login);
 
 		Canceler canceler = xmlrpcClient.login(this.listener, login);
-		listener.put(canceler.getId(), listener);
+		this.listener.put(canceler.getId(), listener);
 
 	}
 
