@@ -197,7 +197,8 @@ public final class DokuwikiXMLRPCClient {
 		 * @param error The error occurred.
 		 */
 		public void onError(long id, XMLRPCException error) {
-			Log.e(DokuwikiApplication.LOGGER_NAME, error.getCause().getMessage());
+			// TODO: Catch XMLRPCAuthorizationException
+			Log.e(DokuwikiApplication.LOGGER_NAME, error.toString());
 			history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, id);
 		}
 

@@ -1,9 +1,11 @@
 package org.dokuwikimobile.manager;
 
 import android.content.Context;
+import android.util.Log;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.dokuwikimobile.Dokuwiki;
 import org.dokuwikimobile.DokuwikiApplication;
@@ -13,6 +15,7 @@ import org.dokuwikimobile.listener.LoginListener;
 import org.dokuwikimobile.listener.PageListener;
 import org.dokuwikimobile.listener.SearchListener;
 import org.dokuwikimobile.model.LoginData;
+import org.dokuwikimobile.model.SearchResult;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 import org.dokuwikimobile.xmlrpc.ErrorCode;
@@ -151,7 +154,10 @@ public class DokuwikiManager {
 	/// ====================
 
 	public void search(SearchListener listener, String query) {
-		// TODO: Implement search
+		// TODO: Search in cache
+		Canceler canceler = xmlrpcClient.search(this.listener, "*" + query + "*");
+		this.listener.put(canceler.getId(), listener);
+		
 	}
 
 	/// ====================
@@ -193,7 +199,7 @@ public class DokuwikiManager {
 	 * that was passed to a call on the DokuwikiManager, and will be saved here
 	 * for later callback.
 	 */
-	private class Listener implements LoginListener {
+	private class Listener implements LoginListener, SearchListener {
 		
 		private Map<Long, CancelableListener> listeners = new HashMap<Long, CancelableListener>();
 
@@ -256,7 +262,7 @@ public class DokuwikiManager {
 			}
 
 			// If listener has wrong type, return null
-			if(listenerType != listener.getClass()) {
+			if(!listenerType.isInstance(listener)) {
 				return null;
 			}
 
@@ -285,6 +291,15 @@ public class DokuwikiManager {
 
 		}
 
+		public void onSearchResults(List<SearchResult> pages, long id) {
+
+			SearchListener l;
+			if((l = getListener(id, SearchListener.class)) != null) {
+				l.onSearchResults(pages, id);
+			}
+			
+		}
+		
 		/**
 		 * Will be called, whenever a call started loading from network.
 		 * This will pass a Canceler object, that allows us to cancel the call.
@@ -336,9 +351,10 @@ public class DokuwikiManager {
 		 * @param id The id of the call.
 		 */
 		public void onError(ErrorCode error, long id) {
+			Log.e(DokuwikiApplication.LOGGER_NAME, "Error returned in DokuwikiManager '" + error.name() + "'");
 			removeListener(id, CancelableListener.class).onError(error, id);
 		}
-		
+
 	}
 
 }

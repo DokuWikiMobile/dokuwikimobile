@@ -14,6 +14,7 @@ import android.widget.Toast;
 import org.dokuwikimobile.R;
 import org.dokuwikimobile.Settings;
 import org.dokuwikimobile.listener.CancelableListener;
+import org.dokuwikimobile.listener.PageListener;
 import org.dokuwikimobile.model.DokuwikiUrl;
 import org.dokuwikimobile.model.Page;
 import org.dokuwikimobile.ui.view.DokuwikiWebView;
@@ -23,7 +24,7 @@ import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 import org.dokuwikimobile.xmlrpc.ErrorCode;
 
 public class BrowserActivity extends DokuwikiActivity implements ScrollListener, 
-		DokuwikiWebView.LinkLoadListener, CancelableListener {
+		DokuwikiWebView.LinkLoadListener, PageListener {
 
 	public final static String PAGEID = "pageid";
 
@@ -119,9 +120,7 @@ public class BrowserActivity extends DokuwikiActivity implements ScrollListener,
 		}
 	}
 
-	@Override
-	protected void onPageLoadedCallback(Page page) {
-		super.onPageLoadedCallback(page);
+	public void onPageLoaded(Page page) {
 
 		if(page == null)
 			return;

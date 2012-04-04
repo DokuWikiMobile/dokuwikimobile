@@ -17,8 +17,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import org.dokuwikimobile.R;
-import org.dokuwikimobile.listener.CancelableListener;
-import org.dokuwikimobile.manager.DokuwikiManager;
+import org.dokuwikimobile.listener.SearchListener;
 import org.dokuwikimobile.model.SearchResult;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 import org.dokuwikimobile.xmlrpc.ErrorCode;
@@ -27,10 +26,8 @@ import org.dokuwikimobile.xmlrpc.ErrorCode;
  *
  * @author Tim Roes
  */
-public class SearchActivity extends DokuwikiActivity implements CancelableListener,
-		OnCancelListener {
-
-	private DokuwikiManager manager;
+public class SearchActivity extends DokuwikiActivity 
+		implements SearchListener, OnCancelListener {
 
 	/**
 	 * The progress dialog that is showed during searching.
@@ -144,9 +141,7 @@ public class SearchActivity extends DokuwikiActivity implements CancelableListen
 		}
 	}
 
-	@Override
-	protected void onSearchCallback(List<SearchResult> pages, long id) {
-		super.onSearchCallback(pages, id);
+	public void onSearchResults(List<SearchResult> pages, long id) {
 		
 		// If we got any results or are completly finished with searching,
 		// hide the dialog loading interface.
