@@ -5,13 +5,12 @@ import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -141,29 +140,35 @@ public class SearchActivity extends DokuwikiActivity
 		}
 	}
 
-	public void onSearchResults(List<SearchResult> pages, long id) {
+	public void onSearchResults(final List<SearchResult> pages, long id) {
 		
-		// If we got any results or are completly finished with searching,
-		// hide the dialog loading interface.
-		if(!pages.isEmpty() || !isLoading()) {
-			hideDialogLoading();
-		}
+		runOnUiThread(new Runnable() {
 
-		// Clear current entries in the list
-		adapter.results.clear();
+			public void run() {
+				// If we got any results or are completly finished with searching,
+				// hide the dialog loading interface.
+				if(!pages.isEmpty() || !isLoading()) {
+					hideDialogLoading();
+				}
 
-		// If any results have been found, show them in the list.
-		if(!pages.isEmpty()) {
-			// Clear old results and show new results
-			showSearchResults(pages.size());
-			adapter.results.addAll(pages);
-		} else if(!isLoading()) {
-			// If no Search results are found and search has been finished
-			// show the no search result text.
-			showSearchResults(0);
-		}
+				// Clear current entries in the list
+				adapter.results.clear();
 
-		adapter.notifyObservers();
+				// If any results have been found, show them in the list.
+				if(!pages.isEmpty()) {
+					// Clear old results and show new results
+					showSearchResults(pages.size());
+					adapter.results.addAll(pages);
+				} else if(!isLoading()) {
+					// If no Search results are found and search has been finished
+					// show the no search result text.
+					showSearchResults(0);
+				}
+
+				adapter.notifyDataSetChanged();
+			}
+
+		});
 
 	}
 
@@ -241,69 +246,34 @@ public class SearchActivity extends DokuwikiActivity
 	/**
 	 * The adapter that holds the search results for the result ListView.
 	 */
-	private class SearchResultAdapter implements ListAdapter {
+	private class SearchResultAdapter extends BaseAdapter {
 
-		private List<DataSetObserver> observers = new ArrayList<DataSetObserver>();
-		public List<SearchResult> results = new ArrayList<SearchResult>();
-		
-		public boolean areAllItemsEnabled() {
-			return true;
-		}
-
-		public boolean isEnabled(int arg0) {
-			return true;
-		}
-
-		public void registerDataSetObserver(DataSetObserver observer) {
-			observers.add(observer);
-		}
-
-		public void unregisterDataSetObserver(DataSetObserver observer) {
-			observers.remove(observer);
-		}
+		private List<SearchResult> results = new ArrayList<SearchResult>();
 
 		public int getCount() {
 			return results.size();
 		}
 
-		public Object getItem(int pos) {
-			return results.get(pos);
+		public Object getItem(int position) {
+			return results.get(position);
 		}
 
-		public long getItemId(int pos) {
-			return pos;
+		public long getItemId(int position) {
+			return position;
 		}
 
-		public boolean hasStableIds() {
-			return false;
-		}
-
-		public View getView(int pos, View oldView, ViewGroup parent) {
-			if(oldView == null)
-				oldView = SearchActivity.this.getLayoutInflater().inflate(R.layout.searchresult, null);
-			((TextView)oldView.findViewById(R.id.searchresult_id)).setText(results.get(pos).getId());
+		public View getView(int position, View recycle, ViewGroup parent) {
+			
+			if(recycle == null)
+				recycle = SearchActivity.this.getLayoutInflater().inflate(R.layout.searchresult, null);
+			
+			((TextView)recycle.findViewById(R.id.searchresult_id)).setText(results.get(position).getId());
 			String hits = getResources().getString(R.string.search_hits,
-					results.get(pos).getScore());
-			((TextView)oldView.findViewById(R.id.searchresult_hits)).setText(hits);
-			return oldView;
-		}
+					results.get(position).getScore());
+			((TextView)recycle.findViewById(R.id.searchresult_hits)).setText(hits);
 
-		public int getItemViewType(int arg0) {
-			return 0;
-		}
-
-		public int getViewTypeCount() {
-			return 1;
-		}
-
-		public boolean isEmpty() {
-			return results.isEmpty();
-		}
-
-		public void notifyObservers() {
-			for(DataSetObserver o : observers) {
-				o.onChanged();
-			}
+			return recycle;
+			
 		}
 		
 	}

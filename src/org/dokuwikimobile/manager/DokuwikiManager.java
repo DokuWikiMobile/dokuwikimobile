@@ -145,7 +145,7 @@ public class DokuwikiManager {
 
 	public void getPage(PageListener listener, String pageName) {
 
-		
+		// TODO: Implement method
 		
 	}
 
@@ -153,6 +153,15 @@ public class DokuwikiManager {
 	/// SEARCHING
 	/// ====================
 
+	/**
+	 * Do a search in this dokuwiki. This will search for any pages containing
+	 * the query string. The listener will be informed about the results.
+	 * For a more detailed description of the dokuwiki search queries, have a 
+	 * look at http://www.dokuwiki.org/search.
+	 * 
+	 * @param listener The listener, to be informed about search results.
+	 * @param query The query search string.
+	 */
 	public void search(SearchListener listener, String query) {
 		// TODO: Search in cache
 		Canceler canceler = xmlrpcClient.search(this.listener, "*" + query + "*");
@@ -164,6 +173,14 @@ public class DokuwikiManager {
 	/// AUTHENTICATION
 	/// ====================
 	
+	/**
+	 * Login to this dokuwiki with the given login data. The listener will be 
+	 * notified about the success or fail of the login.
+	 * 
+	 * @param listener Listener to be informed about result of login.
+	 * @param login Login data to use.
+	 * @param saveLogin Whether the login data should be saved for this dokuwiki.
+	 */
 	public void login(LoginListener listener, LoginData login, boolean saveLogin) {
 
 		if(saveLogin) {
@@ -274,6 +291,13 @@ public class DokuwikiManager {
 			
 		}
 
+		/**
+		 * This method will be called, when the server finished with a login
+		 * attempt.
+		 * 
+		 * @param succeeded Whether the login was successful or not.
+		 * @param id The call id.
+		 */
 		public void onLogin(boolean succeeded, long id) {
 
 			// If login data was wrong, delete it from password manager and xmlrpc
@@ -291,6 +315,12 @@ public class DokuwikiManager {
 
 		}
 
+		/**
+		 * This method will be called, when the server returned some search results.
+		 * 
+		 * @param pages The list of search results found.
+		 * @param id The call id.
+		 */
 		public void onSearchResults(List<SearchResult> pages, long id) {
 
 			SearchListener l;

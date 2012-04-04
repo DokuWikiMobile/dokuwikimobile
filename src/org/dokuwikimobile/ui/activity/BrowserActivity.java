@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import org.dokuwikimobile.R;
 import org.dokuwikimobile.Settings;
-import org.dokuwikimobile.listener.CancelableListener;
 import org.dokuwikimobile.listener.PageListener;
 import org.dokuwikimobile.model.DokuwikiUrl;
 import org.dokuwikimobile.model.Page;
