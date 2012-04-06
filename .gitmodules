@@ -1,3 +1,6 @@
 [submodule "aXMLRPC"]
 	path = aXMLRPC
 	url = git@github.com:timroes/aXMLRPC.git
+[submodule "actionbarsherlock"]
+	path = actionbarsherlock
+	url = git@github.com:DokuWikiMobile/ActionBarSherlock.git
