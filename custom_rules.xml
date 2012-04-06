@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="dokuwikimobile" default="help">
+<project>
 	<!-- Compile the aXMLRPC into a jar file to use as library. -->
 	<target name="-pre-compile">
 		<ant dir="aXMLRPC" target="jar"/>
