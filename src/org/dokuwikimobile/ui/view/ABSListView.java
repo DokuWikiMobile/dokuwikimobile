@@ -20,11 +20,18 @@ import com.actionbarsherlock.view.MenuItem;
  * 
  * You must use ListView.CHOICE_MODE_MULTIPLE as choice mode (not CHOICE_MODE_MULTIPLE_MODAL),
  * and use the ABSListView.MultiChoiceModeListener interface, instead of the native
- * android interface. Everything else should work like in the native android
+ * android interface. Everything else should nearly work like in the native android
  * implementation. 
  * 
  * The ABSListView must be used inside of a SherlockActivity, otherwise it will
  * throw an error.
+ * 
+ * TODO: We expect the items of the listview to be Checkable. That makes in our case
+ * 		(and most cases I can think of) sense. If the ListView items do not implement
+ * 		Checkable, they will not anyhow be highlighted, by selecting them. 
+ * 		Anyhow it is valid for the items not implement Checkable. For that cases
+ * 		we must save  the checked state in an own list, and not casting the views
+ * 		to Checkable without further tests.
  * 
  * @author Tim Roes <mail@timroes.de>
  */
