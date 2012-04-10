@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<org.dokuwikimobile.ui.view.CheckableLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 		android:orientation="vertical"
 		android:padding="6sp"
 		android:layout_width="fill_parent"
@@ -12,4 +12,4 @@
 			android:textColor="@android:color/secondary_text_dark"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"/>
-</LinearLayout>
+</org.dokuwikimobile.ui.view.CheckableLinearLayout>

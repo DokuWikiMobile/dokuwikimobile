@@ -1,31 +1,38 @@
 package org.dokuwikimobile.ui.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.ContextMenu.ContextMenuInfo;
-import android.view.*;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.ActionMode;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.dokuwikimobile.Dokuwiki;
 import org.dokuwikimobile.R;
+import org.dokuwikimobile.ui.view.ABSListView;
 
 /**
  *
  * @author Tim Roes <mail@timroes.de>
  */
-public class ChooserActivity extends Activity implements AdapterView.OnItemClickListener {
+public class ChooserActivity extends SherlockActivity implements AdapterView.OnItemClickListener {
 
-	private ListView wikiList;
+	private static int i = 1;
+	private ABSListView wikiList;
 
 	private ChooserAdapter adapter;
+
+	private ActionMode actionmode;
 	
 	/**
 	 * Called when the activity is first created.
@@ -38,24 +45,31 @@ public class ChooserActivity extends Activity implements AdapterView.OnItemClick
 
 		adapter = new ChooserAdapter();
 
-		wikiList = (ListView)findViewById(R.id.wiki_list);
+		wikiList = (ABSListView)findViewById(R.id.wiki_list);
 		wikiList.setOnItemClickListener(this);
 		wikiList.setAdapter(adapter);
-
-		registerForContextMenu(wikiList);
+		wikiList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		wikiList.setMultiChoiceModeListener(new ChooserMultiChoiceModeListener());
 
 	}
 
+	/**
+	 * Called when the activity should create an options menu.
+	 * 
+	 * @param menu The menu to be inflated.
+	 * @return Whether the menu has been inflated.
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(R.string.add);
-		return super.onCreateOptionsMenu(menu);
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.chooser, menu);
+		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		try {
-				Dokuwiki.add("DWM Wiki", "http://wiki.dokuwikimobile.org/lib/exe/xmlrpc.php");
+			Dokuwiki.add("DWM Wiki", "http://wiki.dokuwikimobile.org/lib/exe/xmlrpc.php" + i++);
 		} catch (MalformedURLException ex) {
 			Logger.getLogger(ChooserActivity.class.getName()).log(Level.SEVERE, null, ex);
 		}
@@ -81,36 +95,46 @@ public class ChooserActivity extends Activity implements AdapterView.OnItemClick
 		
 	}
 
-	/**
-	 * This method will be called when a context menu should be created.
-	 * 
-	 * @param menu The context menu, that should be inflated.
-	 * @param v The view for which a context menu should be created.
-	 * @param menuInfo The context menu information.
-	 */
-	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.choser_item_context, menu);
-	}
+	private class ChooserMultiChoiceModeListener implements ABSListView.MultiChoiceModeListener {
 
-	@Override
-	public boolean onContextItemSelected(MenuItem item) {
-
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo)item.getMenuInfo();
-		
-		switch(item.getItemId()) {
-			
-			case R.id.delete:
-				Dokuwiki.deleteWiki((Dokuwiki)adapter.getItem(info.position));
-				adapter.reload();
-				return true;
-				
-			default:
-				return super.onContextItemSelected(item);
-				
+		public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) { 
+			int wikisSelected = wikiList.getCheckedItemCount();
+			String title = getResources().getQuantityString(R.plurals.wikis_selected, wikisSelected, wikisSelected);
+			mode.setTitle(title);
 		}
+
+		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			MenuInflater inflater = getSupportMenuInflater();
+			inflater.inflate(R.menu.chooser_item_context, menu);
+			return true;
+		}
+
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+			return false;
+		}
+
+		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+			
+			switch(item.getItemId()) {
+				case R.id.delete:
+					// Delete checked wikis from list
+					for(int i = 0; i < wikiList.getCheckedItemPositions().size(); i++) {
+						if(wikiList.getCheckedItemPositions().valueAt(i)) {
+							int position = wikiList.getCheckedItemPositions().keyAt(i);
+							Dokuwiki.deleteWiki((Dokuwiki)adapter.getItem(position));
+						}
+					}
+					// Close ActionMode after deleting wikis
+					mode.finish();
+					adapter.reload();
+					return true;
+				default:
+					return false;
+			}
+
+		}
+
+		public void onDestroyActionMode(ActionMode mode) { }
 		
 	}
 
