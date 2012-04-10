@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
@@ -48,7 +49,14 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 		wikiList = (ABSListView)findViewById(R.id.wiki_list);
 		wikiList.setOnItemClickListener(this);
 		wikiList.setAdapter(adapter);
-		wikiList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		wikiList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		wikiList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+				Toast.makeText(ChooserActivity.this, "Clicked item long", Toast.LENGTH_SHORT).show();
+				return true;
+			}
+		});
 		wikiList.setMultiChoiceModeListener(new ChooserMultiChoiceModeListener());
 
 	}

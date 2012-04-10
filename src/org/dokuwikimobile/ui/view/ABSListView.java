@@ -230,7 +230,8 @@ public class ABSListView extends ListView {
 		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
 			// If choice mode is none, just notify the original listener.
-			if(getChoiceMode() == CHOICE_MODE_NONE) {
+			// TODO: CHOICE_MODE_SINGLE, how is it handled in android native?
+			if(getChoiceMode() == CHOICE_MODE_NONE || getChoiceMode() == CHOICE_MODE_SINGLE) {
 				if(listener != null) {
 					return listener.onItemLongClick(parent, view, position, id);
 				} else {
@@ -249,7 +250,7 @@ public class ABSListView extends ListView {
 
 				return true;
 			
-			}
+			} 
 
 			return false;
 		}
