@@ -34,10 +34,11 @@ import org.dokuwikimobile.model.SearchResult;
  */
 public final class DokuwikiXMLRPCClient {
 
-	public final int version;
+	public int version;
 
 	public final static int ERROR_NO_ACCESS = 1;
 
+	private final static String CALL_VERSION = "dokuwiki.getXMLRPCAPIVersion";
 	private final static String CALL_LOGIN ="dokuwiki.login";
 	private final static String CALL_GETPAGEHTML = "wiki.getPageHTML";
 	private final static String CALL_PAGE_INFO = "wiki.getPageInfo";
@@ -52,20 +53,18 @@ public final class DokuwikiXMLRPCClient {
 	private XMLRPCClient client;
 	private CallbackHandler callbackHandler = new CallbackHandler();
 	private LoginData loginData;
-
+	
 	public DokuwikiXMLRPCClient(URL url) {
 
 		client = new XMLRPCClient(url, "DokuWikiMobile",
 				XMLRPCClient.FLAGS_IGNORE_STATUSCODE | XMLRPCClient.FLAGS_FORWARD);
 		
-		// TODO: Need to be asynchrounous!
-		int v = 0;
-		try {
-			v = (Integer)client.call("dokuwiki.getXMLRPCAPIVersion");
-		} catch (XMLRPCException ex) {
-			// TODO: What do we do when the xmlrpc version cannot be read
-		}
-		version = v;
+		// TODO: For testing only!!! Must be removed with the result from getVersion listener
+		version = 7;
+	}
+
+	public Canceler getVersion(VersionListener listener) {
+		return call(listener, CALL_VERSION);
 	}
 
 	public void setLoginData(LoginData loginData) {
@@ -143,6 +142,9 @@ public final class DokuwikiXMLRPCClient {
 
 			if(call == null) {
 				return;
+			} else if(CALL_VERSION.equals(call.methodName)) {
+				// dokuwiki.version returned
+				((VersionListener)call.listener).onVersion(version, id);
 			} else if(CALL_LOGIN.equals(call.methodName)) {
 				// dokuwiki.login returned
 				((LoginListener)call.listener).onLogin((Boolean)result, id);

@@ -1,7 +1,7 @@
 package org.dokuwikimobile.listener;
 
-import org.dokuwikimobile.model.SearchResult;
 import java.util.List;
+import org.dokuwikimobile.model.SearchResult;
 
 /**
  *
