@@ -11,6 +11,10 @@
 		<item quantity="one">%s wiki selected</item>
 		<item quantity="other">%s wikis selected</item>
 	</plurals>
+	<plurals name="wikis_deleted">
+		<item quantity="one">%s wiki deleted</item>
+		<item quantity="other">%s wikis deleted</item>
+	</plurals>
 
 	<!-- Browser activity -->
 	<string name="page_loading">Page is loading…</string>

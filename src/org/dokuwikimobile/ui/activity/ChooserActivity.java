@@ -34,7 +34,7 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 	private ChooserAdapter adapter;
 
 	private ActionMode actionmode;
-	
+
 	/**
 	 * Called when the activity is first created.
 	 */
@@ -49,16 +49,15 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 		wikiList = (ABSListView)findViewById(R.id.wiki_list);
 		wikiList.setOnItemClickListener(this);
 		wikiList.setAdapter(adapter);
-		wikiList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-		wikiList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-				Toast.makeText(ChooserActivity.this, "Clicked item long", Toast.LENGTH_SHORT).show();
-				return true;
-			}
-		});
+		wikiList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		wikiList.setMultiChoiceModeListener(new ChooserMultiChoiceModeListener());
 
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		clearChoices();
 	}
 
 	/**
@@ -103,6 +102,15 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 		
 	}
 
+	private void clearChoices() {
+		wikiList.clearChoices();
+		wikiList.requestLayout();
+
+		if(actionmode != null) {
+			actionmode.finish();
+		}
+	}
+
 	private class ChooserMultiChoiceModeListener implements ABSListView.MultiChoiceModeListener {
 
 		public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) { 
@@ -112,6 +120,7 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 		}
 
 		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+			actionmode = mode;
 			MenuInflater inflater = getSupportMenuInflater();
 			inflater.inflate(R.menu.chooser_item_context, menu);
 			return true;
@@ -125,6 +134,7 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 			
 			switch(item.getItemId()) {
 				case R.id.delete:
+					int wikisToDelete = wikiList.getCheckedItemCount();
 					// Delete checked wikis from list
 					for(int i = 0; i < wikiList.getCheckedItemPositions().size(); i++) {
 						if(wikiList.getCheckedItemPositions().valueAt(i)) {
@@ -135,6 +145,9 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 					// Close ActionMode after deleting wikis
 					mode.finish();
 					adapter.reload();
+					Toast.makeText(ChooserActivity.this, 
+							getResources().getQuantityString(R.plurals.wikis_deleted, 
+							wikisToDelete, wikisToDelete), Toast.LENGTH_SHORT).show();
 					return true;
 				default:
 					return false;
@@ -142,7 +155,9 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 
 		}
 
-		public void onDestroyActionMode(ActionMode mode) { }
+		public void onDestroyActionMode(ActionMode mode) { 
+			actionmode = null;
+		}
 		
 	}
 

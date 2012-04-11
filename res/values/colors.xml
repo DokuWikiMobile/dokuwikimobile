@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
+	<color name="highlight_list_item">#FF33B5E5</color>
+
 	<color name="success_color1">#00AA00</color>
 	<color name="success_color2">#006600</color>
 	<color name="success_text_color">#FFF</color>

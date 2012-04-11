@@ -1,10 +1,14 @@
 package org.dokuwikimobile.ui.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
+import org.dokuwikimobile.R;
 
 /**
  *
@@ -29,7 +33,7 @@ public class CheckableLinearLayout extends LinearLayout implements Checkable {
 	public void setChecked(boolean checked) {
 		this.checked = checked;
 		if(checked) {
-			this.setBackgroundColor(0xFFFF0000);
+			this.setBackgroundColor(getResources().getColor(R.color.highlight_list_item));
 		} else {
 			this.setBackgroundDrawable(null);
 		}
