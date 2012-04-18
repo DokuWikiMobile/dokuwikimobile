@@ -26,16 +26,16 @@
 	<string name="wiki_added">DokuWiki \'%s\' added</string>
 	<string name="invalid_url_title">Invalid URL</string>
 	<string name="invalid_url_msg">The entered URL was not a valid URL.</string>
-	<string name="not_wiki_url_title">No wiki found</string>
+	<string name="not_wiki_url_title">No DokuWiki found</string>
 	<string name="not_wiki_url_msg">No DokuWiki found under the given URL.</string>
 	<string name="version_error_title">DokuWiki version</string>
 	<string name="version_error_msg">The DokuWiki is not up to date. This application requires at 
 	least DokuWiki \"Adora Belle\".</string>
-	<string name="progress_load_version_and_titel">Retrieve version and titel of DokuWiki…</string>
+	<string name="progress_load_version_and_title">Retrieve version and title of DokuWiki…</string>
 
 	<!-- Barcode scanner -->
 	<string name="install_barcode_title">Install Barcode Scanner?</string>
-	<string name="install_barcode_message">This application requires Barcode Scanner. Would you like to install it?</string>
+	<string name="install_barcode_message">This application requires a barcode scanner. Would you like to install it?</string>
 
 	<!-- Browser activity -->
 	<string name="page_loading">Page is loading…</string>

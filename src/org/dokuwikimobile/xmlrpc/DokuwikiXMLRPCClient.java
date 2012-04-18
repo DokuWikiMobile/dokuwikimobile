@@ -33,16 +33,8 @@ import org.dokuwikimobile.model.SearchResult;
  */
 public final class DokuwikiXMLRPCClient {
 
-	public final static int INVALID_XMLRPC_REQUEST = -32600;
-	public final static int METHOD_NOT_EXIST = -32601;
-	public final static int WRONG_NR_PARAMETER = -32602;
-	public final static int NO_AUTH = -32603;
-	public final static int NOT_LOGGED_IN = -32604; 
-	public final static int PARSE_ERROR = -32700;
-	public final static int RECURSIVE_CALL = -32800;
-	public final static int UNKNOWN_SERVER_ERROR = -99999;
-
-	
+	private final static int NO_AUTH = -32603;
+	private final static int NOT_LOGGED_IN = -32604; 
 
 	private final static String CALL_VERSION = "dokuwiki.getXMLRPCAPIVersion";
 	private final static String CALL_LOGIN ="dokuwiki.login";
