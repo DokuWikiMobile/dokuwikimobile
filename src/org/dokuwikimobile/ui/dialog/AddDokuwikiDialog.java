@@ -27,6 +27,8 @@ import org.dokuwikimobile.xmlrpc.ErrorCode;
 public class AddDokuwikiDialog extends SherlockDialogFragment implements DokuwikiCreationListener,
 		DialogInterface.OnCancelListener {
 
+	private static final String WIKI_URL = "wiki_url";
+
 	public static AddDokuwikiDialog newInstance(AddListener listener) {
 		AddDokuwikiDialog dialog = new AddDokuwikiDialog();
 		dialog.listener = listener;
@@ -49,12 +51,25 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 		PackageManager packageManager = getDialog().getContext().getPackageManager();
 
 		// If device has a camera, we can show the opportunity to scan the url via QR code
-		if(packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+		if((savedInstanceState == null || !savedInstanceState.containsKey(WIKI_URL))
+			&& packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
 			return createChooseView(inflater);
 		} else {
-			return createInputView(inflater, null);
+			return createInputView(inflater, savedInstanceState.getString(WIKI_URL), false);
 		}
 		
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		
+		EditText urlField = (EditText)getDialog().findViewById(R.id.wiki_url);
+
+		if(urlField != null) {
+			outState.putString(WIKI_URL, urlField.getEditableText().toString());
+		}
+
 	}
 
 	private View createChooseView(LayoutInflater inflater) {
@@ -84,16 +99,19 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 		getDialog().setContentView(createChooseView(getDialog().getLayoutInflater()));
 	}
 
-	private View createInputView(LayoutInflater inflater, String url) {
+	private View createInputView(LayoutInflater inflater, String url, boolean autostart) {
 		
 		getDialog().setTitle(R.string.add_wiki_dialog_title);
 		View v = inflater.inflate(R.layout.dialog_adddokuwiki2, null, false);
 
 		final EditText urlField = (EditText)v.findViewById(R.id.wiki_url);
 
+		// If a url has been given write it to the textbox
 		if(!StringUtil.isNullOrEmpty(url)) {
 			urlField.setText(url);
-			addDokuwiki(url);
+			// If autostart was set, directly try to add dokuwiki
+			if(autostart)
+				addDokuwiki(url);
 		} else {
 			urlField.setText("http://wiki-url.com/lib/exe/xmlrpc.php");
 			urlField.setSelection(7, 19);
@@ -102,9 +120,7 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 		((Button)v.findViewById(R.id.add)).setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-
 				addDokuwiki(urlField.getText().toString());
-				
 			}
 
 		});
@@ -114,7 +130,7 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 	}
 
 	public void showInputScreen(String url) {
-		getDialog().setContentView(createInputView(getDialog().getLayoutInflater(), url));
+		getDialog().setContentView(createInputView(getDialog().getLayoutInflater(), url, true));
 	}
 
 	private void startBarcodeScanner() {
