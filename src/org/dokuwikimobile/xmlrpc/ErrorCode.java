@@ -6,7 +6,9 @@ package org.dokuwikimobile.xmlrpc;
  */
 public enum ErrorCode {
 	
-	// Uncategorized errors
+	/**
+	 * Uncategorized server errors.
+	 */
 	UNCATEGORIZED,
 	
 	// Dokuwiki creation errors
@@ -17,7 +19,9 @@ public enum ErrorCode {
 	 */
 	VERSION_ERROR,
 	
-	// Authentication errors
+	/**
+	 * Authentication errors, the user is not authorized or not logged in.
+	 */
 	NO_AUTH,
 	NOT_LOGGED_IN,
 	

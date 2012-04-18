@@ -33,7 +33,16 @@ import org.dokuwikimobile.model.SearchResult;
  */
 public final class DokuwikiXMLRPCClient {
 
-	public final static int ERROR_NO_ACCESS = 1;
+	public final static int INVALID_XMLRPC_REQUEST = -32600;
+	public final static int METHOD_NOT_EXIST = -32601;
+	public final static int WRONG_NR_PARAMETER = -32602;
+	public final static int NO_AUTH = -32603;
+	public final static int NOT_LOGGED_IN = -32604; 
+	public final static int PARSE_ERROR = -32700;
+	public final static int RECURSIVE_CALL = -32800;
+	public final static int UNKNOWN_SERVER_ERROR = -99999;
+
+	
 
 	private final static String CALL_VERSION = "dokuwiki.getXMLRPCAPIVersion";
 	private final static String CALL_LOGIN ="dokuwiki.login";
@@ -205,39 +214,23 @@ public final class DokuwikiXMLRPCClient {
 
 		/**
 		 * Will be called whenever the server returns an error.
-		 * If login with basic auth returns 'no access' and the user has stored
-		 * a username and password, the client tries to login with xmlrpc to check
-		 * if the user is authorized to view the page.
 		 * @param id The id of the request.
 		 * @param error The error returned by the server.
 		 */
 		public void onServerError(long id, XMLRPCServerException error) {
-			// If login with basic auth failed, try to login with xmlrpc
-			if(error.getErrorNr() == ERROR_NO_ACCESS 
-					&& loginData != null) {
-				
-				// Try to login.
-				boolean login = false;
-				try {
-					login = (Boolean)client.call(CALL_LOGIN, loginData.Username, loginData.Password);
-				} catch (XMLRPCException ex) {
-					// Don't do anything. Since login will stay false it will be
-					// handled with the next if statement.
-				}
-				
-				if(login) {
-					history.get(id).listener.onError(ErrorCode.NO_AUTH, id);
-				} else {
-					clearLoginData();
-					client.clearLoginData();
-					// Send error to callback
+			int errorNr = error.getErrorNr(); 
+			
+			switch (errorNr) {
+				case NO_AUTH:
+					history.remove(id).listener.onError(ErrorCode.NO_AUTH, id);
+					break;
+				case NOT_LOGGED_IN:
 					history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, id);
-				}
-			} else {
-				history.remove(id).listener.onError(ErrorCode.NOT_LOGGED_IN, id);
+					break;
+				default:
+					history.remove(id).listener.onError(ErrorCode.UNCATEGORIZED, id);
 			}
 		}
-
 	}
 
 	/**
