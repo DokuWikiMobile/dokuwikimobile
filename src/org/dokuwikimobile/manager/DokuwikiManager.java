@@ -3,7 +3,6 @@ package org.dokuwikimobile.manager;
 import android.content.Context;
 import android.util.Log;
 import java.io.File;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -11,11 +10,9 @@ import java.util.Map;
 import org.dokuwikimobile.Dokuwiki;
 import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.cache.Cache;
-import org.dokuwikimobile.listener.CancelableListener;
-import org.dokuwikimobile.listener.LoginListener;
-import org.dokuwikimobile.listener.PageListener;
-import org.dokuwikimobile.listener.SearchListener;
+import org.dokuwikimobile.listener.*;
 import org.dokuwikimobile.model.LoginData;
+import org.dokuwikimobile.model.Page;
 import org.dokuwikimobile.model.SearchResult;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
@@ -146,7 +143,9 @@ public class DokuwikiManager {
 
 	public void getPage(PageListener listener, String pageName) {
 
-		// TODO: Implement method
+		Canceler canceler = xmlrpcClient.getPageHTML(this.listener, pageName);
+		this.listener.put(canceler.getId(), listener);
+		listener.onStartLoading(canceler, canceler.getId());
 		
 	}
 
@@ -167,6 +166,7 @@ public class DokuwikiManager {
 		// TODO: Search in cache
 		Canceler canceler = xmlrpcClient.search(this.listener, "*" + query + "*");
 		this.listener.put(canceler.getId(), listener);
+		listener.onStartLoading(canceler, canceler.getId());
 		
 	}
 
@@ -194,6 +194,7 @@ public class DokuwikiManager {
 
 		Canceler canceler = xmlrpcClient.login(this.listener, login);
 		this.listener.put(canceler.getId(), listener);
+		listener.onStartLoading(canceler, canceler.getId());
 
 	}
 
@@ -217,7 +218,7 @@ public class DokuwikiManager {
 	 * that was passed to a call on the DokuwikiManager, and will be saved here
 	 * for later callback.
 	 */
-	private class Listener implements LoginListener, SearchListener {
+	private class Listener implements LoginListener, SearchListener, PageHtmlListener {
 		
 		private Map<Long, CancelableListener> listeners = new HashMap<Long, CancelableListener>();
 
@@ -314,6 +315,8 @@ public class DokuwikiManager {
 				l.onLogin(succeeded, id);
 			}
 
+			l.onEndLoading(id);
+
 		}
 
 		/**
@@ -328,50 +331,41 @@ public class DokuwikiManager {
 			if((l = getListener(id, SearchListener.class)) != null) {
 				l.onSearchResults(pages, id);
 			}
+
+			l.onEndLoading(id);
 			
 		}
 		
+		public void onPageHtml(String html, long id) {
+
+			PageListener l;
+			if((l = getListener(id, PageListener.class)) != null) {
+				Page p = new Page(html, null);
+				l.onPageLoaded(p);
+			}
+			
+			l.onEndLoading(id);
+
+		}
+
 		/**
-		 * Will be called, whenever a call started loading from network.
-		 * This will pass a Canceler object, that allows us to cancel the call.
-		 * We will just forward this call to the original listener.
+		 * This method will never be called here, since the DokuwikiManager is
+		 * responsible for generating the calls to onStartLoading.
+		 * Check the interface documentation for more details.
 		 * 
 		 * @param cancel The canceler to cancel the call.
 		 * @param id The id of the call.
 		 */
-		public void onStartLoading(Canceler cancel, long id) {
-
-			CancelableListener l = getListener(id, CancelableListener.class);
-
-			if(l != null) {
-				l.onStartLoading(cancel, id);	
-			}
-			
-		}
+		public void onStartLoading(Canceler cancel, long id) { }
 
 		/**
-		 * Will be called, whenever a call to the xmlrpc interface ended loading.
-		 * This method should be the last callback made for a specific requested call.
-		 * Any listener of an 'original call' can be assume, that after this method 
-		 * has been called on it, no further information will be passed related,
-		 * to the original call.
-		 * If for any reason we want to make further calls or send further information
-		 * to the original caller after the xmlrpc interface ended loading, we need
-		 * to block the callback here. In this case the call must be made, whenever
-		 * we did everything, and are not going to make any further calls related
-		 * to an original call.
+		 * This method will never be called here, since the DokuwikiManager is 
+		 * responsible for generating the calls to onEndLoading.
+		 * Check the interface documentation for more details. 
 		 * 
 		 * @param id The id of the call.
 		 */
-		public void onEndLoading(long id) {
-
-			CancelableListener l = removeListener(id, CancelableListener.class);
-
-			if(l != null) {
-				l.onEndLoading(id);
-			}
-			
-		}
+		public void onEndLoading(long id) { }
 
 		/**
 		 * This method will be called if an error occurred during a call.

@@ -277,7 +277,9 @@ public class Dokuwiki {
 
 			xmlrpcClient = new DokuwikiXMLRPCClient(wikiURL);
 			
-			xmlrpcClient.getVersion(this);
+			Canceler canceler = xmlrpcClient.getVersion(this);
+
+			listener.onStartLoading(canceler, canceler.getId());
 
 		}
 
@@ -288,7 +290,8 @@ public class Dokuwiki {
 				listener.onError(ErrorCode.VERSION_ERROR, id);
 			} else {
 				// Check the title of the DokuWiki.
-				xmlrpcClient.getTitel(this);
+				Canceler canceler = xmlrpcClient.getTitel(this);
+				listener.onStartLoading(canceler, canceler.getId());
 			}
 
 		}
@@ -301,11 +304,9 @@ public class Dokuwiki {
 		}
 		
 		public void onStartLoading(Canceler cancel, long id) {
-			listener.onStartLoading(cancel, id);
 		}
 
 		public void onEndLoading(long id) {
-			listener.onEndLoading(id);
 		}
 
 		public void onError(ErrorCode error, long id) {

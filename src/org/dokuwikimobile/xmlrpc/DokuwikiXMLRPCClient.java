@@ -105,7 +105,6 @@ public final class DokuwikiXMLRPCClient {
 	private Canceler call(CancelableListener listener, String methodName, Object... params) {
 		long id = client.callAsync(callbackHandler, methodName, params);
 		Canceler c = callbackHandler.addCallback(id, listener, methodName, params);
-		listener.onStartLoading(c, id);
 		return c;
 	}
 			
@@ -188,8 +187,6 @@ public final class DokuwikiXMLRPCClient {
 				}
 				((SearchListener)call.listener).onSearchResults(results, id);
 			}
-			
-			call.listener.onEndLoading(id);
 			
 		}
 

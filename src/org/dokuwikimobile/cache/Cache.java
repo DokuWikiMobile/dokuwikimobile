@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.model.Attachment;
-import org.dokuwikimobile.model.Page;
 import org.dokuwikimobile.model.PageInfo;
+import org.dokuwikimobile.model.PageOld;
 import org.dokuwikimobile.util.FileUtil;
 
 /**
@@ -16,7 +16,7 @@ import org.dokuwikimobile.util.FileUtil;
  */
 public class Cache {
 
-	private Map<String, Page> cachedPages = new HashMap<String, Page>();
+	private Map<String, PageOld> cachedPages = new HashMap<String, PageOld>();
 
 	private static final String PAGE_DIR = "pages";
 	private static final String PAGE_CONTENTS_DIR = "content";
@@ -50,12 +50,12 @@ public class Cache {
 	 * 
 	 * @param page The page to add to the cache.
 	 */
-	public void savePage(Page page) {
+	public void savePage(PageOld page) {
 		cachedPages.put(page.getPageName(), page);
 		writePageToDisk(page);
 	}
 	
-	public Page getPage(String pagename) {
+	public PageOld getPage(String pagename) {
 		return cachedPages.get(pagename);
 	}
 
@@ -106,7 +106,7 @@ public class Cache {
 	 * 
 	 * @param page The page that should be written to disk.
 	 */
-	private void writePageToDisk(Page page) {
+	private void writePageToDisk(PageOld page) {
 		writeObjectToFile(new File(pageContentDir, page.getPageName()), page.getContent());
 		writeObjectToFile(new File(pageInfoDir, page.getPageName()), page.getPageInfo());
 	}
@@ -139,8 +139,8 @@ public class Cache {
 		
 	}
 
-	private Page loadEmptyPage(File file) {
-		return new Page(this, (PageInfo)loadObject(file));
+	private PageOld loadEmptyPage(File file) {
+		return new PageOld(this, (PageInfo)loadObject(file));
 	}
 
 	private Attachment loadAttachment(String id) {
@@ -172,11 +172,11 @@ public class Cache {
 		
 	}
 
-	private Map<String,Page> loadPagesFromDisk() {
+	private Map<String,PageOld> loadPagesFromDisk() {
 		
-		Map<String,Page> page = new HashMap<String, Page>();
+		Map<String,PageOld> page = new HashMap<String, PageOld>();
 
-		Page p;
+		PageOld p;
 		for(File f : pageInfoDir.listFiles()) {
 			p = loadEmptyPage(f);
 			p.setCache(this);

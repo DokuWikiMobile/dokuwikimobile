@@ -45,9 +45,9 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 		
 		// If cache strategy allows showing cached pages, show cached page
 		if(strategy.showCachedPage()) {
-			Page p = cache.getPage(pagename);
+			PageOld p = cache.getPage(pagename);
 			if(p != null) {
-				listener.onPageLoaded(p);
+			//	listener.onPageLoaded(p);
 			}
 		}
 
@@ -106,7 +106,7 @@ public class CacheManager implements PageInfoListener, PageHtmlListener, SearchL
 
 	public void onPageHtml(String html, long id) {
 		//Page p = new Page(cache, html, tmpPageInfos.remove(pagename));
-		Page p = null;
+		PageOld p = null;
 
 		// Page should be cached
 		if(strategy.cachePages()) {

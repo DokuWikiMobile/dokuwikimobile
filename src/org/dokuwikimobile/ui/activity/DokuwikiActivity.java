@@ -5,16 +5,20 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import org.dokuwikimobile.Dokuwiki;
 import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.manager.DokuwikiManager;
 import org.dokuwikimobile.ui.dialog.LoginDialog;
 
 /**
- *
+ * The DokuwikiActivity is the parent class for all all activities, that should
+ * be available for every wiki. It takes care of reading the currently selected
+ * wiki from the intent and pass it to the next activity.
+ * 
  * @author Tim Roes <mail@timroes.de>
  */
-public abstract class DokuwikiActivity extends Activity 
+public abstract class DokuwikiActivity extends SherlockFragmentActivity 
 		implements LoginDialog.LoginDialogFinished {
 
 	public final static String WIKI_HASH = "wiki_hash";
@@ -23,6 +27,14 @@ public abstract class DokuwikiActivity extends Activity
 	
 	protected DokuwikiManager manager;
 
+	/**
+	 * This method gets called when the activity is about to be created.
+	 * The dokuwiki for this activity is read from the intent. If it couldn't
+	 * be read, finish the activity. We cannot do anything without the knowledge
+	 * of the current dokuwiki.
+	 * 
+	 * @param savedInstanceState The bundle with saved informations.
+	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

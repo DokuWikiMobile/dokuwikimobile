@@ -25,7 +25,7 @@ import org.dokuwikimobile.xmlrpc.ErrorCode;
  *
  * @author Tim Roes
  */
-public class SearchActivity extends DokuwikiActivity 
+public class SearchActivity extends DokuwikiActivity
 		implements SearchListener, OnCancelListener {
 
 	/**
@@ -89,8 +89,8 @@ public class SearchActivity extends DokuwikiActivity
 		resultList.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> adview, View view, int position, long id) {
 				// A search result has been clicked
-				Intent intent = new Intent(SearchActivity.this, BrowserActivity.class);
-				intent.putExtra(BrowserActivity.PAGEID, ((SearchResult)adview.getItemAtPosition(position)).getId());
+				Intent intent = new Intent(SearchActivity.this, BrowserActivityOld.class);
+				intent.putExtra(BrowserActivityOld.PAGEID, ((SearchResult)adview.getItemAtPosition(position)).getId());
 				startActivity(intent);
 			}
 		});

@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/reload_abort"
-			android:icon="@drawable/ic_menu_refresh"
-			android:title="reload"/>
+			android:icon="@drawable/ic_bar_refresh"
+			android:title="reload"
+			android:showAsAction="ifRoom|withText"/>
 	<item android:id="@+id/pageinfo"
 			android:enabled="false"
-			android:icon="@drawable/ic_menu_info_details"
-			android:title="@string/pageinfo"/>
+			android:icon="@drawable/ic_bar_info"
+			android:title="@string/pageinfo"
+			android:showAsAction="ifRoom"/>
 	<item android:id="@+id/search"
-			android:icon="@drawable/ic_menu_search"
-			android:title="@string/search"/>
+			android:icon="@drawable/ic_bar_search"
+			android:title="@string/search"
+			android:showAsAction="ifRoom"/>
 	<item android:id="@+id/preferences"
-			android:icon="@drawable/ic_menu_preferences"
-			android:title="@string/preferences"/>
+			android:icon="@drawable/ic_bar_settings"
+			android:title="@string/preferences"
+			android:showAsAction="ifRoom"/>
 </menu>

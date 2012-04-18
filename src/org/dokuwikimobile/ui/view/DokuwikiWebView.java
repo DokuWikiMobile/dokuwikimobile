@@ -7,9 +7,10 @@ import android.provider.Browser;
 import android.util.AttributeSet;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import java.util.Stack;
 import org.dokuwikimobile.model.DokuwikiUrl;
 import org.dokuwikimobile.model.Page;
-import java.util.Stack;
+import org.dokuwikimobile.model.PageOld;
 
 /**
  *
@@ -93,7 +94,8 @@ public class DokuwikiWebView extends WebView {
 		}
 
 		// Notify listerner that page is loaded from history
-		linkListener.onHistoryLoaded(this, new DokuwikiUrl(currentPage.getPageName()));
+		linkListener.onHistoryLoaded(this, new DokuwikiUrl(currentPage.getPageinfo().getName()));
+	
 		
 		// Load page, but dont modify history again
 		loadPage(currentPage, false);
@@ -214,7 +216,7 @@ public class DokuwikiWebView extends WebView {
 		 * @param webview The webview to which the page has been loaded.
 		 * @param page The page that has been loaded.
 		 */
-		public void onPageLoaded(DokuwikiWebView webview, Page page);
+		public void onPageLoaded(DokuwikiWebView webview, PageOld page);
 		
 	}
 	
