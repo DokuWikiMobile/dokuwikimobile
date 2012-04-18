@@ -127,7 +127,8 @@ public class ChooserActivity extends SherlockFragmentActivity
 		runOnUiThread(new Runnable() {
 			public void run() {
 				adapter.reload();
-				Toast.makeText(ChooserActivity.this, getResources().getString(R.string.wiki_added, dokuwiki.getTitle()), Toast.LENGTH_SHORT).show();
+				Toast.makeText(ChooserActivity.this, getResources().getString(
+						R.string.wiki_added, dokuwiki.getTitle()), Toast.LENGTH_SHORT).show();
 			}
 		});
 	}

@@ -252,8 +252,8 @@ public final class DokuwikiXMLRPCClient {
 		}
 		
 		public void cancel() {
-			callbackHandler.history.remove(id);
 			client.cancel(id);
+			callbackHandler.history.remove(id);
 		}
 
 		public long getId() {

@@ -1,5 +1,6 @@
 package org.dokuwikimobile.ui.dialog;
 
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.google.zxing.integration.android.IntentIntegrator;
 import java.net.MalformedURLException;
@@ -16,6 +16,7 @@ import org.dokuwikimobile.Dokuwiki;
 import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.R;
 import org.dokuwikimobile.listener.DokuwikiCreationListener;
+import org.dokuwikimobile.util.StringUtil;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 import org.dokuwikimobile.xmlrpc.ErrorCode;
 
@@ -23,7 +24,8 @@ import org.dokuwikimobile.xmlrpc.ErrorCode;
  *
  * @author Tim Roes <mail@timroes.de>
  */
-public class AddDokuwikiDialog extends SherlockDialogFragment implements DokuwikiCreationListener {
+public class AddDokuwikiDialog extends SherlockDialogFragment implements DokuwikiCreationListener,
+		DialogInterface.OnCancelListener {
 
 	public static AddDokuwikiDialog newInstance(AddListener listener) {
 		AddDokuwikiDialog dialog = new AddDokuwikiDialog();
@@ -32,6 +34,8 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 	}
 
 	private AddListener listener;
+	private ProgressDialog progressDialog;
+	private Canceler canceler;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -85,13 +89,15 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 		getDialog().setTitle(R.string.add_wiki_dialog_title);
 		View v = inflater.inflate(R.layout.dialog_adddokuwiki2, null, false);
 
-		if(url != null) {
-			((TextView)v.findViewById(R.id.wiki_url)).setText(url);
-		}
-
 		final EditText urlField = (EditText)v.findViewById(R.id.wiki_url);
-		urlField.setText("http://wiki-url.com/lib/exe/xmlrpc.php");
-		urlField.setSelection(7, 19);
+
+		if(!StringUtil.isNullOrEmpty(url)) {
+			urlField.setText(url);
+			addDokuwiki(url);
+		} else {
+			urlField.setText("http://wiki-url.com/lib/exe/xmlrpc.php");
+			urlField.setSelection(7, 19);
+		}
 
 		((Button)v.findViewById(R.id.add)).setOnClickListener(new View.OnClickListener() {
 
@@ -129,6 +135,9 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 	private void addDokuwiki(String wikiUrl) {
 
 		try {
+			progressDialog = new ProgressDialog(getDialog().getContext());
+			progressDialog.show();
+
 			Dokuwiki.Creator creator = new Dokuwiki.Creator();
 			creator.create(wikiUrl, this);
 		} catch (MalformedURLException ex) {
@@ -145,15 +154,28 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 
 	public void onDokuwikiCreated(final Dokuwiki dokuwiki) {
 		listener.onDokuwikiAdded(dokuwiki);
+		progressDialog.dismiss();
 		dismiss();
 	}
 
 	public void onStartLoading(Canceler cancel, long id) {
-		Log.d(DokuwikiApplication.LOGGER_NAME, "Start Loading");
+		this.canceler = cancel;
+		progressDialog.setMessage(R.string.progress_load_version_and_titel);
+		progressDialog.setOnCancelListener(this);
 	}
 
-	public void onEndLoading(long id) {
-		Log.d(DokuwikiApplication.LOGGER_NAME, "End loading");
+	public void onEndLoading(long id) { 
+		// No need to do anything here
+	}
+
+	@Override
+	public void onCancel(DialogInterface dialog) {
+		super.onCancel(dialog);
+		Log.d(DokuwikiApplication.LOGGER_NAME, "The adding of a DokuWiki has been canceled.");
+
+		if(canceler != null) {
+			canceler.cancel();
+		}
 	}
 
 	public void onError(ErrorCode error, long id) {
@@ -167,11 +189,13 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 				msg = R.string.not_wiki_url_msg;
 				break;
 			case VERSION_ERROR:
+				Log.e(DokuwikiApplication.LOGGER_NAME, "DokuWiki remote API version 7 is required. Failed to add wiki.");
 				title = R.string.version_error_title;
 				msg = R.string.version_error_msg;
 				break;
 		}
 
+		progressDialog.dismiss();
 		showError(title, msg);
 		
 	}
