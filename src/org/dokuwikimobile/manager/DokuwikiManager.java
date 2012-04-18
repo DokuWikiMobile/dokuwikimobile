@@ -3,6 +3,7 @@ package org.dokuwikimobile.manager;
 import android.content.Context;
 import android.util.Log;
 import java.io.File;
+import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;

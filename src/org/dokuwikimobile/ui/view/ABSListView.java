@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.Checkable;
 import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -42,26 +43,27 @@ public class ABSListView extends ListView {
 	private OnItemLongClickListenerWrapper longClickWrapper = new OnItemLongClickListenerWrapper();
 	private OnItemClickListenerWrapper clickWrapper = new OnItemClickListenerWrapper();
 
-    private SherlockActivity mSherlock;
+	private SherlockActivity sherlockActivity;
+	private SherlockFragmentActivity sherlockFragmentActivity;
 
 	/**
 	 * Get the SherlockActivity, the ListView is used in.
 	 * 
 	 * @return The parent SherlockActivity.
 	 */
-    protected final SherlockActivity getSherlockActivity() {
+	private ActionMode startActionMode(ABSListView.MultiChoiceModeListener listener) {
 		
-        if (mSherlock == null) {
-			Context ctx = getContext();
-			if(!SherlockActivity.class.isAssignableFrom(ctx.getClass())) {
-				throw new Error("The view is not inside a SherlockActivity.");
-			}
-            mSherlock = ((SherlockActivity)ctx);
-        }
+		Context ctx = getContext();
 		
-        return mSherlock;
+		if(SherlockActivity.class.isAssignableFrom(ctx.getClass())) {
+			return ((SherlockActivity)ctx).startActionMode(multiChoiceListener);
+		} else if(SherlockFragmentActivity.class.isAssignableFrom(ctx.getClass())) {
+			return ((SherlockFragmentActivity)ctx).startActionMode(multiChoiceListener);
+		} else {
+			throw new Error("The view is not inside a SherlockActivity.");
+		}
 
-    }
+	}
 
 	public ABSListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -241,7 +243,7 @@ public class ABSListView extends ListView {
 				
 				// Start actionmode on the parent SherlockActivity
 				if(actionmode == null) {
-					actionmode = getSherlockActivity().startActionMode((ABSListView.MultiChoiceModeListener)multiChoiceListener);
+					actionmode = ABSListView.this.startActionMode(multiChoiceListener);
 				}
 
 				// Check the item and inform the MultiChoiceModeListener

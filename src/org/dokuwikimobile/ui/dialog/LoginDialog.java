@@ -11,16 +11,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
 import android.widget.*;
-import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
+import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.R;
 import org.dokuwikimobile.listener.LoginListener;
 import org.dokuwikimobile.manager.DokuwikiManager;
-import org.dokuwikimobile.manager.PasswordManager;
 import org.dokuwikimobile.model.LoginData;
 import org.dokuwikimobile.xmlrpc.DokuwikiXMLRPCClient.Canceler;
 import org.dokuwikimobile.xmlrpc.ErrorCode;
-import org.dokuwikimobile.DokuwikiApplication;
 
 /**
  *

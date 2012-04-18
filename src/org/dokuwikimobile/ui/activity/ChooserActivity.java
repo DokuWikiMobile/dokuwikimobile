@@ -4,36 +4,36 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.actionbarsherlock.app.SherlockActivity;
+import android.widget.*;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import java.net.MalformedURLException;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.dokuwikimobile.Dokuwiki;
 import org.dokuwikimobile.R;
+import org.dokuwikimobile.ui.dialog.AddDokuwikiDialog;
 import org.dokuwikimobile.ui.view.ABSListView;
 
 /**
  *
  * @author Tim Roes <mail@timroes.de>
  */
-public class ChooserActivity extends SherlockActivity implements AdapterView.OnItemClickListener {
+public class ChooserActivity extends SherlockFragmentActivity 
+		implements AdapterView.OnItemClickListener, AddDokuwikiDialog.AddListener {
 
-	private static int i = 1;
+	private static final String ADD_DIALOG_TAG = "add_dialog";
+	
 	private ABSListView wikiList;
 
 	private ChooserAdapter adapter;
 
 	private ActionMode actionmode;
+
+	private AddDokuwikiDialog addDialog;
 
 	/**
 	 * Called when the activity is first created.
@@ -60,6 +60,15 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 		clearChoices();
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		final IntentResult scan = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+		// TODO: Check for valid url
+		if(scan != null && scan.getContents() != null) {
+			addDialog.showInputScreen(scan.getContents());
+		}
+	}
+
 	/**
 	 * Called when the activity should create an options menu.
 	 * 
@@ -75,13 +84,16 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		try {
-			Dokuwiki.add("DWM Wiki", "http://wiki.dokuwikimobile.org/lib/exe/xmlrpc.php" + i++);
-		} catch (MalformedURLException ex) {
-			Logger.getLogger(ChooserActivity.class.getName()).log(Level.SEVERE, null, ex);
+
+		switch(item.getItemId()) {
+			case R.id.add:
+				addDialog = AddDokuwikiDialog.newInstance(this);
+				addDialog.show(getSupportFragmentManager(), ADD_DIALOG_TAG);
+				return true;
 		}
-		adapter.reload();
-		return true;
+
+		return false;
+
 	}
 
 	/**
@@ -94,7 +106,7 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 	 * @param id The id of the clicked item.
 	 */
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+		
 		Intent intent = new Intent(this, BrowserActivity.class);
 		intent.putExtra(DokuwikiActivity.WIKI_HASH, 
 				((Dokuwiki)adapter.getItem(position)).getMd5hash());
@@ -109,6 +121,15 @@ public class ChooserActivity extends SherlockActivity implements AdapterView.OnI
 		if(actionmode != null) {
 			actionmode.finish();
 		}
+	}
+
+	public void onDokuwikiAdded(final Dokuwiki dokuwiki) {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				adapter.reload();
+				Toast.makeText(ChooserActivity.this, getResources().getString(R.string.wiki_added, dokuwiki.getTitle()), Toast.LENGTH_SHORT).show();
+			}
+		});
 	}
 
 	private class ChooserMultiChoiceModeListener implements ABSListView.MultiChoiceModeListener {

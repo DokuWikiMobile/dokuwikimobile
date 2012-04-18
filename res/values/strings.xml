@@ -3,6 +3,7 @@
     <string name="app_name">DokuWiki Mobile</string>
 
 	<string name="ok">OK</string>
+	<string name="yes">Yes</string>
 	<string name="add">Add</string>
 	<string name="delete">Delete</string>
 
@@ -15,6 +16,24 @@
 		<item quantity="one">%s wiki deleted</item>
 		<item quantity="other">%s wikis deleted</item>
 	</plurals>
+	<!-- Add wiki dialog -->
+	<string name="add_wiki_dialog_title">Enter URL of wiki</string>
+	<string name="add_wiki_choose_method_title">Choose a way to add a new wiki</string>
+	<string name="add_by_url">Enter URL of wiki</string>
+	<string name="add_by_photo">Use QR code</string>
+	<string name="add_wiki">Add Wiki</string>
+	<string name="wiki_added">DokuWiki \'%s\' added</string>
+	<string name="invalid_url_title">Invalid URL</string>
+	<string name="invalid_url_msg">The entered URL was not a valid URL.</string>
+	<string name="not_wiki_url_title">No wiki found</string>
+	<string name="not_wiki_url_msg">No DokuWiki found under the given URL.</string>
+	<string name="version_error_title">Dokuwiki version</string>
+	<string name="version_error_msg">The DokuWiki is not up to date. This application requires at 
+	least the WHATEVER release.</string>
+
+	<!-- Barcode scanner -->
+	<string name="install_barcode_title">Install Barcode Scanner?</string>
+	<string name="install_barcode_message">This application requires Barcode Scanner. Would you like to install it?</string>
 
 	<!-- Browser activity -->
 	<string name="page_loading">Page is loading…</string>

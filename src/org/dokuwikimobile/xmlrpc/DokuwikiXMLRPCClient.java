@@ -5,7 +5,6 @@ import de.timroes.axmlrpc.XMLRPCCallback;
 import de.timroes.axmlrpc.XMLRPCClient;
 import de.timroes.axmlrpc.XMLRPCException;
 import de.timroes.axmlrpc.XMLRPCServerException;
-import de.timroes.base64.Base64;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,8 +33,6 @@ import org.dokuwikimobile.model.SearchResult;
  */
 public final class DokuwikiXMLRPCClient {
 
-	public int version;
-
 	public final static int ERROR_NO_ACCESS = 1;
 
 	private final static String CALL_VERSION = "dokuwiki.getXMLRPCAPIVersion";
@@ -44,6 +41,7 @@ public final class DokuwikiXMLRPCClient {
 	private final static String CALL_PAGE_INFO = "wiki.getPageInfo";
 	private final static String CALL_GETATTACHMENT = "wiki.getAttachment";
 	private final static String CALL_SEARCH = "dokuwiki.search";
+	private final static String CALL_TITLE = "dokuwiki.getTitle";
 
 	private final static String KEY_PAGE_NAME = "name";
 	private final static String KEY_LAST_MODIFIED = "lastModified";
@@ -59,12 +57,10 @@ public final class DokuwikiXMLRPCClient {
 		client = new XMLRPCClient(url, "DokuWikiMobile",
 				XMLRPCClient.FLAGS_IGNORE_STATUSCODE | XMLRPCClient.FLAGS_FORWARD);
 		
-		// TODO: For testing only!!! Must be removed with the result from getVersion listener
-		version = 7;
 	}
 
-	public Canceler getVersion(VersionListener listener) {
-		return call(listener, CALL_VERSION);
+	public URL getURL() {
+		return client.getURL();
 	}
 
 	public void setLoginData(LoginData loginData) {
@@ -75,6 +71,14 @@ public final class DokuwikiXMLRPCClient {
 	public void clearLoginData() {
 		this.loginData = null;
 		client.clearLoginData();
+	}
+
+	public Canceler getVersion(VersionListener listener) {
+		return call(listener, CALL_VERSION);
+	}
+
+	public Canceler getTitel(TitleListener listener) {
+		return call(listener, CALL_TITLE);
 	}
 
 	public Canceler login(LoginListener listener, LoginData login) {
@@ -144,7 +148,10 @@ public final class DokuwikiXMLRPCClient {
 				return;
 			} else if(CALL_VERSION.equals(call.methodName)) {
 				// dokuwiki.version returned
-				((VersionListener)call.listener).onVersion(version, id);
+				((VersionListener)call.listener).onVersion((Integer)result, id);
+			} else if(CALL_TITLE.equals(call.methodName)) {
+				// dokuwiki.getTitle returned
+				((TitleListener)call.listener).onTitle((String)result, id);
 			} else if(CALL_LOGIN.equals(call.methodName)) {
 				// dokuwiki.login returned
 				((LoginListener)call.listener).onLogin((Boolean)result, id);
@@ -163,14 +170,7 @@ public final class DokuwikiXMLRPCClient {
 			} else if(CALL_GETATTACHMENT.equals(call.methodName)) {
 				// TODO: CHECK REAL xmlrpc version here when it is implemented
 				// getAttachment returned
-				byte[] data;
-				if(version >= 7) {
-					data = (byte[])result;
-				} else {
-					// Before XMLRPC version 7 the data was encoded as base64 but 
-					// transfered as type string, so we need to decode it here.
-					data = Base64.decode((String)result);
-				}
+				byte[] data = (byte[])result;
 				Attachment a = new Attachment(call.params[0].toString(), data);
 				((AttachmentListener)call.listener).onAttachmentLoaded(a, id);
 			} else if(CALL_SEARCH.equals(call.methodName)) {
