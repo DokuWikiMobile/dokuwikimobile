@@ -160,7 +160,7 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 
 	public void onStartLoading(Canceler cancel, long id) {
 		this.canceler = cancel;
-		progressDialog.setMessage(R.string.progress_load_version_and_titel);
+		progressDialog.setMessage(R.string.progress_load_version_and_title);
 		progressDialog.setOnCancelListener(this);
 	}
 
