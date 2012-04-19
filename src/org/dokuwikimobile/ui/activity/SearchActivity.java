@@ -1,20 +1,23 @@
 package org.dokuwikimobile.ui.activity;
 
-import android.app.ProgressDialog;
 import android.app.SearchManager;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
+import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.R;
 import org.dokuwikimobile.listener.SearchListener;
 import org.dokuwikimobile.model.SearchResult;
@@ -23,233 +26,137 @@ import org.dokuwikimobile.xmlrpc.ErrorCode;
 
 /**
  *
- * @author Tim Roes
+ * @author Tim Roes <mail@timroes.de>
  */
-public class SearchActivity extends DokuwikiActivity
-		implements SearchListener, OnCancelListener {
+public class SearchActivity extends DokuwikiActivity implements SearchListener {
 
-	/**
-	 * The progress dialog that is showed during searching.
-	 */
-	private ProgressDialog progress;
-
-	/**
-	 * The progress bar that is shown below the list.
-	 */
-	private View searchProgress;
-
-	/**
-	 * The no search results view above the list of results.
-	 */
-	private View searchInformation;
-	
-	/**
-	 * The canceler to cancel the current search.
-	 */
-	private Canceler canceler;
-
-	/**
-	 * The queued search string.
-	 */
-	private String queuedSearch;
-
-	/**
-	 * The listview of search results.
-	 */
-	private ListView resultList;
-
-	/**
-	 * The adapter for the search results.
-	 */
+	private ListView results;
 	private SearchResultAdapter adapter;
-
+	private Canceler canceler;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.search);
-
-		searchProgress = findViewById(R.id.search_progress);
-                // TODO: Move to xml file
-		searchProgress.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				cancel();
-			}
-		});
-
-		searchInformation = findViewById(R.id.search_information);
-		searchInformation.setVisibility(View.GONE);
-                // TODO: Move to xml file
-		searchInformation.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View view) {
-				onSearchRequested();
-			}
-		});
-
-		resultList = (ListView)findViewById(R.id.search_results);
-		resultList.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> adview, View view, int position, long id) {
-				// A search result has been clicked
-				Intent intent = new Intent(SearchActivity.this, BrowserActivityOld.class);
-				intent.putExtra(BrowserActivityOld.PAGEID, ((SearchResult)adview.getItemAtPosition(position)).getId());
-				startActivity(intent);
-			}
-		});
 
 		adapter = new SearchResultAdapter();
-		resultList.setAdapter(adapter);
+		adapter.registerDataSetObserver(new SearchDataObserver());
+		
+		results = new ListView(this);
+		results.setAdapter(adapter);
+		results.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-		queueSearch();
-		startSearch();
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Intent intent = new Intent(SearchActivity.this, BrowserActivity.class);
+				intent.putExtra(BrowserActivity.EXTRA_PAGE_ID, 
+						((SearchResult)adapter.getItem(position)).getId());
+				startActivity(intent);
+			}
+
+		});
+
+		setupActionBar();
+
+		startSearchFromIntent();
+		
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		setIntent(intent);
-		queueSearch();
-		startSearch();
-	};
 
-	/**
-	 * Queue the search string from the intent for a search.
-	 * This will show the loading dialog. The doSearch method can be called
-	 * afterwards, to start the queued search.
-	 */
-	private void queueSearch() {
-		if(Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
-			queuedSearch = getIntent().getStringExtra(SearchManager.QUERY);
-			// Show no search results until we have some to show.
-			hideSearchInformation();
-			// Show the progress dialog as long as we don't have any results to show
-			progress = ProgressDialog.show(this, null, getResources().getText(R.string.searching), 
-					true, true, this);
-			// Try to start the search yet. Normally the service won't be available yet.
-			startSearch();
+		// If there is a running search cancel this before starting new search
+		if(canceler != null) {
+			Log.d(DokuwikiApplication.LOGGER_NAME, "Aborting previous search for new search.");
+			canceler.cancel();
 		}
+		
+		startSearchFromIntent();
 	}
-	
-	/**
-	 * This method starts a queued search. It will be called when the service
-	 * is available for the activity.
-	 */
-	private void startSearch() {
-		if(queuedSearch != null) {
-			manager.search(this, queuedSearch);
-			// Clear queued search since, since its started now
-			queuedSearch = null;
+
+	private void startSearchFromIntent() {
+
+		if(Intent.ACTION_SEARCH.equals(getIntent().getAction())) {
+			// Show loading screen
+			loadingScreen();
+			// Clear subtitle
+			getSupportActionBar().setSubtitle(null);
+			// Start search
+			manager.search(this, getIntent().getStringExtra(SearchManager.QUERY));
+		}
+		
+	}
+
+	private void setupActionBar() {
+
+		ActionBar bar = getSupportActionBar();
+		// Set titel to titel of dokuwiki
+		bar.setTitle(manager.getDokuwiki().getTitle());
+
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.search, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+			case R.id.new_search:
+				onSearchRequested();
+				return true;
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
 	public void onSearchResults(final List<SearchResult> pages, long id) {
 		
-		runOnUiThread(new Runnable() {
+		handler.post(new Runnable() {
 
 			public void run() {
-				// If we got any results or are completly finished with searching,
-				// hide the dialog loading interface.
-				if(!pages.isEmpty() || !isLoading()) {
-					hideDialogLoading();
-				}
 
-				// Clear current entries in the list
+				setContentView(results);
+
+				// Clear current entries in the adapter
 				adapter.results.clear();
-
-				// If any results have been found, show them in the list.
-				if(!pages.isEmpty()) {
-					// Clear old results and show new results
-					showSearchResults(pages.size());
-					adapter.results.addAll(pages);
-				} else if(!isLoading()) {
-					// If no Search results are found and search has been finished
-					// show the no search result text.
-					showSearchResults(0);
-				}
-
+				// Add search results to adapter
+				adapter.results.addAll(pages);
+				
 				adapter.notifyDataSetChanged();
+
 			}
 
 		});
-
-	}
-
-	public void onStartLoading(Canceler cancel, long id) {
-		this.canceler = cancel;
-		showBottomLoading();
-	}
-
-	public void onEndLoading(long id) {
-		hideBottomLoading();
-		hideDialogLoading();
-	}
-
-	/**
-	 * Will be called, when the user press backs, while the progress
-	 * dialog is shown. It will hide the dialog. If the queued search
-	 * has already been started, cancel it.
-	 */
-	public void onCancel(DialogInterface dialog) {
-		cancel();
-	}
-
-	private void cancel() {
-		if(canceler != null) {
-			canceler.cancel();
-		}
-		hideDialogLoading();
-		hideBottomLoading();
-		showSearchResults(adapter.results.size());
-	}
-
-	private void showSearchResults(int size) {
-		String information = getResources().getQuantityString(R.plurals.search_results, 
-				size, String.valueOf(size));
 		
-		((TextView)findViewById(R.id.search_information_text)).setText(information);
-		searchInformation.setVisibility(View.VISIBLE);
-	}
-	
-	private void hideSearchInformation() {
-		searchInformation.setVisibility(View.GONE);
-	}
-	
-	private void showBottomLoading() {
-		searchProgress.setVisibility(View.VISIBLE);
-		// TODO: can be removed
-		// Must be done due to a "bug" in Android, see also:
-		// http://code.google.com/p/android/issues/detail?id=12870
-		resultList.setAdapter(resultList.getAdapter());
 	}
 
-	private void hideBottomLoading() {
-		resultList.post(new Runnable() {
-			public void run() {
-				searchProgress.setVisibility(View.GONE);
-			}
-		});
+	@Override
+	public void onStartLoading(Canceler cancel, long id) {
+		super.onStartLoading(cancel, id);
+		this.canceler = cancel;
 	}
 
-	private boolean isLoading() {
-		return searchProgress.getVisibility() == View.VISIBLE
-				|| progress.isShowing();
+	@Override
+	public void onEndLoading(long id) {
+		super.onEndLoading(id);
+		this.canceler = null;
 	}
 
-	private void hideDialogLoading() {
-		if(progress.isShowing()) {
-			progress.dismiss();
-		}
-	}
-
+	@Override
 	public void onError(ErrorCode error, long id) {
+		super.onError(error, id);
+		// TODO: implement this
 		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	/**
-	 * The adapter that holds the search results for the result ListView.
-	 */
 	private class SearchResultAdapter extends BaseAdapter {
 
 		private List<SearchResult> results = new ArrayList<SearchResult>();
-
+		
 		public int getCount() {
 			return results.size();
 		}
@@ -262,18 +169,40 @@ public class SearchActivity extends DokuwikiActivity
 			return position;
 		}
 
-		public View getView(int position, View recycle, ViewGroup parent) {
-			
-			if(recycle == null)
-				recycle = SearchActivity.this.getLayoutInflater().inflate(R.layout.searchresult, null);
-			
-			((TextView)recycle.findViewById(R.id.searchresult_id)).setText(results.get(position).getId());
-			String hits = getResources().getString(R.string.search_hits,
-					results.get(position).getScore());
-			((TextView)recycle.findViewById(R.id.searchresult_hits)).setText(hits);
+		public View getView(int position, View convertView, ViewGroup parent) {
 
-			return recycle;
+			if(convertView == null) 
+				convertView = getLayoutInflater().inflate(R.layout.searchresult, parent, false);
+
+			SearchResult result = results.get(position);
+			String hits = getResources().getQuantityString(R.plurals.search_hits,
+					result.getScore(), result.getScore());
 			
+			((TextView)convertView.findViewById(R.id.searchresult_id)).setText(result.getTitle());
+			((TextView)convertView.findViewById(R.id.searchresult_hits)).setText(hits);
+
+			return convertView;
+			
+		}
+
+	}
+
+	/**
+	 * The SearchDataObserver refreshes the subtitle of the actionbar to show
+	 * the amount of search results.
+	 */
+	private class SearchDataObserver extends DataSetObserver {
+
+		/**
+		 * This method will be called when the search results has been changed.
+		 * It will refresh the subtitle in the ActionBar to show the amount of
+		 * search results.
+		 */
+		@Override
+		public void onChanged() {
+			super.onChanged();
+			getSupportActionBar().setSubtitle(getResources().getQuantityString(
+					R.plurals.search_results, adapter.getCount(), adapter.getCount()));
 		}
 		
 	}

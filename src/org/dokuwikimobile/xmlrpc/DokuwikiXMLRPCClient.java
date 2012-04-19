@@ -182,6 +182,7 @@ public final class DokuwikiXMLRPCClient {
 							(Integer)searchResult.get("score"),
 							(Integer)searchResult.get("rev"),
 							(String)searchResult.get("id"),
+							(String)searchResult.get("title"),
 							(String)searchResult.get("snippet")));
 							
 				}

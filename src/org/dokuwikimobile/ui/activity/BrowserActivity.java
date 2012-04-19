@@ -2,13 +2,11 @@ package org.dokuwikimobile.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.Window;
 import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.R;
 import org.dokuwikimobile.listener.PageListener;
@@ -23,10 +21,8 @@ import org.dokuwikimobile.xmlrpc.ErrorCode;
  */
 public class BrowserActivity extends DokuwikiActivity implements PageListener {
 
-	private static final String PAGE_ID = "pageid";
+	public static final String EXTRA_PAGE_ID = "pageid";
 
-	private Handler handler;
-	
 	private DokuwikiWebView browser;
 	private Canceler canceler;
 	
@@ -34,12 +30,7 @@ public class BrowserActivity extends DokuwikiActivity implements PageListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-		
-		handler = new Handler();
-
 		browser = new DokuwikiWebView(this);
-		setContentView(browser);
 
 		setupActionBar();
 
@@ -88,11 +79,6 @@ public class BrowserActivity extends DokuwikiActivity implements PageListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		
 		switch(item.getItemId()) {
-			case android.R.id.home:
-				Intent intent = new Intent(this, ChooserActivity.class);
-				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				return true;
 			case R.id.reload_abort:
 				if(canceler != null) {
 					Log.d(DokuwikiApplication.LOGGER_NAME, "Abort loading");
@@ -120,20 +106,18 @@ public class BrowserActivity extends DokuwikiActivity implements PageListener {
 	private void setupActionBar() {
 
 		ActionBar bar = getSupportActionBar();
-		// Set subtitel to application name
-		bar.setSubtitle(R.string.app_name);
 		// Set titel to titel of dokuwiki
 		bar.setTitle(manager.getDokuwiki().getTitle());
-		// Enable up navigation over icon
-		bar.setHomeButtonEnabled(true);
-		bar.setDisplayHomeAsUpEnabled(true);
 		
 	}
 
 	private void startLoadingPage() {
 		
-		if(getIntent().getStringExtra(PAGE_ID) != null) {
-			manager.getPage(this, getIntent().getStringExtra(PAGE_ID));
+		// Start the loading screen
+		loadingScreen();
+		
+		if(getIntent().getStringExtra(EXTRA_PAGE_ID) != null) {
+			manager.getPage(this, getIntent().getStringExtra(EXTRA_PAGE_ID));
 		} else {
 			manager.getPage(this, "start");
 		}
@@ -145,7 +129,6 @@ public class BrowserActivity extends DokuwikiActivity implements PageListener {
 		handler.post(new Runnable() {
 
 			public void run() {
-				setSupportProgressBarIndeterminateVisibility(true);
 				invalidateOptionsMenu();
 			}
 			
@@ -158,8 +141,9 @@ public class BrowserActivity extends DokuwikiActivity implements PageListener {
 		handler.post(new Runnable() {
 
 			public void run() {
-				setSupportProgressBarIndeterminateVisibility(false);
+				setContentView(browser);
 				invalidateOptionsMenu();
+				setSupportProgressBarIndeterminateVisibility(false);
 			}
 			
 		});
@@ -173,15 +157,21 @@ public class BrowserActivity extends DokuwikiActivity implements PageListener {
 		browser.loadPage(page);
 	}
 	
+	@Override
 	public void onStartLoading(Canceler cancel, long id) {
+		super.onStartLoading(cancel, id);
 		showLoading(cancel);
 	}
 
+	@Override
 	public void onEndLoading(long id) {
+		super.onEndLoading(id);
 		endLoading();
 	}
 
+	@Override
 	public void onError(ErrorCode error, long id) {
+		super.onError(error, id);
 		endLoading();
 	}
 
