@@ -119,14 +119,19 @@ public class SearchActivity extends DokuwikiActivity implements SearchListener {
 
 			public void run() {
 
-				setContentView(results);
+				// If some results have been found, display these
+				if(!pages.isEmpty()) {
+					
+					setContentView(results);
 
-				// Clear current entries in the adapter
-				adapter.results.clear();
-				// Add search results to adapter
-				adapter.results.addAll(pages);
-				
-				adapter.notifyDataSetChanged();
+					// Clear current entries in the adapter
+					adapter.results.clear();
+					// Add search results to adapter
+					adapter.results.addAll(pages);
+					
+					adapter.notifyDataSetChanged();
+
+				}
 
 			}
 
@@ -144,6 +149,9 @@ public class SearchActivity extends DokuwikiActivity implements SearchListener {
 	public void onEndLoading(long id) {
 		super.onEndLoading(id);
 		this.canceler = null;
+
+		handler.post(new NoResultsScreen());
+		
 	}
 
 	@Override
@@ -203,6 +211,30 @@ public class SearchActivity extends DokuwikiActivity implements SearchListener {
 			super.onChanged();
 			getSupportActionBar().setSubtitle(getResources().getQuantityString(
 					R.plurals.search_results, adapter.getCount(), adapter.getCount()));
+		}
+		
+	}
+
+	/**
+	 * This Runnable will check if the adapter holds no search results.
+	 * If it has no results, a big no search result message will be thrown.
+	 */
+	private class NoResultsScreen implements Runnable {
+
+		public void run() {
+
+			if(adapter.getCount() == 0) {
+				// If no results have been found, and we have been finished loading
+				// display a big no search result message.
+				messageScreen(R.string.no_search_results, R.string.start_new_search,
+						new View.OnClickListener() {
+							public void onClick(View v) {
+								onSearchRequested();
+							}
+						}
+				);
+			}
+
 		}
 		
 	}
