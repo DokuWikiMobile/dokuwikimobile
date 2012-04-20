@@ -7,7 +7,10 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.Window;
@@ -114,11 +117,71 @@ public abstract class DokuwikiActivity extends SherlockFragmentActivity
 	 */
 	protected void loadingScreen() {
 		
-		setContentView(R.layout.loading);
+		setContentView(R.layout.loading_screen);
 		ProgressBar spinner = (ProgressBar)findViewById(R.id.spinner);
 		AnimationDrawable anim = (AnimationDrawable)getResources().getDrawable(R.drawable.spinner);
 		spinner.setIndeterminateDrawable(anim);
 		anim.start();
+		
+	}
+
+	/**
+	 * Replace all content of the current activity with a big message.
+	 * This can be used to show warnings or errors, while no other data is available
+	 * to present to the user.
+	 * 
+	 * @param message The resource id of the message to show.
+	 */
+	protected void messageScreen(int message) {
+		messageScreen(getResources().getString(message));
+	}
+
+	/**
+	 * Replace all content of the current activity with a big message.
+	 * This can be used to show warnings or errors, while no other data is available
+	 * to present to the user.
+	 * 
+	 * @param message The message to show.
+	 */
+	protected void messageScreen(String message) {
+		messageScreen(message, null, null);
+	}
+
+	/**
+	 * Replace all content of the current activity with a big message and a button below.
+	 * This can be used to show warnings or errors, while no other data is
+	 * available to present to the user.
+	 * 
+	 * @param message The resource id of the message to show.
+	 * @param buttonLabel The resource id of the button label.
+	 * @param clickListener A listener to be notified about the button click.
+	 */
+	protected void messageScreen(int message, int buttonLabel, View.OnClickListener clickListener) {
+		messageScreen(getResources().getString(message), getResources().getString(buttonLabel), clickListener);
+	}
+
+	/**
+	 * Replace all content of the current activity with a big message and a button below.
+	 * This can be used to show warnings or errors, while no other data is
+	 * available to present to the user.
+	 * 
+	 * @param message The message to show.
+	 * @param buttonLabel The button label.
+	 * @param clickListener A listener to be notified about the button click.
+	 */
+	protected void messageScreen(String message, String buttonLabel, View.OnClickListener clickListener) {
+
+		setContentView(R.layout.message_screen);
+		TextView messageView = (TextView)findViewById(R.id.message);
+		messageView.setText(message);
+
+		Button button = (Button)findViewById(R.id.button);
+		if(buttonLabel == null || clickListener == null) {
+			button.setVisibility(View.GONE);
+		} else {
+			button.setText(buttonLabel);
+			button.setOnClickListener(clickListener);
+		}
 		
 	}
 
