@@ -7,13 +7,11 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 import org.dokuwikimobile.R;
-import org.dokuwikimobile.Settings;
 import org.dokuwikimobile.listener.PageListener;
 import org.dokuwikimobile.model.DokuwikiUrl;
 import org.dokuwikimobile.model.Page;
@@ -63,7 +61,7 @@ public class BrowserActivityOld extends Activity implements ScrollListener,
 			displayPage(DokuwikiUrl.parseUrl(getIntent().getStringExtra(PAGEID)));
 			getIntent().removeExtra(PAGEID);
 		} else if(currentRequested == null) {
-			displayPage(new DokuwikiUrl(Settings.HOME));
+			//displayPage(new DokuwikiUrl(Settings.HOME));
 		} 
 	}
 
