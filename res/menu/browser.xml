@@ -15,6 +15,5 @@
 			android:showAsAction="ifRoom"/>
 	<item android:id="@+id/preferences"
 			android:icon="@drawable/ic_bar_settings"
-			android:title="@string/preferences"
-			android:showAsAction="ifRoom"/>
+			android:title="@string/preferences"/>
 </menu>
