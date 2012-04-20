@@ -158,6 +158,7 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 			Dokuwiki.Creator creator = new Dokuwiki.Creator();
 			creator.create(wikiUrl, this);
 		} catch (MalformedURLException ex) {
+			progressDialog.dismiss();
 			showError(R.string.invalid_url_title, R.string.invalid_url_msg);
 			Log.e(DokuwikiApplication.LOGGER_NAME, "Cannot add dokuwiki " + wikiUrl + ". This isn't a valid url.");
 		}
