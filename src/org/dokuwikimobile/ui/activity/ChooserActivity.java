@@ -42,15 +42,16 @@ public class ChooserActivity extends SherlockFragmentActivity
 	public void onCreate(Bundle icicle) {
 
 		super.onCreate(icicle);
-		setContentView(R.layout.chooser);
 
 		adapter = new ChooserAdapter();
 
-		wikiList = (ABSListView)findViewById(R.id.wiki_list);
+		wikiList = new ABSListView(this);
 		wikiList.setOnItemClickListener(this);
 		wikiList.setAdapter(adapter);
 		wikiList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		wikiList.setMultiChoiceModeListener(new ChooserMultiChoiceModeListener());
+
+		setContentView(wikiList);
 
 	}
 

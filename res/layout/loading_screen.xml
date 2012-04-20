@@ -4,7 +4,7 @@
     	android:layout_height="fill_parent">
 	<ProgressBar android:id="@+id/spinner"
 			android:indeterminate="true"
-			android:layout_width="130sp"
-			android:layout_height="130sp"
+			android:layout_width="130dp"
+			android:layout_height="130dp"
 			android:layout_centerInParent="true"/>
 </RelativeLayout>

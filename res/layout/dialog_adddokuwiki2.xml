@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     	android:orientation="vertical"
+		android:paddingLeft="16dp"
+		android:paddingRight="16dp"
+		android:paddingBottom="8dp"
+		android:paddingTop="8dp"
 	    android:layout_width="fill_parent"
     	android:layout_height="fill_parent">
 	<EditText android:id="@+id/wiki_url"
 			android:inputType="textUri"
+			android:layout_marginBottom="8dp"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"/>
 	<Button android:id="@+id/add"
