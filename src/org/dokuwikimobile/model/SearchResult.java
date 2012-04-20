@@ -45,7 +45,7 @@ public class SearchResult {
 	}
 
 	public String getTitle() {
-		return title;
+		return StringUtil.isNullOrEmpty(title) ? id : title;
 	}
 
 	@Override
