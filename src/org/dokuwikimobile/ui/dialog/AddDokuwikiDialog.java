@@ -55,7 +55,8 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 			&& packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
 			return createChooseView(inflater);
 		} else {
-			return createInputView(inflater, savedInstanceState.getString(WIKI_URL), false);
+			String loadWiki = (savedInstanceState == null) ? null : savedInstanceState.getString(WIKI_URL);
+			return createInputView(inflater, loadWiki, false);
 		}
 		
 	}
