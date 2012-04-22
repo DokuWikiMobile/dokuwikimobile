@@ -20,6 +20,7 @@ import org.dokuwikimobile.ui.view.ABSListView;
 
 /**
  *
+ * @author Daniel Baelz <daniel.baelz@lysandor.de>
  * @author Tim Roes <mail@timroes.de>
  */
 public class ChooserActivity extends SherlockFragmentActivity 
@@ -61,6 +62,20 @@ public class ChooserActivity extends SherlockFragmentActivity
 		clearChoices();
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();	
+
+		Intent intent = getIntent();
+		
+		if(intent != null && intent.getAction().equals("android.intent.action.VIEW")
+				&& intent.getData() != null) {
+			addDialog = AddDokuwikiDialog.newInstance(this);
+			// TODO: Add Dokuwiki...
+		}
+		
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		final IntentResult scan = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
