@@ -68,10 +68,15 @@ public class ChooserActivity extends SherlockFragmentActivity
 
 		Intent intent = getIntent();
 		
+		// If an view intent was used to open this activity and it holds an url
+		// open the add dokuwiki dialog for this url.
 		if(intent != null && intent.getAction().equals("android.intent.action.VIEW")
 				&& intent.getData() != null) {
-			addDialog = AddDokuwikiDialog.newInstance(this);
-			// TODO: Add Dokuwiki...
+			addDialog = AddDokuwikiDialog.newInstance(this, intent.getDataString());
+			addDialog.show(getSupportFragmentManager(), ADD_DIALOG_TAG);
+			// Delete the URI from the intent, so if onResume is called the next
+			// time, no dialog will be started.
+			intent.setData(null);
 		}
 		
 	}

@@ -30,8 +30,20 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 	private static final String WIKI_URL = "wiki_url";
 
 	public static AddDokuwikiDialog newInstance(AddListener listener) {
+		return newInstance(listener, null);
+	}
+
+	public static AddDokuwikiDialog newInstance(AddListener listener, String url) {
 		AddDokuwikiDialog dialog = new AddDokuwikiDialog();
+
+		if(!StringUtil.isNullOrEmpty(url)) {
+			Bundle args = new Bundle();
+			args.putString(WIKI_URL, url);
+			dialog.setArguments(args);
+		}
+
 		dialog.listener = listener;
+
 		return dialog;
 	}
 
@@ -50,13 +62,24 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 
 		PackageManager packageManager = getDialog().getContext().getPackageManager();
 
-		// If device has a camera, we can show the opportunity to scan the url via QR code
-		if((savedInstanceState == null || !savedInstanceState.containsKey(WIKI_URL))
-			&& packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+		String wikiUrl = null;
+		boolean autostart = false;
+
+		if(savedInstanceState != null && savedInstanceState.containsKey(WIKI_URL)) {
+			// If a url is given in the savedInstance, use this again
+			wikiUrl = savedInstanceState.getString(WIKI_URL);
+		} else if(getArguments() != null && getArguments().containsKey(WIKI_URL)) {
+			// If a url is given in the arguments use this and directly load wiki
+			wikiUrl = getArguments().getString(WIKI_URL);
+			autostart = true;
+		}
+
+		// If no url was given and a camera is available, show chooser
+		if(packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA)
+				&& wikiUrl == null) {
 			return createChooseView(inflater);
 		} else {
-			String loadWiki = (savedInstanceState == null) ? null : savedInstanceState.getString(WIKI_URL);
-			return createInputView(inflater, loadWiki, false);
+			return createInputView(inflater, wikiUrl, autostart);
 		}
 		
 	}
