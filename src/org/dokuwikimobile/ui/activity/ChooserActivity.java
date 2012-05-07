@@ -1,6 +1,7 @@
 package org.dokuwikimobile.ui.activity;
 
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,7 @@ import org.dokuwikimobile.ui.view.ABSListView;
  * @author Daniel Baelz <daniel.baelz@lysandor.de>
  * @author Tim Roes <mail@timroes.de>
  */
-public class ChooserActivity extends SherlockFragmentActivity 
+public class ChooserActivity extends SherlockFragmentActivity
 		implements AdapterView.OnItemClickListener, AddDokuwikiDialog.AddListener {
 
 	private static final String ADD_DIALOG_TAG = "add_dialog";
@@ -45,6 +46,14 @@ public class ChooserActivity extends SherlockFragmentActivity
 		super.onCreate(icicle);
 
 		adapter = new ChooserAdapter();
+		// Update content view if adapter has changed
+		adapter.registerDataSetObserver(new DataSetObserver() {
+			@Override
+			public void onChanged() {
+				showContent();
+				super.onChanged();
+			}
+		});
 
 		wikiList = new ABSListView(this);
 		wikiList.setOnItemClickListener(this);
@@ -52,7 +61,7 @@ public class ChooserActivity extends SherlockFragmentActivity
 		wikiList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
 		wikiList.setMultiChoiceModeListener(new ChooserMultiChoiceModeListener());
 
-		setContentView(wikiList);
+		showContent();
 
 	}
 
@@ -133,6 +142,17 @@ public class ChooserActivity extends SherlockFragmentActivity
 				((Dokuwiki)adapter.getItem(position)).getMd5hash());
 		startActivity(intent);
 		
+	}
+
+	private void showContent() {
+		if(adapter.getCount() > 0) {
+			setContentView(wikiList);
+		} else {
+			setContentView(R.layout.message_screen_icon);
+			((TextView)findViewById(R.id.message)).setText(R.string.add_wiki_to_start);
+			((ImageView)findViewById(R.id.icon)).setImageResource(R.drawable.ic_msg_new_wiki);
+			((Button)findViewById(R.id.button)).setVisibility(View.GONE);
+		}
 	}
 
 	private void clearChoices() {

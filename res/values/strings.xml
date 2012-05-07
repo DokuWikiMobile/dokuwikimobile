@@ -18,6 +18,8 @@
 		<item quantity="one">%s wiki deleted</item>
 		<item quantity="other">%s wikis deleted</item>
 	</plurals>
+	<string name="add_wiki_to_start">Add a DokuWiki to start.</string>
+	
 	<!-- Add wiki dialog -->
 	<string name="add_wiki_dialog_title">Enter URL of wiki</string>
 	<string name="add_wiki_choose_method_title">Choose a way to add a new wiki</string>
