@@ -194,6 +194,7 @@ public abstract class DokuwikiActivity extends SherlockFragmentActivity
 	 * available to present to the user.
 	 * 
 	 * @param message The message to show.
+	 * @param icon The resource id of a drawable to use as icon.
 	 * @param clickListener A listener to be notified about the button click.
 	 */
 	protected void messageScreen(String message, Drawable icon, View.OnClickListener clickListener) {
