@@ -8,12 +8,15 @@ import android.util.AttributeSet;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import java.util.Stack;
+import org.dokuwikimobile.model.Attachment;
 import org.dokuwikimobile.model.DokuwikiUrl;
 import org.dokuwikimobile.model.Page;
 import org.dokuwikimobile.model.PageOld;
+import org.dokuwikimobile.util.HashUtil;
 
 /**
  *
+ * @author Daniel Baelz <daniel.baelz@lysandor.de>
  * @author Tim Roes
  */
 public class DokuwikiWebView extends WebView {
@@ -43,6 +46,7 @@ public class DokuwikiWebView extends WebView {
 
 	private void build() {
 		setBackgroundColor(0xFFFFFFFF);
+		getSettings().setJavaScriptEnabled(true);
 	}
 
 	@Override
@@ -108,7 +112,6 @@ public class DokuwikiWebView extends WebView {
 
 	@Override
 	protected void onFinishInflate() {
-		getSettings().setJavaScriptEnabled(true);
 		setWebViewClient(new WebViewClient() {
 
 			@Override
@@ -183,7 +186,23 @@ public class DokuwikiWebView extends WebView {
 		}
 
 		this.currentPage = p;
-		loadDataWithBaseURL(null, p.getHtml(), "text/html", "utf-8", null);
+		String pageHtml = scriptTag("file:///android_asset/jquery-1.7.2.min.js")
+				+ scriptTag("file:///android_asset/imgloading.js")
+				+ p.getHtml(); 
+		loadDataWithBaseURL(null, pageHtml, "text/html", "utf-8", null);
+		
+	}
+	
+	private String scriptTag(String src) {
+		return "<script type='text/javascript' src='" + src + "'></script>";
+	}
+	
+	public void updateImage(Attachment attachment) {
+		String js = String.format("javascript:updateImage(%s,%s,%s);",
+				HashUtil.hash(attachment.getId(), HashUtil.MD5),
+				attachment.getBase64Data(),
+				attachment.getType());
+		loadUrl(js);
 	}
 	
 	public void loadPage(Page p) {
