@@ -226,7 +226,7 @@ public class SearchActivity extends DokuwikiActivity implements SearchListener {
 			if(adapter.getCount() == 0) {
 				// If no results have been found, and we have been finished loading
 				// display a big no search result message.
-				messageScreen(R.string.no_search_results, R.string.start_new_search,
+				messageScreen(R.string.no_search_results,
 						new View.OnClickListener() {
 							public void onClick(View v) {
 								onSearchRequested();

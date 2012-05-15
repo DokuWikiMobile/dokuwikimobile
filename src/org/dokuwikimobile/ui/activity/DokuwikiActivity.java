@@ -146,7 +146,7 @@ public abstract class DokuwikiActivity extends SherlockFragmentActivity
 	 * @param message The message to show.
 	 */
 	protected void messageScreen(String message) {
-		messageScreen(message, null, null, null);
+		messageScreen(message, null, null);
 	}
 
 	/**
@@ -159,7 +159,7 @@ public abstract class DokuwikiActivity extends SherlockFragmentActivity
 	 */
 	protected void messageScreen(int message, int icon) {
 		messageScreen(getResources().getString(message), 
-				getResources().getDrawable(icon), null, null);
+				getResources().getDrawable(icon), null);
 	}
 
 	/**
@@ -168,12 +168,10 @@ public abstract class DokuwikiActivity extends SherlockFragmentActivity
 	 * available to present to the user.
 	 * 
 	 * @param message The resource id of the message to show.
-	 * @param buttonLabel The resource id of the button label.
 	 * @param clickListener A listener to be notified about the button click.
 	 */
-	protected void messageScreen(int message, int buttonLabel, View.OnClickListener clickListener) {
-		messageScreen(getResources().getString(message),
-				null, getResources().getString(buttonLabel), clickListener);
+	protected void messageScreen(int message, View.OnClickListener clickListener) {
+		messageScreen(getResources().getString(message), null, clickListener);
 	}
 
 	/**
@@ -183,13 +181,11 @@ public abstract class DokuwikiActivity extends SherlockFragmentActivity
 	 * 
 	 * @param message The resource id of the message to show.
 	 * @param icon The resource id of a drawable to use as icon.
-	 * @param buttonLabel The resource id of the button label.
 	 * @param clickListener A listener to be notified about the button click.
 	 */
-	protected void messageScreen(int message, int icon, int buttonLabel, View.OnClickListener clickListener) {
+	protected void messageScreen(int message, int icon, View.OnClickListener clickListener) {
 		messageScreen(getResources().getString(message), 
-				getResources().getDrawable(icon),
-				getResources().getString(buttonLabel), clickListener);
+				getResources().getDrawable(icon), clickListener);
 	}
 
 	/**
@@ -198,10 +194,9 @@ public abstract class DokuwikiActivity extends SherlockFragmentActivity
 	 * available to present to the user.
 	 * 
 	 * @param message The message to show.
-	 * @param buttonLabel The button label.
 	 * @param clickListener A listener to be notified about the button click.
 	 */
-	protected void messageScreen(String message, Drawable icon, String buttonLabel, View.OnClickListener clickListener) {
+	protected void messageScreen(String message, Drawable icon, View.OnClickListener clickListener) {
 
 		int layoutId = (icon == null) ? R.layout.message_screen : R.layout.message_screen_icon;
 		setContentView(layoutId);
@@ -209,12 +204,8 @@ public abstract class DokuwikiActivity extends SherlockFragmentActivity
 		TextView messageView = (TextView)findViewById(R.id.message);
 		messageView.setText(message);
 
-		Button button = (Button)findViewById(R.id.button);
-		if(buttonLabel == null || clickListener == null) {
-			button.setVisibility(View.GONE);
-		} else {
-			button.setText(buttonLabel);
-			button.setOnClickListener(clickListener);
+		if(clickListener != null) {
+			findViewById(android.R.id.content).setOnClickListener(clickListener);
 		}
 
 		if(icon != null) {

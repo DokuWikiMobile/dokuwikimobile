@@ -151,7 +151,6 @@ public class ChooserActivity extends SherlockFragmentActivity
 			setContentView(R.layout.message_screen_icon);
 			((TextView)findViewById(R.id.message)).setText(R.string.add_wiki_to_start);
 			((ImageView)findViewById(R.id.icon)).setImageResource(R.drawable.ic_msg_new_wiki);
-			((Button)findViewById(R.id.button)).setVisibility(View.GONE);
 			findViewById(android.R.id.content).setOnClickListener(new View.OnClickListener() {
 				public void onClick(View arg0) {
 					addDialog = AddDokuwikiDialog.newInstance(ChooserActivity.this);

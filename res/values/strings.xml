@@ -47,10 +47,9 @@
 	<!-- Search -->
 	<string name="search">Search</string>
 	<string name="new_search">New search</string>
-	<string name="start_new_search">Start new search</string>
 	<string name="search_hint">Search pages</string>
 	<string name="searching">Searching…</string>
-	<string name="no_search_results">No search results.</string>
+	<string name="no_search_results">No search results.\nTab screen to start new search.</string>
 	<plurals name="search_hits">
 		<item quantity="one">%s hit</item>
 		<item quantity="other">%s hits</item>
