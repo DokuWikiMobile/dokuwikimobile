@@ -1,5 +1,6 @@
 package org.dokuwikimobile.ui.dialog;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import com.actionbarsherlock.app.SherlockDialogFragment;
 import com.google.zxing.integration.android.IntentIntegrator;
 import java.net.MalformedURLException;
+import java.net.URL;
 import org.dokuwikimobile.Dokuwiki;
 import org.dokuwikimobile.DokuwikiApplication;
 import org.dokuwikimobile.R;
@@ -175,16 +177,44 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 	private void addDokuwiki(String wikiUrl) {
 
 		try {
-			progressDialog = new ProgressDialog(getDialog().getContext());
-			progressDialog.show();
 
-			Dokuwiki.Creator creator = new Dokuwiki.Creator();
-			creator.create(wikiUrl, this);
+			final URL url = new URL(wikiUrl);
+			
+			if(!"https".equals(url.getProtocol().toLowerCase())) {
+
+				// Warn about unsecure connection
+				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+				builder.setMessage(R.string.unsafe_connection_warning).setPositiveButton(android.R.string.yes,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							queryDokuwikiInformation(url);
+							dialog.dismiss();
+						}
+					}).setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					}).create().show();
+				
+			} else {
+				queryDokuwikiInformation(url);
+			}
+
+
 		} catch (MalformedURLException ex) {
-			progressDialog.dismiss();
 			showError(R.string.invalid_url_title, R.string.invalid_url_msg);
 			Log.e(DokuwikiApplication.LOGGER_NAME, "Cannot add dokuwiki " + wikiUrl + ". This isn't a valid url.");
 		}
+
+	}
+
+	private void queryDokuwikiInformation(URL wikiURL) {
+		
+		progressDialog = new ProgressDialog(getDialog().getContext());
+		progressDialog.show();
+
+		Dokuwiki.Creator creator = new Dokuwiki.Creator();
+		creator.create(wikiURL, this);
 
 	}
 
@@ -240,7 +270,7 @@ public class AddDokuwikiDialog extends SherlockDialogFragment implements Dokuwik
 		showError(title, msg);
 		
 	}
-
+	
 	public static interface AddListener {
 		
 		public void onDokuwikiAdded(Dokuwiki dokuwiki);

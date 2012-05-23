@@ -35,6 +35,8 @@
 	<string name="version_error_msg">The DokuWiki is not up to date. This application requires at 
 	least DokuWiki \"Adora Belle\".</string>
 	<string name="progress_load_version_and_title">Retrieve version and title of DokuWiki…</string>
+	<string name="unsafe_connection_warning">This DokuWiki is using an unsafe connection. If you enter login data
+	it will be send unencrypted over the internet. Add this DokuWiki anyway?</string>
 
 	<!-- Barcode scanner -->
 	<string name="install_barcode_title">Install Barcode Scanner?</string>
