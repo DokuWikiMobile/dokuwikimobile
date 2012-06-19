@@ -26,3 +26,8 @@ under http://www.dokuwiki.org/logo.
 
 jQuery is used under the MIT license. More information on the license of jQuery can be found under
 http://www.jquery.org/license.
+
+======================================================
+
+ZXing (package com.google.zxing.integration.android) is licensed under the Apache License, Version 2.0
+http://www.apache.org/licenses/LICENSE-2.0, more information can be found under http://code.google.com/p/zxing/
